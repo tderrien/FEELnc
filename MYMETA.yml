@@ -1,0 +1,24 @@
+---
+abstract: unknown
+author:
+  - ' Fabrice Legeai ; Audrey David ; Thomas Derrien'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: FEELnc
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Bio::SeqFeature::Generic: 0
+  Bio::Tools::GFF: 0
+  Parallel::ForkManager: 1.06
+version: 0.1
