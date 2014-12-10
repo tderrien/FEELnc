@@ -278,6 +278,6 @@ sub pathProg{
 	}else{
         croak "pathProg: undefined program '$prog'...\n";
 	}
-	return $path[-1].$prog;
+	return $path[-1]."/".$prog;
 }
 1;
