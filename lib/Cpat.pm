@@ -57,6 +57,9 @@ sub runCPAT{
 	my $cmd = "$pathhexamer -c $trainORF -n $trainlnc  > ".$outfile."_hexamer.table  2>/dev/null";
 	print "$cmd\n" if ($verbosity > 10);
 	system($cmd);
+	
+	# test that outfile are created
+	die "Something went wrong with CPAT::$pathhexamer\n Check CPAT installation..."  (! -r $outfile."_hexamer.table");
 
 	# build the logit
 	print "CPAT:: Build Logit model \n" if ($verbosity > 5);
@@ -64,6 +67,9 @@ sub runCPAT{
 	print "$cmd\n" if ($verbosity > 10);
 	system($cmd);
 	
+	# test that outfile are created
+	die "Something went wrong with CPAT::$pathlogit\n Check CPAT installation..."  (! -r $outfile.".logit.RData");
+
 	
 	# use CPAT if testfile if defined
 	# els
