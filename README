@@ -62,6 +62,7 @@ export PATH=$PATH:$FEELNCPATH/scripts/
 cd test/
 perl ../scripts/FEELnc_filter.pl       -i transcript_chr38.gtf 	           -a annotation_chr38.gtf    -b transcript_biotype=protein_coding > candidate_lncRNA.gtf
 # Note that this test is done on only 100 tx (-n 100 option)
+# Note also that this module requires the CPAT tool and therefore the variable PYTONPATH to be defined
 perl ../scripts/FEELnc_codpot.pl       -i candidate_lncRNA.gtf             -a annotation_chr38.gtf    -g genome_chr38.fa -n 100 -v 20
 perl ../scripts/FEELnc_classifier.pl   -i candidate_lncRNA.gtf.lncRNA.gtf  -a annotation_chr38.gtf    >  candidate_lncRNA_classes.txt
 

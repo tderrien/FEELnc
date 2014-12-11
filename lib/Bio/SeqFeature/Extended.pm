@@ -15,7 +15,7 @@ bla bla
 =cut
 
 
-=head add_interaction
+=head2 add_interaction
  Title   : add_interaction
  Usage   : $feature->add_interaction($interaction);
  Function: 
@@ -37,7 +37,7 @@ sub add_interaction {
 }
 
 
-=head get_interactions
+=head2 get_interactions
  Title   : 
  Usage   : 
  Function: 

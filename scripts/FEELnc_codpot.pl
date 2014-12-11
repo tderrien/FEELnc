@@ -87,7 +87,7 @@ my $pathRscript		=   Utils::pathProg("Rscript");
 my $pathlogit		=   Utils::pathProg("cpat.py");
 # test PYTHONPATH from CPAT : http://dldcc-web.brc.bcm.edu/lilab/liguow/CGI/cpat/_build/html/index.html#installation
 die "Error: You should set the PYTHONPATH env. variable to CPAT installation
-export PYTHONPATH=/home/user/CPAT/usr/local/lib/python2.7/site-packages:$PYTHONPATH. #setup PYTHONPATH
+export PYTHONPATH=/home/user/CPAT/usr/local/lib/python2.7/site-packages:\$PYTHONPATH. #setup PYTHONPATH
 (See http://dldcc-web.brc.bcm.edu/lilab/liguow/CGI/cpat/_build/html/index.html#installation)\n" unless (defined $ENV{'PYTHONPATH'});
 
 # Log File

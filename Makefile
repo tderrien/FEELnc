@@ -15,7 +15,7 @@
 #     BUILD_REQUIRES => {  }
 #     CONFIGURE_REQUIRES => {  }
 #     NAME => q[FEELnc]
-#     PREREQ_PM => { Bio::Tools::GFF=>q[0], Parallel::ForkManager=>q[1.06], Bio::SeqFeature::Generic=>q[0] }
+#     PREREQ_PM => { Bio::SeqFeature::Generic=>q[0], Parallel::ForkManager=>q[1.06], Bio::Tools::GFF=>q[0] }
 #     TEST_REQUIRES => {  }
 #     VERSION_FROM => q[lib/FEELnc.pm]
 
@@ -210,44 +210,44 @@ TO_INST_PM = lib/Bio/SeqFeature/Empty.pm \
 	lib/StringUtils.pm \
 	lib/Utils.pm
 
-PM_TO_BLIB = lib/FEELnc.pm \
-	blib/lib/FEELnc.pm \
-	lib/Bio/SeqFeature/InteractionIterator.pm \
-	blib/lib/Bio/SeqFeature/InteractionIterator.pm \
+PM_TO_BLIB = lib/Bio/SeqFeature/Genic.pm \
+	blib/lib/Bio/SeqFeature/Genic.pm \
 	lib/ExtractFromFeature.pm \
 	blib/lib/ExtractFromFeature.pm \
-	lib/Filter.pm \
-	blib/lib/Filter.pm \
-	lib/Bio/SeqFeature/Extended.pm \
-	blib/lib/Bio/SeqFeature/Extended.pm \
-	lib/Bio/SeqFeature/InteractionCollection.pm \
-	blib/lib/Bio/SeqFeature/InteractionCollection.pm \
-	lib/Parser.pm \
-	blib/lib/Parser.pm \
-	lib/Cpat.pm \
-	blib/lib/Cpat.pm \
-	lib/Bio/SeqFeature/Empty.pm \
-	blib/lib/Bio/SeqFeature/Empty.pm \
+	lib/Intersect.pm \
+	blib/lib/Intersect.pm \
 	lib/ExtractFromHash.pm \
 	blib/lib/ExtractFromHash.pm \
 	lib/Bio/SeqFeature/InterGenic.pm \
 	blib/lib/Bio/SeqFeature/InterGenic.pm \
-	lib/Bio/SeqFeature/Genic.pm \
-	blib/lib/Bio/SeqFeature/Genic.pm \
-	lib/StringUtils.pm \
-	blib/lib/StringUtils.pm \
-	lib/Intersect.pm \
-	blib/lib/Intersect.pm \
-	lib/Bio/SeqFeature/database_part.pm \
-	blib/lib/Bio/SeqFeature/database_part.pm \
-	lib/Utils.pm \
-	blib/lib/Utils.pm \
-	lib/Orf.pm \
-	blib/lib/Orf.pm \
+	lib/Parser.pm \
+	blib/lib/Parser.pm \
+	lib/Bio/SeqFeature/Extended.pm \
+	blib/lib/Bio/SeqFeature/Extended.pm \
 	lib/Bio/SeqFeature/LncRNAs_Factory.pm \
 	blib/lib/Bio/SeqFeature/LncRNAs_Factory.pm \
+	lib/StringUtils.pm \
+	blib/lib/StringUtils.pm \
+	lib/Orf.pm \
+	blib/lib/Orf.pm \
+	lib/Bio/SeqFeature/InteractionIterator.pm \
+	blib/lib/Bio/SeqFeature/InteractionIterator.pm \
+	lib/Bio/SeqFeature/Empty.pm \
+	blib/lib/Bio/SeqFeature/Empty.pm \
+	lib/Bio/SeqFeature/InteractionCollection.pm \
+	blib/lib/Bio/SeqFeature/InteractionCollection.pm \
+	lib/Utils.pm \
+	blib/lib/Utils.pm \
+	lib/FEELnc.pm \
+	blib/lib/FEELnc.pm \
+	lib/Bio/SeqFeature/database_part.pm \
+	blib/lib/Bio/SeqFeature/database_part.pm \
 	lib/Bio/SeqFeature/Interaction.pm \
-	blib/lib/Bio/SeqFeature/Interaction.pm
+	blib/lib/Bio/SeqFeature/Interaction.pm \
+	lib/Cpat.pm \
+	blib/lib/Cpat.pm \
+	lib/Filter.pm \
+	blib/lib/Filter.pm
 
 
 # --- MakeMaker platform_constants section:
@@ -469,25 +469,25 @@ POD2MAN = $(POD2MAN_EXE)
 
 
 manifypods : pure_all  \
-	lib/Bio/SeqFeature/Genic.pm \
+	lib/Bio/SeqFeature/database_part.pm \
 	lib/Bio/SeqFeature/InterGenic.pm \
-	lib/Bio/SeqFeature/Interaction.pm \
-	lib/Bio/SeqFeature/LncRNAs_Factory.pm \
-	lib/Bio/SeqFeature/InteractionCollection.pm \
 	lib/Parser.pm \
 	lib/Bio/SeqFeature/Extended.pm \
+	lib/Bio/SeqFeature/LncRNAs_Factory.pm \
+	lib/Bio/SeqFeature/Interaction.pm \
 	lib/Bio/SeqFeature/InteractionIterator.pm \
-	lib/Bio/SeqFeature/database_part.pm
+	lib/Bio/SeqFeature/Genic.pm \
+	lib/Bio/SeqFeature/InteractionCollection.pm
 	$(NOECHO) $(POD2MAN) --section=3 --perm_rw=$(PERM_RW) \
-	  lib/Bio/SeqFeature/Genic.pm $(INST_MAN3DIR)/Bio::SeqFeature::Genic.$(MAN3EXT) \
+	  lib/Bio/SeqFeature/database_part.pm $(INST_MAN3DIR)/Bio::SeqFeature::database_part.$(MAN3EXT) \
 	  lib/Bio/SeqFeature/InterGenic.pm $(INST_MAN3DIR)/Bio::SeqFeature::InterGenic.$(MAN3EXT) \
-	  lib/Bio/SeqFeature/Interaction.pm $(INST_MAN3DIR)/Bio::SeqFeature::Interaction.$(MAN3EXT) \
-	  lib/Bio/SeqFeature/LncRNAs_Factory.pm $(INST_MAN3DIR)/Bio::SeqFeature::LncRNAs_Factory.$(MAN3EXT) \
-	  lib/Bio/SeqFeature/InteractionCollection.pm $(INST_MAN3DIR)/Bio::SeqFeature::InteractionCollection.$(MAN3EXT) \
 	  lib/Parser.pm $(INST_MAN3DIR)/Parser.$(MAN3EXT) \
 	  lib/Bio/SeqFeature/Extended.pm $(INST_MAN3DIR)/Bio::SeqFeature::Extended.$(MAN3EXT) \
+	  lib/Bio/SeqFeature/LncRNAs_Factory.pm $(INST_MAN3DIR)/Bio::SeqFeature::LncRNAs_Factory.$(MAN3EXT) \
+	  lib/Bio/SeqFeature/Interaction.pm $(INST_MAN3DIR)/Bio::SeqFeature::Interaction.$(MAN3EXT) \
 	  lib/Bio/SeqFeature/InteractionIterator.pm $(INST_MAN3DIR)/Bio::SeqFeature::InteractionIterator.$(MAN3EXT) \
-	  lib/Bio/SeqFeature/database_part.pm $(INST_MAN3DIR)/Bio::SeqFeature::database_part.$(MAN3EXT) 
+	  lib/Bio/SeqFeature/Genic.pm $(INST_MAN3DIR)/Bio::SeqFeature::Genic.$(MAN3EXT) \
+	  lib/Bio/SeqFeature/InteractionCollection.pm $(INST_MAN3DIR)/Bio::SeqFeature::InteractionCollection.$(MAN3EXT) 
 
 
 
@@ -514,22 +514,22 @@ clean_subdirs :
 
 clean :: clean_subdirs
 	- $(RM_F) \
-	  perlmain.c perl$(EXE_EXT) \
-	  $(MAKE_APERL_FILE) *$(LIB_EXT) \
-	  perl.exe tmon.out \
-	  $(INST_ARCHAUTODIR)/extralibs.all core.[0-9][0-9][0-9] \
-	  core.[0-9][0-9][0-9][0-9][0-9] core.*perl.*.? \
-	  $(BOOTSTRAP) blibdirs.ts \
-	  MYMETA.json $(BASEEXT).def \
-	  *perl.core $(INST_ARCHAUTODIR)/extralibs.ld \
-	  core.[0-9][0-9] pm_to_blib \
-	  core $(BASEEXT).x \
-	  pm_to_blib.ts MYMETA.yml \
-	  perl mon.out \
-	  lib$(BASEEXT).def $(BASEEXT).bso \
-	  core.[0-9] $(BASEEXT).exp \
-	  core.[0-9][0-9][0-9][0-9] so_locations \
-	  *$(OBJ_EXT) 
+	  perl core \
+	  mon.out $(BASEEXT).x \
+	  tmon.out core.*perl.*.? \
+	  $(INST_ARCHAUTODIR)/extralibs.all perl.exe \
+	  $(BOOTSTRAP) pm_to_blib.ts \
+	  MYMETA.yml $(BASEEXT).def \
+	  $(INST_ARCHAUTODIR)/extralibs.ld lib$(BASEEXT).def \
+	  *$(LIB_EXT) core.[0-9][0-9][0-9] \
+	  *perl.core $(MAKE_APERL_FILE) \
+	  MYMETA.json core.[0-9][0-9][0-9][0-9] \
+	  so_locations core.[0-9][0-9][0-9][0-9][0-9] \
+	  perlmain.c core.[0-9] \
+	  $(BASEEXT).exp $(BASEEXT).bso \
+	  pm_to_blib blibdirs.ts \
+	  *$(OBJ_EXT) core.[0-9][0-9] \
+	  perl$(EXE_EXT) 
 	- $(RM_RF) \
 	  blib 
 	- $(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD) $(DEV_NULL)
@@ -921,7 +921,7 @@ ppd :
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Bio::SeqFeature::Generic" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Bio::Tools::GFF" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Parallel::ForkManager" VERSION="1.06" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE VERSION="1.06" NAME="Parallel::ForkManager" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-5.18" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> $(DISTNAME).ppd
@@ -932,25 +932,25 @@ ppd :
 
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
-	  lib/FEELnc.pm blib/lib/FEELnc.pm \
-	  lib/Bio/SeqFeature/InteractionIterator.pm blib/lib/Bio/SeqFeature/InteractionIterator.pm \
+	  lib/Bio/SeqFeature/Genic.pm blib/lib/Bio/SeqFeature/Genic.pm \
 	  lib/ExtractFromFeature.pm blib/lib/ExtractFromFeature.pm \
-	  lib/Filter.pm blib/lib/Filter.pm \
-	  lib/Bio/SeqFeature/Extended.pm blib/lib/Bio/SeqFeature/Extended.pm \
-	  lib/Bio/SeqFeature/InteractionCollection.pm blib/lib/Bio/SeqFeature/InteractionCollection.pm \
-	  lib/Parser.pm blib/lib/Parser.pm \
-	  lib/Cpat.pm blib/lib/Cpat.pm \
-	  lib/Bio/SeqFeature/Empty.pm blib/lib/Bio/SeqFeature/Empty.pm \
+	  lib/Intersect.pm blib/lib/Intersect.pm \
 	  lib/ExtractFromHash.pm blib/lib/ExtractFromHash.pm \
 	  lib/Bio/SeqFeature/InterGenic.pm blib/lib/Bio/SeqFeature/InterGenic.pm \
-	  lib/Bio/SeqFeature/Genic.pm blib/lib/Bio/SeqFeature/Genic.pm \
-	  lib/StringUtils.pm blib/lib/StringUtils.pm \
-	  lib/Intersect.pm blib/lib/Intersect.pm \
-	  lib/Bio/SeqFeature/database_part.pm blib/lib/Bio/SeqFeature/database_part.pm \
-	  lib/Utils.pm blib/lib/Utils.pm \
-	  lib/Orf.pm blib/lib/Orf.pm \
+	  lib/Parser.pm blib/lib/Parser.pm \
+	  lib/Bio/SeqFeature/Extended.pm blib/lib/Bio/SeqFeature/Extended.pm \
 	  lib/Bio/SeqFeature/LncRNAs_Factory.pm blib/lib/Bio/SeqFeature/LncRNAs_Factory.pm \
-	  lib/Bio/SeqFeature/Interaction.pm blib/lib/Bio/SeqFeature/Interaction.pm 
+	  lib/StringUtils.pm blib/lib/StringUtils.pm \
+	  lib/Orf.pm blib/lib/Orf.pm \
+	  lib/Bio/SeqFeature/InteractionIterator.pm blib/lib/Bio/SeqFeature/InteractionIterator.pm \
+	  lib/Bio/SeqFeature/Empty.pm blib/lib/Bio/SeqFeature/Empty.pm \
+	  lib/Bio/SeqFeature/InteractionCollection.pm blib/lib/Bio/SeqFeature/InteractionCollection.pm \
+	  lib/Utils.pm blib/lib/Utils.pm \
+	  lib/FEELnc.pm blib/lib/FEELnc.pm \
+	  lib/Bio/SeqFeature/database_part.pm blib/lib/Bio/SeqFeature/database_part.pm \
+	  lib/Bio/SeqFeature/Interaction.pm blib/lib/Bio/SeqFeature/Interaction.pm \
+	  lib/Cpat.pm blib/lib/Cpat.pm \
+	  lib/Filter.pm blib/lib/Filter.pm 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 

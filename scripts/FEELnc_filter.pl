@@ -172,16 +172,15 @@ foreach my $chrlnc (keys %{$reflncchr} ) {
 	my %lnctorm; # hash storing tx IDs to remove
 	
 	# 2n chromosome
-	foreach my $chrmRNA (keys %{$refmRNAchr} ) {
+	if (exists $refmRNAchr->{$chrlnc}) {
 		
-		next if ($chrlnc ne $chrmRNA);
-				
+		print STDERR "$chrlnc\n";
 		# start fork
-	    my $pid = $pm->start($chrmRNA) and next;
+	    my $pid = $pm->start($chrlnc) and next;
      	
      	# get ref on hash per chromosome
      	my $refh1 = $reflncchr->{$chrlnc};
-        my $refh2 = $refmRNAchr->{$chrmRNA};  
+        my $refh2 = $refmRNAchr->{$chrlnc};  
 
         %lnctorm = Intersect::getOverlapping($refh1, $refh2, $strandedmode, $minfrac_over, $monoexonic, $linconly, $verbosity);
     }
