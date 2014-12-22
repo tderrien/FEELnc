@@ -20,5 +20,5 @@ no_index:
 requires:
   Bio::SeqFeature::Generic: 0
   Bio::Tools::GFF: 0
-  Parallel::ForkManager: 1.06
+  Parallel::ForkManager: 1.07
 version: 0.1

@@ -1,0 +1,22 @@
+=head2 Mon Dec 15 12:24:40 2014: C<Module> L<FEELnc|FEELnc>
+
+=over 4
+
+=item *
+
+C<installed into: /home/genouest/umr6061/recomgen/tderrien/bin/perl/FEELnc_v0.1/lib/site_perl/5.18.2>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.1>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+

@@ -381,7 +381,7 @@ sub printer {
 			_lncRNA_informations($self->{'_subject'});
 		}
 		
-	if ($self->{'_subject'}->seq_id() != -555) {
+	if ($self->{'_subject'}->seq_id() eq "-555") {
 			
 		print "\t Interaction information \n";
 		_ligne_carre();
@@ -428,7 +428,7 @@ sub _print_finfo{
 #	_ligne_carre();
 	print	"\t | Primary tag : ",
     		$f->primary_tag(),"\n \t | source tag : ",
-    		$f->source_tag,"\n \t | seq id : ",
+#     		$f->source_tag,"\n \t | seq id : ",
     		$f->seq_id() , "\n \t | start : ",
     		$f->start, "\n \t |  end : ",
     		$f->end, "\n \t | strand : ",

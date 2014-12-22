@@ -327,13 +327,13 @@ sub computeOptCutoff {
 	print STDERR "> Compute optimal coding potential cutoff:\n";
 	my $h 	= Parser::parseCPAT($featurefile, $verbosity);
 	Cpat::WriteRdmCPATFile($h, $outfile, $verbosity);
-
+	print STDERR "Cpat::WriteRdmCPATFile($h, $outfile, $verbosity);\n";
 
 	# Launch 10 fold cross validation R script
 	#################
 	print "> 10 fold crossValidation of CPAT cutoff :\n";
 
-# 	print STDERR "Rscript $scriptR $outfile 2>/dev/null\n";
+#  	print STDERR "Rscript $scriptR $outfile \n";
 	
 	open my $command_out, "-|", "Rscript $scriptR $outfile 2>/dev/null"  or die "$0: could not start R program:  $scriptR";
 

@@ -34,7 +34,7 @@
          "requires" : {
             "Bio::SeqFeature::Generic" : "0",
             "Bio::Tools::GFF" : "0",
-            "Parallel::ForkManager" : "1.06"
+            "Parallel::ForkManager" : "1.07"
          }
       }
    },

@@ -6,7 +6,7 @@
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
 #
-#   MakeMaker ARGV: ()
+#   MakeMaker ARGV: (q[PREFIX=/home/genouest/umr6061/recomgen/tderrien/bin/perl/FEELnc_v0.1])
 #
 
 #   MakeMaker Parameters:
@@ -15,7 +15,7 @@
 #     BUILD_REQUIRES => {  }
 #     CONFIGURE_REQUIRES => {  }
 #     NAME => q[FEELnc]
-#     PREREQ_PM => { Bio::SeqFeature::Generic=>q[0], Parallel::ForkManager=>q[1.06], Bio::Tools::GFF=>q[0] }
+#     PREREQ_PM => { Bio::SeqFeature::Generic=>q[0], Bio::Tools::GFF=>q[0], Parallel::ForkManager=>q[1.07] }
 #     TEST_REQUIRES => {  }
 #     VERSION_FROM => q[lib/FEELnc.pm]
 
@@ -46,8 +46,8 @@ RANLIB = :
 SITELIBEXP = /local/perl/5.18.2/lib/site_perl/5.18.2
 SITEARCHEXP = /local/perl/5.18.2/lib/site_perl/5.18.2/x86_64-linux
 SO = so
-VENDORARCHEXP = 
-VENDORLIBEXP = 
+VENDORARCHEXP = $(VENDORPREFIX)/lib/5.18.2/x86_64-linux
+VENDORLIBEXP = $(VENDORPREFIX)/lib
 
 
 # --- MakeMaker constants section:
@@ -73,45 +73,45 @@ MAN1EXT = 1
 MAN3EXT = 3
 INSTALLDIRS = site
 DESTDIR = 
-PREFIX = $(SITEPREFIX)
-PERLPREFIX = /local/perl/5.18.2
-SITEPREFIX = /local/perl/5.18.2
-VENDORPREFIX = 
-INSTALLPRIVLIB = /local/perl/5.18.2/lib/5.18.2
+PREFIX = /home/genouest/umr6061/recomgen/tderrien/bin/perl/FEELnc_v0.1
+PERLPREFIX = $(PREFIX)
+SITEPREFIX = $(PREFIX)
+VENDORPREFIX = $(PREFIX)
+INSTALLPRIVLIB = $(PERLPREFIX)/lib/5.18.2
 DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)
-INSTALLSITELIB = /local/perl/5.18.2/lib/site_perl/5.18.2
+INSTALLSITELIB = $(SITEPREFIX)/lib/site_perl/5.18.2
 DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)
-INSTALLVENDORLIB = 
+INSTALLVENDORLIB = $(VENDORPREFIX)/lib
 DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)
-INSTALLARCHLIB = /local/perl/5.18.2/lib/5.18.2/x86_64-linux
+INSTALLARCHLIB = $(PERLPREFIX)/lib/5.18.2/x86_64-linux
 DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)
-INSTALLSITEARCH = /local/perl/5.18.2/lib/site_perl/5.18.2/x86_64-linux
+INSTALLSITEARCH = $(SITEPREFIX)/lib/site_perl/5.18.2/x86_64-linux
 DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)
-INSTALLVENDORARCH = 
+INSTALLVENDORARCH = $(VENDORPREFIX)/lib/5.18.2/x86_64-linux
 DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)
-INSTALLBIN = /local/perl/5.18.2/bin
+INSTALLBIN = $(PERLPREFIX)/bin
 DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)
-INSTALLSITEBIN = /local/perl/5.18.2/bin
+INSTALLSITEBIN = $(SITEPREFIX)/bin
 DESTINSTALLSITEBIN = $(DESTDIR)$(INSTALLSITEBIN)
-INSTALLVENDORBIN = 
+INSTALLVENDORBIN = $(VENDORPREFIX)/bin
 DESTINSTALLVENDORBIN = $(DESTDIR)$(INSTALLVENDORBIN)
-INSTALLSCRIPT = /local/perl/5.18.2/bin
+INSTALLSCRIPT = $(PERLPREFIX)/bin
 DESTINSTALLSCRIPT = $(DESTDIR)$(INSTALLSCRIPT)
-INSTALLSITESCRIPT = /local/perl/5.18.2/bin
+INSTALLSITESCRIPT = $(SITEPREFIX)/bin
 DESTINSTALLSITESCRIPT = $(DESTDIR)$(INSTALLSITESCRIPT)
-INSTALLVENDORSCRIPT = 
+INSTALLVENDORSCRIPT = $(VENDORPREFIX)/bin
 DESTINSTALLVENDORSCRIPT = $(DESTDIR)$(INSTALLVENDORSCRIPT)
-INSTALLMAN1DIR = /local/perl/5.18.2/man/man1
+INSTALLMAN1DIR = $(PERLPREFIX)/man/man1
 DESTINSTALLMAN1DIR = $(DESTDIR)$(INSTALLMAN1DIR)
-INSTALLSITEMAN1DIR = /local/perl/5.18.2/man/man1
+INSTALLSITEMAN1DIR = $(SITEPREFIX)/man/man1
 DESTINSTALLSITEMAN1DIR = $(DESTDIR)$(INSTALLSITEMAN1DIR)
-INSTALLVENDORMAN1DIR = 
+INSTALLVENDORMAN1DIR = $(VENDORPREFIX)/man/man1
 DESTINSTALLVENDORMAN1DIR = $(DESTDIR)$(INSTALLVENDORMAN1DIR)
-INSTALLMAN3DIR = /local/perl/5.18.2/man/man3
+INSTALLMAN3DIR = $(PERLPREFIX)/man/man3
 DESTINSTALLMAN3DIR = $(DESTDIR)$(INSTALLMAN3DIR)
-INSTALLSITEMAN3DIR = /local/perl/5.18.2/man/man3
+INSTALLSITEMAN3DIR = $(SITEPREFIX)/man/man3
 DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)
-INSTALLVENDORMAN3DIR = 
+INSTALLVENDORMAN3DIR = $(VENDORPREFIX)/man/man3
 DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)
 PERL_LIB = /local/perl/5.18.2/lib/5.18.2
 PERL_ARCHLIB = /local/perl/5.18.2/lib/5.18.2/x86_64-linux
@@ -160,7 +160,8 @@ C_FILES  =
 O_FILES  = 
 H_FILES  = 
 MAN1PODS = 
-MAN3PODS = lib/Bio/SeqFeature/Extended.pm \
+MAN3PODS = lib/5.8.8/x86_64-linux/perllocal.pod \
+	lib/Bio/SeqFeature/Extended.pm \
 	lib/Bio/SeqFeature/Genic.pm \
 	lib/Bio/SeqFeature/InterGenic.pm \
 	lib/Bio/SeqFeature/Interaction.pm \
@@ -168,7 +169,16 @@ MAN3PODS = lib/Bio/SeqFeature/Extended.pm \
 	lib/Bio/SeqFeature/InteractionIterator.pm \
 	lib/Bio/SeqFeature/LncRNAs_Factory.pm \
 	lib/Bio/SeqFeature/database_part.pm \
-	lib/Parser.pm
+	lib/Parser.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/Extended.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/Genic.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/InterGenic.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/Interaction.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/InteractionCollection.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/InteractionIterator.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/LncRNAs_Factory.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/database_part.pm \
+	lib/site_perl/5.8.8/Parser.pm
 
 # Where is the Config information that we are using/depend on
 CONFIGDEP = $(PERL_ARCHLIB)$(DFSEP)Config.pm $(PERL_INC)$(DFSEP)config.h
@@ -190,7 +200,8 @@ PERL_ARCHIVE       =
 PERL_ARCHIVE_AFTER = 
 
 
-TO_INST_PM = lib/Bio/SeqFeature/Empty.pm \
+TO_INST_PM = lib/5.8.8/x86_64-linux/perllocal.pod \
+	lib/Bio/SeqFeature/Empty.pm \
 	lib/Bio/SeqFeature/Extended.pm \
 	lib/Bio/SeqFeature/Genic.pm \
 	lib/Bio/SeqFeature/InterGenic.pm \
@@ -208,46 +219,108 @@ TO_INST_PM = lib/Bio/SeqFeature/Empty.pm \
 	lib/Orf.pm \
 	lib/Parser.pm \
 	lib/StringUtils.pm \
-	lib/Utils.pm
+	lib/Utils.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/Empty.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/Extended.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/Genic.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/InterGenic.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/Interaction.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/InteractionCollection.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/InteractionIterator.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/LncRNAs_Factory.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/database_part.pm \
+	lib/site_perl/5.8.8/Cpat.pm \
+	lib/site_perl/5.8.8/ExtractFromFeature.pm \
+	lib/site_perl/5.8.8/ExtractFromHash.pm \
+	lib/site_perl/5.8.8/FEELnc.pm \
+	lib/site_perl/5.8.8/Filter.pm \
+	lib/site_perl/5.8.8/Intersect.pm \
+	lib/site_perl/5.8.8/Orf.pm \
+	lib/site_perl/5.8.8/Parser.pm \
+	lib/site_perl/5.8.8/StringUtils.pm \
+	lib/site_perl/5.8.8/Utils.pm \
+	lib/site_perl/5.8.8/x86_64-linux/auto/FEELnc/.packlist
 
-PM_TO_BLIB = lib/Bio/SeqFeature/Genic.pm \
-	blib/lib/Bio/SeqFeature/Genic.pm \
-	lib/ExtractFromFeature.pm \
-	blib/lib/ExtractFromFeature.pm \
-	lib/Intersect.pm \
-	blib/lib/Intersect.pm \
-	lib/ExtractFromHash.pm \
-	blib/lib/ExtractFromHash.pm \
-	lib/Bio/SeqFeature/InterGenic.pm \
-	blib/lib/Bio/SeqFeature/InterGenic.pm \
-	lib/Parser.pm \
-	blib/lib/Parser.pm \
-	lib/Bio/SeqFeature/Extended.pm \
-	blib/lib/Bio/SeqFeature/Extended.pm \
-	lib/Bio/SeqFeature/LncRNAs_Factory.pm \
-	blib/lib/Bio/SeqFeature/LncRNAs_Factory.pm \
-	lib/StringUtils.pm \
-	blib/lib/StringUtils.pm \
-	lib/Orf.pm \
-	blib/lib/Orf.pm \
-	lib/Bio/SeqFeature/InteractionIterator.pm \
-	blib/lib/Bio/SeqFeature/InteractionIterator.pm \
+PM_TO_BLIB = lib/5.8.8/x86_64-linux/perllocal.pod \
+	blib/lib/5.8.8/x86_64-linux/perllocal.pod \
+	lib/site_perl/5.8.8/x86_64-linux/auto/FEELnc/.packlist \
+	blib/lib/site_perl/5.8.8/x86_64-linux/auto/FEELnc/.packlist \
 	lib/Bio/SeqFeature/Empty.pm \
 	blib/lib/Bio/SeqFeature/Empty.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/InteractionCollection.pm \
+	blib/lib/site_perl/5.8.8/Bio/SeqFeature/InteractionCollection.pm \
+	lib/Intersect.pm \
+	blib/lib/Intersect.pm \
 	lib/Bio/SeqFeature/InteractionCollection.pm \
 	blib/lib/Bio/SeqFeature/InteractionCollection.pm \
-	lib/Utils.pm \
-	blib/lib/Utils.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/Interaction.pm \
+	blib/lib/site_perl/5.8.8/Bio/SeqFeature/Interaction.pm \
+	lib/ExtractFromFeature.pm \
+	blib/lib/ExtractFromFeature.pm \
+	lib/Bio/SeqFeature/Extended.pm \
+	blib/lib/Bio/SeqFeature/Extended.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/Extended.pm \
+	blib/lib/site_perl/5.8.8/Bio/SeqFeature/Extended.pm \
+	lib/Bio/SeqFeature/Genic.pm \
+	blib/lib/Bio/SeqFeature/Genic.pm \
+	lib/site_perl/5.8.8/Filter.pm \
+	blib/lib/site_perl/5.8.8/Filter.pm \
+	lib/site_perl/5.8.8/Utils.pm \
+	blib/lib/site_perl/5.8.8/Utils.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/InterGenic.pm \
+	blib/lib/site_perl/5.8.8/Bio/SeqFeature/InterGenic.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/Genic.pm \
+	blib/lib/site_perl/5.8.8/Bio/SeqFeature/Genic.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/InteractionIterator.pm \
+	blib/lib/site_perl/5.8.8/Bio/SeqFeature/InteractionIterator.pm \
 	lib/FEELnc.pm \
 	blib/lib/FEELnc.pm \
-	lib/Bio/SeqFeature/database_part.pm \
-	blib/lib/Bio/SeqFeature/database_part.pm \
-	lib/Bio/SeqFeature/Interaction.pm \
-	blib/lib/Bio/SeqFeature/Interaction.pm \
+	lib/site_perl/5.8.8/ExtractFromHash.pm \
+	blib/lib/site_perl/5.8.8/ExtractFromHash.pm \
+	lib/Parser.pm \
+	blib/lib/Parser.pm \
+	lib/site_perl/5.8.8/FEELnc.pm \
+	blib/lib/site_perl/5.8.8/FEELnc.pm \
+	lib/site_perl/5.8.8/ExtractFromFeature.pm \
+	blib/lib/site_perl/5.8.8/ExtractFromFeature.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/Empty.pm \
+	blib/lib/site_perl/5.8.8/Bio/SeqFeature/Empty.pm \
+	lib/site_perl/5.8.8/Orf.pm \
+	blib/lib/site_perl/5.8.8/Orf.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/database_part.pm \
+	blib/lib/site_perl/5.8.8/Bio/SeqFeature/database_part.pm \
+	lib/Orf.pm \
+	blib/lib/Orf.pm \
+	lib/StringUtils.pm \
+	blib/lib/StringUtils.pm \
 	lib/Cpat.pm \
 	blib/lib/Cpat.pm \
+	lib/Bio/SeqFeature/LncRNAs_Factory.pm \
+	blib/lib/Bio/SeqFeature/LncRNAs_Factory.pm \
+	lib/Bio/SeqFeature/InteractionIterator.pm \
+	blib/lib/Bio/SeqFeature/InteractionIterator.pm \
+	lib/site_perl/5.8.8/Cpat.pm \
+	blib/lib/site_perl/5.8.8/Cpat.pm \
+	lib/site_perl/5.8.8/Parser.pm \
+	blib/lib/site_perl/5.8.8/Parser.pm \
+	lib/Bio/SeqFeature/database_part.pm \
+	blib/lib/Bio/SeqFeature/database_part.pm \
+	lib/ExtractFromHash.pm \
+	blib/lib/ExtractFromHash.pm \
+	lib/Utils.pm \
+	blib/lib/Utils.pm \
+	lib/site_perl/5.8.8/StringUtils.pm \
+	blib/lib/site_perl/5.8.8/StringUtils.pm \
 	lib/Filter.pm \
-	blib/lib/Filter.pm
+	blib/lib/Filter.pm \
+	lib/site_perl/5.8.8/Intersect.pm \
+	blib/lib/site_perl/5.8.8/Intersect.pm \
+	lib/Bio/SeqFeature/Interaction.pm \
+	blib/lib/Bio/SeqFeature/Interaction.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/LncRNAs_Factory.pm \
+	blib/lib/site_perl/5.8.8/Bio/SeqFeature/LncRNAs_Factory.pm \
+	lib/Bio/SeqFeature/InterGenic.pm \
+	blib/lib/Bio/SeqFeature/InterGenic.pm
 
 
 # --- MakeMaker platform_constants section:
@@ -469,25 +542,45 @@ POD2MAN = $(POD2MAN_EXE)
 
 
 manifypods : pure_all  \
-	lib/Bio/SeqFeature/database_part.pm \
-	lib/Bio/SeqFeature/InterGenic.pm \
-	lib/Parser.pm \
-	lib/Bio/SeqFeature/Extended.pm \
-	lib/Bio/SeqFeature/LncRNAs_Factory.pm \
-	lib/Bio/SeqFeature/Interaction.pm \
-	lib/Bio/SeqFeature/InteractionIterator.pm \
 	lib/Bio/SeqFeature/Genic.pm \
-	lib/Bio/SeqFeature/InteractionCollection.pm
+	lib/site_perl/5.8.8/Parser.pm \
+	lib/Bio/SeqFeature/database_part.pm \
+	lib/Bio/SeqFeature/Interaction.pm \
+	lib/Bio/SeqFeature/InterGenic.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/LncRNAs_Factory.pm \
+	lib/Bio/SeqFeature/LncRNAs_Factory.pm \
+	lib/Bio/SeqFeature/Extended.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/Extended.pm \
+	lib/Bio/SeqFeature/InteractionIterator.pm \
+	lib/Parser.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/database_part.pm \
+	lib/Bio/SeqFeature/InteractionCollection.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/InteractionCollection.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/Interaction.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/InterGenic.pm \
+	lib/5.8.8/x86_64-linux/perllocal.pod \
+	lib/site_perl/5.8.8/Bio/SeqFeature/Genic.pm \
+	lib/site_perl/5.8.8/Bio/SeqFeature/InteractionIterator.pm
 	$(NOECHO) $(POD2MAN) --section=3 --perm_rw=$(PERM_RW) \
-	  lib/Bio/SeqFeature/database_part.pm $(INST_MAN3DIR)/Bio::SeqFeature::database_part.$(MAN3EXT) \
-	  lib/Bio/SeqFeature/InterGenic.pm $(INST_MAN3DIR)/Bio::SeqFeature::InterGenic.$(MAN3EXT) \
-	  lib/Parser.pm $(INST_MAN3DIR)/Parser.$(MAN3EXT) \
-	  lib/Bio/SeqFeature/Extended.pm $(INST_MAN3DIR)/Bio::SeqFeature::Extended.$(MAN3EXT) \
-	  lib/Bio/SeqFeature/LncRNAs_Factory.pm $(INST_MAN3DIR)/Bio::SeqFeature::LncRNAs_Factory.$(MAN3EXT) \
-	  lib/Bio/SeqFeature/Interaction.pm $(INST_MAN3DIR)/Bio::SeqFeature::Interaction.$(MAN3EXT) \
-	  lib/Bio/SeqFeature/InteractionIterator.pm $(INST_MAN3DIR)/Bio::SeqFeature::InteractionIterator.$(MAN3EXT) \
 	  lib/Bio/SeqFeature/Genic.pm $(INST_MAN3DIR)/Bio::SeqFeature::Genic.$(MAN3EXT) \
-	  lib/Bio/SeqFeature/InteractionCollection.pm $(INST_MAN3DIR)/Bio::SeqFeature::InteractionCollection.$(MAN3EXT) 
+	  lib/site_perl/5.8.8/Parser.pm $(INST_MAN3DIR)/site_perl::5.8.8::Parser.$(MAN3EXT) \
+	  lib/Bio/SeqFeature/database_part.pm $(INST_MAN3DIR)/Bio::SeqFeature::database_part.$(MAN3EXT) \
+	  lib/Bio/SeqFeature/Interaction.pm $(INST_MAN3DIR)/Bio::SeqFeature::Interaction.$(MAN3EXT) \
+	  lib/Bio/SeqFeature/InterGenic.pm $(INST_MAN3DIR)/Bio::SeqFeature::InterGenic.$(MAN3EXT) \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/LncRNAs_Factory.pm $(INST_MAN3DIR)/site_perl::5.8.8::Bio::SeqFeature::LncRNAs_Factory.$(MAN3EXT) \
+	  lib/Bio/SeqFeature/LncRNAs_Factory.pm $(INST_MAN3DIR)/Bio::SeqFeature::LncRNAs_Factory.$(MAN3EXT) \
+	  lib/Bio/SeqFeature/Extended.pm $(INST_MAN3DIR)/Bio::SeqFeature::Extended.$(MAN3EXT) \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/Extended.pm $(INST_MAN3DIR)/site_perl::5.8.8::Bio::SeqFeature::Extended.$(MAN3EXT) \
+	  lib/Bio/SeqFeature/InteractionIterator.pm $(INST_MAN3DIR)/Bio::SeqFeature::InteractionIterator.$(MAN3EXT) \
+	  lib/Parser.pm $(INST_MAN3DIR)/Parser.$(MAN3EXT) \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/database_part.pm $(INST_MAN3DIR)/site_perl::5.8.8::Bio::SeqFeature::database_part.$(MAN3EXT) \
+	  lib/Bio/SeqFeature/InteractionCollection.pm $(INST_MAN3DIR)/Bio::SeqFeature::InteractionCollection.$(MAN3EXT) \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/InteractionCollection.pm $(INST_MAN3DIR)/site_perl::5.8.8::Bio::SeqFeature::InteractionCollection.$(MAN3EXT) \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/Interaction.pm $(INST_MAN3DIR)/site_perl::5.8.8::Bio::SeqFeature::Interaction.$(MAN3EXT) \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/InterGenic.pm $(INST_MAN3DIR)/site_perl::5.8.8::Bio::SeqFeature::InterGenic.$(MAN3EXT) \
+	  lib/5.8.8/x86_64-linux/perllocal.pod $(INST_MAN3DIR)/5.8.8::x86_64-linux::perllocal.$(MAN3EXT) \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/Genic.pm $(INST_MAN3DIR)/site_perl::5.8.8::Bio::SeqFeature::Genic.$(MAN3EXT) \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/InteractionIterator.pm $(INST_MAN3DIR)/site_perl::5.8.8::Bio::SeqFeature::InteractionIterator.$(MAN3EXT) 
 
 
 
@@ -514,22 +607,22 @@ clean_subdirs :
 
 clean :: clean_subdirs
 	- $(RM_F) \
-	  perl core \
-	  mon.out $(BASEEXT).x \
-	  tmon.out core.*perl.*.? \
-	  $(INST_ARCHAUTODIR)/extralibs.all perl.exe \
-	  $(BOOTSTRAP) pm_to_blib.ts \
-	  MYMETA.yml $(BASEEXT).def \
-	  $(INST_ARCHAUTODIR)/extralibs.ld lib$(BASEEXT).def \
-	  *$(LIB_EXT) core.[0-9][0-9][0-9] \
-	  *perl.core $(MAKE_APERL_FILE) \
-	  MYMETA.json core.[0-9][0-9][0-9][0-9] \
-	  so_locations core.[0-9][0-9][0-9][0-9][0-9] \
-	  perlmain.c core.[0-9] \
-	  $(BASEEXT).exp $(BASEEXT).bso \
-	  pm_to_blib blibdirs.ts \
-	  *$(OBJ_EXT) core.[0-9][0-9] \
-	  perl$(EXE_EXT) 
+	  lib$(BASEEXT).def $(INST_ARCHAUTODIR)/extralibs.ld \
+	  pm_to_blib.ts mon.out \
+	  $(BASEEXT).exp core.[0-9][0-9][0-9][0-9] \
+	  *perl.core $(INST_ARCHAUTODIR)/extralibs.all \
+	  *$(LIB_EXT) core.[0-9] \
+	  $(MAKE_APERL_FILE) core.*perl.*.? \
+	  blibdirs.ts core.[0-9][0-9] \
+	  pm_to_blib MYMETA.yml \
+	  $(BASEEXT).def perl$(EXE_EXT) \
+	  tmon.out $(BOOTSTRAP) \
+	  core.[0-9][0-9][0-9] core.[0-9][0-9][0-9][0-9][0-9] \
+	  MYMETA.json perlmain.c \
+	  *$(OBJ_EXT) so_locations \
+	  perl.exe $(BASEEXT).bso \
+	  $(BASEEXT).x perl \
+	  core 
 	- $(RM_RF) \
 	  blib 
 	- $(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD) $(DEV_NULL)
@@ -574,7 +667,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Bio::SeqFeature::Generic: 0' >> META_new.yml
 	$(NOECHO) $(ECHO) '  Bio::Tools::GFF: 0' >> META_new.yml
-	$(NOECHO) $(ECHO) '  Parallel::ForkManager: 1.06' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Parallel::ForkManager: 1.07' >> META_new.yml
 	$(NOECHO) $(ECHO) 'version: 0.1' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
@@ -614,7 +707,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Bio::SeqFeature::Generic" : "0",' >> META_new.json
 	$(NOECHO) $(ECHO) '            "Bio::Tools::GFF" : "0",' >> META_new.json
-	$(NOECHO) $(ECHO) '            "Parallel::ForkManager" : "1.06"' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Parallel::ForkManager" : "1.07"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
@@ -696,7 +789,7 @@ distdir : create_distdir distmeta
 
 # --- MakeMaker dist_test section:
 disttest : distdir
-	cd $(DISTVNAME) && $(ABSPERLRUN) Makefile.PL 
+	cd $(DISTVNAME) && $(ABSPERLRUN) Makefile.PL "PREFIX=/home/genouest/umr6061/recomgen/tderrien/bin/perl/FEELnc_v0.1"
 	cd $(DISTVNAME) && $(MAKE) $(PASTHRU)
 	cd $(DISTVNAME) && $(MAKE) test $(PASTHRU)
 
@@ -860,7 +953,7 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 	-$(NOECHO) $(RM_F) $(MAKEFILE_OLD)
 	-$(NOECHO) $(MV)   $(FIRST_MAKEFILE) $(MAKEFILE_OLD)
 	- $(MAKE) $(USEMAKEFILE) $(MAKEFILE_OLD) clean $(DEV_NULL)
-	$(PERLRUN) Makefile.PL 
+	$(PERLRUN) Makefile.PL "PREFIX=/home/genouest/umr6061/recomgen/tderrien/bin/perl/FEELnc_v0.1"
 	$(NOECHO) $(ECHO) "==> Your Makefile has been rebuilt. <=="
 	$(NOECHO) $(ECHO) "==> Please rerun the $(MAKE) command.  <=="
 	$(FALSE)
@@ -881,7 +974,8 @@ $(MAKE_APERL_FILE) : $(FIRST_MAKEFILE) pm_to_blib
 	$(NOECHO) $(PERLRUNINST) \
 		Makefile.PL DIR= \
 		MAKEFILE=$(MAKE_APERL_FILE) LINKTYPE=static \
-		MAKEAPERL=1 NORECURS=1 CCCDLFLAGS=
+		MAKEAPERL=1 NORECURS=1 CCCDLFLAGS= \
+		PREFIX=/home/genouest/umr6061/recomgen/tderrien/bin/perl/FEELnc_v0.1
 
 
 # --- MakeMaker test section:
@@ -921,7 +1015,7 @@ ppd :
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Bio::SeqFeature::Generic" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Bio::Tools::GFF" />' >> $(DISTNAME).ppd
-	$(NOECHO) $(ECHO) '        <REQUIRE VERSION="1.06" NAME="Parallel::ForkManager" />' >> $(DISTNAME).ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE VERSION="1.07" NAME="Parallel::ForkManager" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-5.18" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> $(DISTNAME).ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> $(DISTNAME).ppd
@@ -932,25 +1026,46 @@ ppd :
 
 pm_to_blib : $(FIRST_MAKEFILE) $(TO_INST_PM)
 	$(NOECHO) $(ABSPERLRUN) -MExtUtils::Install -e 'pm_to_blib({@ARGV}, '\''$(INST_LIB)/auto'\'', q[$(PM_FILTER)], '\''$(PERM_DIR)'\'')' -- \
-	  lib/Bio/SeqFeature/Genic.pm blib/lib/Bio/SeqFeature/Genic.pm \
-	  lib/ExtractFromFeature.pm blib/lib/ExtractFromFeature.pm \
-	  lib/Intersect.pm blib/lib/Intersect.pm \
-	  lib/ExtractFromHash.pm blib/lib/ExtractFromHash.pm \
-	  lib/Bio/SeqFeature/InterGenic.pm blib/lib/Bio/SeqFeature/InterGenic.pm \
-	  lib/Parser.pm blib/lib/Parser.pm \
-	  lib/Bio/SeqFeature/Extended.pm blib/lib/Bio/SeqFeature/Extended.pm \
-	  lib/Bio/SeqFeature/LncRNAs_Factory.pm blib/lib/Bio/SeqFeature/LncRNAs_Factory.pm \
-	  lib/StringUtils.pm blib/lib/StringUtils.pm \
-	  lib/Orf.pm blib/lib/Orf.pm \
-	  lib/Bio/SeqFeature/InteractionIterator.pm blib/lib/Bio/SeqFeature/InteractionIterator.pm \
+	  lib/5.8.8/x86_64-linux/perllocal.pod blib/lib/5.8.8/x86_64-linux/perllocal.pod \
+	  lib/site_perl/5.8.8/x86_64-linux/auto/FEELnc/.packlist blib/lib/site_perl/5.8.8/x86_64-linux/auto/FEELnc/.packlist \
 	  lib/Bio/SeqFeature/Empty.pm blib/lib/Bio/SeqFeature/Empty.pm \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/InteractionCollection.pm blib/lib/site_perl/5.8.8/Bio/SeqFeature/InteractionCollection.pm \
+	  lib/Intersect.pm blib/lib/Intersect.pm \
 	  lib/Bio/SeqFeature/InteractionCollection.pm blib/lib/Bio/SeqFeature/InteractionCollection.pm \
-	  lib/Utils.pm blib/lib/Utils.pm \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/Interaction.pm blib/lib/site_perl/5.8.8/Bio/SeqFeature/Interaction.pm \
+	  lib/ExtractFromFeature.pm blib/lib/ExtractFromFeature.pm \
+	  lib/Bio/SeqFeature/Extended.pm blib/lib/Bio/SeqFeature/Extended.pm \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/Extended.pm blib/lib/site_perl/5.8.8/Bio/SeqFeature/Extended.pm \
+	  lib/Bio/SeqFeature/Genic.pm blib/lib/Bio/SeqFeature/Genic.pm \
+	  lib/site_perl/5.8.8/Filter.pm blib/lib/site_perl/5.8.8/Filter.pm \
+	  lib/site_perl/5.8.8/Utils.pm blib/lib/site_perl/5.8.8/Utils.pm \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/InterGenic.pm blib/lib/site_perl/5.8.8/Bio/SeqFeature/InterGenic.pm \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/Genic.pm blib/lib/site_perl/5.8.8/Bio/SeqFeature/Genic.pm \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/InteractionIterator.pm blib/lib/site_perl/5.8.8/Bio/SeqFeature/InteractionIterator.pm \
 	  lib/FEELnc.pm blib/lib/FEELnc.pm \
-	  lib/Bio/SeqFeature/database_part.pm blib/lib/Bio/SeqFeature/database_part.pm \
-	  lib/Bio/SeqFeature/Interaction.pm blib/lib/Bio/SeqFeature/Interaction.pm \
+	  lib/site_perl/5.8.8/ExtractFromHash.pm blib/lib/site_perl/5.8.8/ExtractFromHash.pm \
+	  lib/Parser.pm blib/lib/Parser.pm \
+	  lib/site_perl/5.8.8/FEELnc.pm blib/lib/site_perl/5.8.8/FEELnc.pm \
+	  lib/site_perl/5.8.8/ExtractFromFeature.pm blib/lib/site_perl/5.8.8/ExtractFromFeature.pm \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/Empty.pm blib/lib/site_perl/5.8.8/Bio/SeqFeature/Empty.pm \
+	  lib/site_perl/5.8.8/Orf.pm blib/lib/site_perl/5.8.8/Orf.pm \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/database_part.pm blib/lib/site_perl/5.8.8/Bio/SeqFeature/database_part.pm \
+	  lib/Orf.pm blib/lib/Orf.pm \
+	  lib/StringUtils.pm blib/lib/StringUtils.pm \
 	  lib/Cpat.pm blib/lib/Cpat.pm \
-	  lib/Filter.pm blib/lib/Filter.pm 
+	  lib/Bio/SeqFeature/LncRNAs_Factory.pm blib/lib/Bio/SeqFeature/LncRNAs_Factory.pm \
+	  lib/Bio/SeqFeature/InteractionIterator.pm blib/lib/Bio/SeqFeature/InteractionIterator.pm \
+	  lib/site_perl/5.8.8/Cpat.pm blib/lib/site_perl/5.8.8/Cpat.pm \
+	  lib/site_perl/5.8.8/Parser.pm blib/lib/site_perl/5.8.8/Parser.pm \
+	  lib/Bio/SeqFeature/database_part.pm blib/lib/Bio/SeqFeature/database_part.pm \
+	  lib/ExtractFromHash.pm blib/lib/ExtractFromHash.pm \
+	  lib/Utils.pm blib/lib/Utils.pm \
+	  lib/site_perl/5.8.8/StringUtils.pm blib/lib/site_perl/5.8.8/StringUtils.pm \
+	  lib/Filter.pm blib/lib/Filter.pm \
+	  lib/site_perl/5.8.8/Intersect.pm blib/lib/site_perl/5.8.8/Intersect.pm \
+	  lib/Bio/SeqFeature/Interaction.pm blib/lib/Bio/SeqFeature/Interaction.pm \
+	  lib/site_perl/5.8.8/Bio/SeqFeature/LncRNAs_Factory.pm blib/lib/site_perl/5.8.8/Bio/SeqFeature/LncRNAs_Factory.pm \
+	  lib/Bio/SeqFeature/InterGenic.pm blib/lib/Bio/SeqFeature/InterGenic.pm 
 	$(NOECHO) $(TOUCH) pm_to_blib
 
 
