@@ -266,22 +266,27 @@ sub renamefile {
 # Out : full path to the program
 # Example :     my $pathlogit       =   Utils::pathProg("make_logitModel.py");
 sub pathProg{
-	my ($prog) = @_;
-	$prog   ||= undef;
-	my @path;
-	
-	if (defined $prog){
-	    @path = grep { -x "$_/".$prog}split /:/,$ENV{PATH};
+    my ($prog) = @_;
+    $prog   ||= undef;
+    my @path;
 
-        if (-x $prog){
-        	croak "pathProg: Cannot't exec '$prog'...\n" ;
-        } elsif (!@path){
+    if (defined $prog){
+        @path = grep { -x "$_/".$prog}split /:/,$ENV{PATH};
+
+ 		if (!@path){
 			croak "pathProg: '$prog' not in your PATH...";
-		}
+        }		
 
-	}else{
-        croak "pathProg: undefined program '$prog'...\n";
-	}
-	return $path[-1]."/".$prog;
+        if ( -x $path[-1]."/".$prog){
+            return $path[-1]."/".$prog;
+        } elsif (-x $prog){
+            return $prog;
+        } else {
+			croak "pathProg: '$prog' not executable..";
+        }
+    }else{
+            croak "pathProg: undefined program '$prog'...\n";
+    }
 }
+
 1;
