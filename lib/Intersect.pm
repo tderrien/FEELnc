@@ -78,7 +78,7 @@ sub compare_chr_distrib{
 # Input:
 #	- $refh1		: ref on a FEELnc tx Datastructure hash
 # 	- $refh2		: ref on a FEELnc tx Datastructure hash
-# 	- $stranded		: mode 0 is unstranded // 1 if required same strandness // -1 for different strand
+# 	- $stranded		: mode 0 is unstranded // 1 if required same strandness // -1 for oppposite strand
 # 	- $fraction		: min proportion of overlap from tx1 to be considered as overlapping
 # 	- $monoexonic	: whether to keep mono exonic as: -1 keep monoexonicAS, 1 keep all monoexonic (if 0 their should be no monoexonic at this stage)
 # 	- $verbosity	: level of verbosity
@@ -114,7 +114,6 @@ sub getOverlapping{
 		# we compute nb 
 		my $tr1nbexon 	= ExtractFromFeature::features2nbExon($refh1->{$tr1}->{"feature"}) if ($monoexonic == -1);
 
-
 		# 2nd tx
 	    foreach my $tr2 (  ExtractFromHash::sortTxsStartt($refh2) ){			
 
@@ -145,14 +144,18 @@ sub getOverlapping{
 			
 			# Compute proportion
 			my $fractionoverexon1	=	$cumul_overlap_size/$tr1_exon_size;
+
+# 			print STDERR "$fractionoverexon1 > $fraction --- $monoexonic == -1 && $tr1nbexon ==1\n";
 						
 			#  Output 
-			if ( $fractionoverexon1 > $fraction){
+			if ( $fractionoverexon1 && $fractionoverexon1 >= $fraction){ # si overlap and overlap greater or (equal (same coordinates == 1) ) to the fraction cutoff
+
 
 				if ( $monoexonic == -1 && $tr1nbexon ==1){ # if monoexonic AS
 					my $overlaptype	= -1;
-					my $stdok		= Utils::strandmode($strand1, $strand2, $overlaptype);
-					next if ($stdok); 	# we do not consider/remove this monoexonic if it is AS
+					my $isantisense		= Utils::strandmode($strand1, $strand2, $overlaptype);
+# 					print STDERR "Monoexonic option ($monoexonic)\nUtils::strandmode($strand1, $strand2, $overlaptype)\noverResu=  $isantisense\n";
+					$matchingtx{$tr1}	=	$tr2 if (!$isantisense); 	# we do consider/remove this monoexonic if it is not AS
 				} else {
 					$matchingtx{$tr1}	=	$tr2;
 					last;
