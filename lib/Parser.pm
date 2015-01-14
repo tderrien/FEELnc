@@ -219,7 +219,7 @@ sub parseAttributes{
 		my $c_value = $2;
 		$c_value=~ s/\"//g;
 		if (exists($attribs{$c_type})){
-			carp "WARNINGS: key '$c_type' already exists with ",$attribs{$c_type}," value...\n" if ($verbosity > 10);
+			carp "WARNINGS: key '$c_type' already exists with ",$attribs{$c_type}," value...\n" if ($verbosity > 15);
 		}
 		
 		# **** FEELnc nomenclature is to use : 'biotype' instead of 'type' *******
