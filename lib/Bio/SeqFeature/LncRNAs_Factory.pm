@@ -102,10 +102,11 @@ sub create_interaction{
 	my $type = type_of_interaction("pkg",$object,$subject);
  
 	if ( $type == 1 ){ 
-	
+		
+		
 		# create an genic interaction
 		$interaction = Bio::SeqFeature::Genic->new('-object' => $object, '-subject' => $subject);
-		$interaction->printer() if ($interaction->gestion_error() == 0);
+		$interaction->warning();
 	}elsif ($type == 0){ 
 		
 		# create an interaction intergenic interaction
@@ -146,104 +147,91 @@ sub DoItForMe{
 	my $window = shift;
 	my $lncrna_file = shift;
 	my $mrna_file = shift;
+	my $max_window = shift;
 	
-	print STDERR "window : $window - lncrna : $lncrna_file - mrna : $mrna_file\n";
+	print STDERR "window : $window - max window : $max_window - lncrna : $lncrna_file - mrna : $mrna_file\n";
 	my $db_lnc = Bio::SeqFeature::database_part->new();
 	my $db_mrna = Bio::SeqFeature::database_part->new();
 	
-	$db_lnc->load_merge_gtf_into_db($lncrna_file,2, 'lncRNA');
-	$db_mrna->load_merge_gtf_into_db($mrna_file, 2,'mRNA');
+	my $nblnc = $db_lnc->load_merge_gtf_into_db($lncrna_file,2, 'lncRNA');
+	my $nb_mrna = $db_mrna->load_merge_gtf_into_db($mrna_file, 2,'mRNA');
 	
 
 	my $prec = 0;
-	#my $db = Bio::SeqFeature::database_part->open_db($user, $host,$database);
-
-	#print STDERR $db, "\n";
-## second step : collection initialization
 
 	my $collection =  Bio::SeqFeature::InteractionCollection->new();
 	
 	my $nombre = 0;
 	my $numberlnc = 0;
-## third step : extract for the DB the lncRNAs - the tag is Audrey
-	
-	#print 'types', join " ", $db->types(), "\n";
+	my @no_interaction=();
 		
-#	my @lncs = $db_lnc->get_features_by_type('lncrna');
-	#print "lncs : @lncs\n";
-
 	my $lnc=$db_lnc->get_seq_stream(-type => "lncrna");
  
-	while (my $object = $lnc->next_seq) { 
-#		print STDERR "obj : $object\n";
-		my $autour_s = $object->start() - $window; # upstream 
-		my $autour_e = $object->end() + $window; #downstream
-		$numberlnc ++;
-		
-		#print " nombre de lncRNAs actuels : $numberlnc \n";
-		#print "lncrRNA : ", $object->start(), "  ", $object->seq_id(),"  \n";
-		#_afficher_fvalues($object);
-		#_print_exons($object);
-	 
-## forth step : for each give me the mRNA wich are around : $autour_s and $autour end	
- 		
- 	
-	#	print STDERR "-seq_id => ", $object->seq_id() , "-start => $autour_s ,-end => $autour_e\n"; 
- 		 
- 		 my @features = $db_mrna->get_features_by_location(-seq_id=>$object->seq_id(),-start=>$autour_s,-end=>$autour_e);
- #		 print STDERR "feats : ", scalar(@features), "\n";
-		#my ($segment)= $db->segment(-seq_id=>$object->seq_id(),-start=>$autour_s,-end=>$autour_e);
- 		
-
-		#my $aphid=$db->get_seq_stream(-seq_id => $object->seq_id() , -start => $autour_s ,-end => $autour_e ); 
-		
-### intermediate step: what happens if an lncRNA do not have any interaction? -> report it
-		my $interaction_per_lncRNA = 0;
-## fifth step : create the interaction		
-		
-		foreach my $subject (@features){
-#			print STDERR $subject->primary_tag(), "\n";
-			next unless ($subject->primary_tag eq 'mRNA');
-				
  
+	while (my $object = $lnc->next_seq) { 
+		my $step=1;
+		my $interaction_per_lncRNA = 0;
+		$numberlnc++;
+		
+		while (($interaction_per_lncRNA) == 0 && ($step*$window <= $max_window)) {
+			if ($step >1) {
+				print  STDERR "No interaction found for ", $object->get_tag_values("transcript_id"), " within a window  of size  ", $window*($step-1), ". Expanded to : ", $window*$step,"\n";
+			}
+			
+			my $autour_s = $object->start() - $step*$window; # upstream 
+			my $autour_e = $object->end() + $step*$window; #downstream
+ 
+ 			 my @features = $db_mrna->get_features_by_location(-seq_id=>$object->seq_id(),-start=>$autour_s,-end=>$autour_e);
+					
+			foreach my $subject (@features){
+				next unless ($subject->primary_tag eq 'mRNA');
 				$nombre ++;
 				$interaction_per_lncRNA++;
 				my $interaction = Bio::SeqFeature::LncRNAs_Factory->create_interaction($object, $subject);
 				
 				#$interaction->printer();
 	
-## sixth step : add to the collection
-			$collection->add_interaction($interaction);
-		}
- 
-		#print " nombre d'interactions courante : $interaction_per_lncRNA \n";
-		#print " nombre d'interactions totale : $nombre\n "; #jepeux passer au lncRNA suivant \n";
-
-### intermediate step: what happens if an lncRNA do not have any interaction? -> report it
- if ($interaction_per_lncRNA == 0) {
- 		#my $interaction = Bio::SeqFeature::LncRNAs_Factory->_no_interaction($object);
-		#$collection->add_interaction($interaction);		
-		print  STDERR "interaction not found - ",$object->seq_id() ,"\t", $object->start(),"\t", $object->end(),"\t", $object->strand(),"\t", $object->primary_tag(),"\n";
- }
+				## sixth step : add to the collection
+				$collection->add_interaction($interaction);
+			}
+ 	
+ 		 	if ($interaction_per_lncRNA == 0) {
+			 	# We try to expand the environment
+				$step++;	 	
+ 			}
  
 		
-		if ($nombre%100 ==0 && $prec !=$nombre ){
-			print STDERR " ... Looking for interactions, currently eq to $nombre \n" ;
-			$prec = $nombre;
-		}	
+			if ($nombre%100 ==0 && $prec !=$nombre ){
+				print STDERR " ... Looking for interactions, currently eq to $nombre \n" ;
+				$prec = $nombre;
+			}	
 
+		}
+		if ($interaction_per_lncRNA == 0) {
+			# We try to expand the environment
+			push @no_interaction,  $object->get_tag_values("transcript_id");
+ 		}
+ 
+	}
+	 
+
+	print "#FEELnc Classification\n";
+	print "#lncRNA file :  lncrna : $lncrna_file \n";
+	print "#mRNA file : $mrna_file\n";
+	print "#Minimal window size : $window\n";
+	print "Maximal window size : $max_window\n";
+	print "#Number of lncRNA : $numberlnc \n";
+	print "#Number of mRNA : $nb_mrna\n";
+	print "#Number of interaction : $nombre \n";
+	print "#Number of lncRNA without interaction : ",scalar(@no_interaction), "\n";
+	print "#List of lncRNA without interaction : ", join (" ", @no_interaction), "\n";
+	print "#INTERACTIONS\n";
 	
-	} 
-### intermediate step
-print "#SUMMARY \n";
-print "#Number of lncRNA : $numberlnc \n";
-print "#Number of interaction : $nombre \n";
-
 	$db_lnc->destroy();
 	$db_mrna->destroy();
-## seventh step: return the collection
+	## seventh step: return the collection
  
-		return $collection;
+	return $collection;
 	
 }
 
@@ -389,4 +377,5 @@ sub _afficher_fvalues{
     	print "\t \t";print " transcript_id: ", $feat->get_tag_values("transcript_id"), "\n";   
     		print " \t ______________________________ \n";	
 }
+
 1;

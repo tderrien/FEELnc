@@ -26,7 +26,7 @@ sub new {
 	my $dsn =  $BASEDIR."/interact.$rand_number";
 	
 	my $db = Bio::DB::SeqFeature::Store->new( -adaptor => 'berkeleydb',
-                                            -dsn     => "/tmp/interact.$rand_number",
+                                            -dsn     => "$BASEDIR/interact.$rand_number",
                                             -create => 1,
                                             -compress => 1 );
 	 my $db_part = bless {
@@ -232,6 +232,7 @@ sub load_merge_gtf_into_db {
 		}
 		
 		print STDERR  " Importation  merge GTF file : ", $line, " $type done \n";
+		return $line;
 	#last : return the $db
 }
 

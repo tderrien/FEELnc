@@ -273,7 +273,8 @@ Bio::SeqFeature:Interaction
 # this fonction use the SUPER printer and is also defined in intergenic
 sub printer_mini {
 	my $self = shift;
-	$self->SUPER::printer_mini();
+	my $best=shift;
+	$self->SUPER::printer_mini($best);
 	print "\t Status=",_print_divergent($self->_get_divergent());
 	print "\t Subtype=",_print_subtype($self->subtype()),"\n";
 
@@ -284,7 +285,7 @@ sub printer_mini {
 # return : /
 sub  _print_divergent{
 	my $div = shift;
-	my %div_types = ( -2 => "unknow strand(s)", -1 => 'same strand', 1 => 'divergent', 0 => 'convergent');
+	my %div_types = ( -2 => "unknow strand(s)", -1 => 'same_strand', 1 => 'divergent', 0 => 'convergent');
 	if (exists $div_types{$div}) {
 		return $div_types{$div};
 	}
