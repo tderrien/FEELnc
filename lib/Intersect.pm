@@ -112,7 +112,7 @@ sub getOverlapping{
 		my $strand1 	= $refh1->{$tr1}->{"strand"};
 		
 		# we compute nb 
-		my $tr1nbexon 	= ExtractFromFeature::features2nbExon($refh1->{$tr1}->{"feature"}) if ($monoexonic == -1);
+		my $tr1nbexon 	= ExtractFromFeature::features2nbExon($refh1->{$tr1}->{"feature"}) if ($monoexonic);
 
 		# 2nd tx
 	    foreach my $tr2 (  ExtractFromHash::sortTxsStartt($refh2) ){			
@@ -137,29 +137,22 @@ sub getOverlapping{
 			##### Overlap window  ########
 			
 			# get cumulsize of lncRNA cDNA (exon level)
-			my $tr1_exon_size		= ExtractFromHash::cumulSize($refh1->{$tr1}->{"feature"});
+			my $tr1_cdna_size		= ExtractFromHash::cumulSize($refh1->{$tr1}->{"feature"});
 			
 			# Get the number  of bp overlap
-			my $cumul_overlap_size	=	ExtractFromFeature::intersectFeatures($refh1->{$tr1}->{'feature'}, $refh2->{$tr2}->{'feature'}, $stranded, $verbosity);
+			my $cumul_overlap_size	=	0;
+			my $checksense 			= -1; 	# if keep monoexonic all and AS,  implies to keep only Antisense,
+											# therfore we only check for antisense ($checksense = -1) overlap
+
+			$cumul_overlap_size	=	ExtractFromFeature::intersectFeatures($refh1->{$tr1}->{'feature'}, $refh2->{$tr2}->{'feature'}, $checksense, $verbosity);
+			my $fractionoverexon1	=	$cumul_overlap_size/$tr1_cdna_size;
 			
-			# Compute proportion
-			my $fractionoverexon1	=	$cumul_overlap_size/$tr1_exon_size;
-
-# 			print STDERR "$fractionoverexon1 > $fraction --- $monoexonic == -1 && $tr1nbexon ==1\n";
-						
-			#  Output 
-			if ( $fractionoverexon1 && $fractionoverexon1 >= $fraction){ # si overlap and overlap greater or (equal (same coordinates == 1) ) to the fraction cutoff
-
-
-				if ( $monoexonic == -1 && $tr1nbexon ==1){ # if monoexonic AS
-					my $overlaptype	= -1;
-					my $isantisense		= Utils::strandmode($strand1, $strand2, $overlaptype);
-# 					print STDERR "Monoexonic option ($monoexonic)\nUtils::strandmode($strand1, $strand2, $overlaptype)\noverResu=  $isantisense\n";
-					$matchingtx{$tr1}	=	$tr2 if (!$isantisense); 	# we do consider/remove this monoexonic if it is not AS
-				} else {
-					$matchingtx{$tr1}	=	$tr2;
-					last;
-				}
+			# intersectFeatures returns > 0 if there is an ANTISENSE OVERLAP (otherwise it is  0 for sense or if strand is ".")
+			# if no AS match or uncertainty with either lncRNA or mRNA strand we remove the lncRNA
+# 			print STDERR "===> $fractionoverexon1  = ($cumul_overlap_size/$tr1_cdna_size) <= $fraction --- $monoexonic == -1 && $tr1nbexon ==1\n";
+			if (!$cumul_overlap_size || $fractionoverexon1 < $fraction){
+				$matchingtx{$tr1}	=	$tr2;
+				last;
 			}
         }
 
@@ -321,7 +314,7 @@ sub Intersect2HsplitFork_clean{
 			
 			# ############## Exon overlap
 			if (!$keepduptx){
-				my $tr1_exon_size		= ExtractFromHash::cumulSize($refh1->{$tr1}->{"feature"});
+				my $tr1_cdna_size		= ExtractFromHash::cumulSize($refh1->{$tr1}->{"feature"});
     		    my $tr2_exon_size		= ExtractFromHash::cumulSize($refh2->{$tr2}->{"feature"});
 			
 				# Exon overlap
@@ -329,7 +322,7 @@ sub Intersect2HsplitFork_clean{
 				
 				
 				# proportion
-				my $fractionoverexon1	=	$cumul_overlap_size/$tr1_exon_size;
+				my $fractionoverexon1	=	$cumul_overlap_size/$tr1_cdna_size;
 				my $fractionoverexon2	=	$cumul_overlap_size/$tr2_exon_size;
 								
 				# remove same tx exons in 2
@@ -420,14 +413,14 @@ sub Intersect2HsplitFork_compare{
 			##### Overlap window  ########
 			
 			# ############## Exon overlap
-			my $tr1_exon_size		= ExtractFromHash::cumulSize($refh1->{$tr1}->{"feature"});
+			my $tr1_cdna_size		= ExtractFromHash::cumulSize($refh1->{$tr1}->{"feature"});
     		my $tr2_exon_size		= ExtractFromHash::cumulSize($refh2->{$tr2}->{"feature"});
 			
 			# Exon overlap
 			my $cumul_overlap_size	=	ExtractFromFeature::intersectFeatures($refh1->{$tr1}->{'feature'}, $refh2->{$tr2}->{'feature'}, $stranded, $verbosity);
 			
 			# proportion
-			my $fractionoverexon1	=	$cumul_overlap_size/$tr1_exon_size;
+			my $fractionoverexon1	=	$cumul_overlap_size/$tr1_cdna_size;
 			my $fractionoverexon2	=	$cumul_overlap_size/$tr2_exon_size;
 							
 			#  same tx exons in 2
