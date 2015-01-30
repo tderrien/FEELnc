@@ -52,8 +52,7 @@ sub new {
 		_subtype => undef,
 		@_,
 	);
-	#TODO n
-	#is it really genic? 
+
 }
 
 
@@ -232,19 +231,59 @@ sub _overlaps_btwn_feature_array{
 	for ( $i = 0; $i <= $#array1; $i++) {
 		
 	
-		for ( $j =0 ; $j <= $#array2 ; $j++){
-			#print "exons", $array1[$i]->start, " - ", $array1[$i]->end() , "\n"; #partie censé se chevaucher
-			#print " \t\t introns ( ",$array2[$j]->start, " - " , $array2[$j]->end(), ")\n"; 
-		
+		for ( $j =0 ; $j <= $#array2 ; $j++){		
 			if ($array2[$j]->overlaps($array1[$i])){
 				$required++;
-				#print "oui \n";
 				if ($required == $number ){ #do we obtain the number of overlaps required?
 					return 1;
 				}
 			}
 		}
 	}
+}
+
+
+=head1 overlap
+
+=head1 DESCRIPTION 
+
+returns the number of bases that are overlapping between the subject and the object
+
+=cut
+
+sub overlap {
+	my $interaction=shift;
+	
+	my $object = $interaction->object();
+	my $subject = $interaction->subject();
+	
+	my @exons_mRNA= _getExons($object);
+	my @exons_lncRNA = _getExons($subject);
+
+	my $overlap=0;
+	foreach my $exon_mRNA (@exons_mRNA) {
+		
+		foreach my $exon_lncRNA (@exons_lncRNA) {
+				my $first=$exon_mRNA;
+				my $second=$exon_lncRNA;
+				if ($exon_mRNA->start() > $exon_lncRNA->start()) {
+					$first=$exon_lncRNA;
+					$second=$exon_mRNA;
+				}
+	
+					
+				next if ($first->end() < $second->start);
+				
+				my $begin = $first->start();
+				my $end = $first->end();
+				if ($second->end() < $first->end) {
+					$end = $second->end();
+				}
+				
+				$overlap= $overlap+$end-$begin; 
+		}
+	}		
+	return $overlap;
 }
 					
 =head1 _getIntrons() 
@@ -363,10 +402,14 @@ print short interaction informations
 
 sub printer_mini {
 	my $self = shift;
-	$self->SUPER::printer_mini();
-#	print "\t Other info \n";
-#	Bio::SeqFeature::Genic->_ligne_carre();
-	print "\t Status=",$self->nested();
+	my $best=shift;
+	$self->SUPER::printer_mini($best);
+	
+	my $status = 'not_nested';
+	if ($self->nested==1) {
+		$status='nested';
+	}
+	print "\t Status=",$status;
 	print "\t Subtype=",_print_subtype($self->subtype()),"\n";
 
 }
@@ -394,7 +437,7 @@ sub printer {
 
 sub _print_subtype{
 	my $subtype = shift;
-	my %subtypes =( 1 => 'exonic', 2=>' intronic', 3 => 'overlapping');
+	my %subtypes =( 1 => 'exonic', 2=>' intronic', 3 => 'containing');
 	if (exists $subtypes{$subtype}) {
 		return $subtypes{$subtype};
 	}
@@ -492,8 +535,7 @@ sub reciprocal {
 
 				# ---------------------------------------------------- #
 				# ---------------------------------------------------- #
-=head1 gestion_error() 
-IMPORTANT
+=head1 warning()
 
 Bio::SeqFeature::Genic
 
@@ -501,16 +543,12 @@ Bio::SeqFeature::Genic
 when a genic interaction is created, this function has to be called to check if it's an exonic same strand interaction
 then a error has to be solved
 =cut
-sub gestion_error{ # if exonic and direction == 1 that's an error
+sub warning{ # if exonic and direction == 1 that's an error
 	
 	my $self = shift;
 	if ($self->isExonic == 1){
 		if ($self->direction == 1){
-			print "The subject and the object are in the same direction and there is at least one overlap btwn exon \n";
-			print "If you are trying to class lncRNAs in relation to mRNA, that's an error of classification \n";
-			print "Please have a look of your entry sets \n";
-			print "If you use our method ... please contact us \n";
-			sleep(1);
+			print STDERR  $self->object()->get_tag_values("transcript_id"), " and ",  $self->subject()->get_tag_values("transcript_id") , " are overlapping in the same strand\n";
 			return 0; # fatal error for the entry
 		}
 	}

@@ -105,15 +105,9 @@ sub _add_interaction_object{
 	my $self = shift;
 	my $interaction = shift;
 	my $object_indx = $interaction->object(); #index 
-	
-
 
 	
 	push (@{$self->{'_objects'}->{$object_indx}}, $interaction); # add the interaction to a pointer to the object seqfeature object	
-	
-	#print " j'ai été ajouté je suis : ", $self->{'_objects'}->{$object_indx}->[0], "xxx \n";
-	#print " un peu plus d'info obj : ", $self->{'_objects'}->{$object_indx}->[0]->object()->seq_id(), "\n";
-	#print " un peu plus d'info sub : ", $self->{'_objects'}->{$object_indx}->[0]->subject()->seq_id(), "\n";
 }
 
 ### add the subject of the interaction
@@ -125,19 +119,41 @@ sub _add_interaction_subject{
 	
 	push (@{$self->{'_subjects'}->{$subject_indx}}, $interaction); 
 }
-=head1 remove_interaction
 
-Bio::SeqFeature::Interaction
 
-=head1 DESCRIPTION 
 
-revome an Interaction or a list of interaction in a collection of interactions
-based on the subject and object index
+=head1 get_subjects
+
+returns a list of Bio::SeqFeature
+
+=head1 DESCRIPTION
+
+this function returns the list of subjects of interactions 
 
 =cut
 
+sub get_subjects {
+	my $self = shift;
+	
+	return  keys %{$self->{'_subjects'}};
+	
+}
 
-sub remove_interaction{
+
+=head1 get_objects
+
+returns a list of Bio::SeqFeature
+
+=head1 DESCRIPTION
+
+this function returns the list of objects of interactions 
+
+=cut
+
+sub get_objects {
+	my $self = shift;
+	
+	return  keys %{$self->{'_objects'}};
 	
 }
 
@@ -163,10 +179,10 @@ if the seqfeature is the subject fill 2 for the second parameter
 $col->get_interaction($feature, 2 ); #look for all interaction shared by $feature and in which $feature is the subject 
 
 note:  if you pass an unrecognized second argument, than the default one will be called (means : all )
+
 =cut
 
 sub get_interactions{
-
 	my $col = shift;
 	my $index = shift; # adress of the subject/object
 	my $option = 3; # by default all
@@ -202,7 +218,6 @@ sub _getArray_from_hash {
 		return undef; #object not found
 	}
 
-	my $array = $hash{$cle}; #${$col->{'_objects'}{$index}->[0]
 	return (@{$hash{$cle}}); #return the list/array
 }
 # private method : _isExist_hash
@@ -228,10 +243,6 @@ sub _get_interactions_object{
 	my $index = shift;
 	
 	
-	#print " OBJECT go to get Array from hash \n";
-	#my @array = _getArray_from_hash(\%{$self->{'_objects'}},$index); 
-	#print "obj ",  $array[0],"cccc \n";
-	
 	return ( _getArray_from_hash(\%{$self->{'_objects'}},$index));
 }
 
@@ -240,12 +251,7 @@ sub _get_interactions_object{
 
 sub _get_interactions_subject{
 	my $self = shift;
-	my $index = shift;
-
-	#print " SUBJECT go to get Array from hash \n";
-	#my @array = _getArray_from_hash(\%{$self->{'_subjects'}},$index); 
-	#print "sub ", $array[0]," cccc \n";
-	
+	my $index = shift;	
 	
 	return ( _getArray_from_hash(\%{$self->{'_subjects'}},$index));
 }
@@ -378,8 +384,7 @@ sub get_all_interactions {
  	foreach my $k ( keys (%{$collection->{'_objects'}}) ) {
  		my @array = _getArray_from_hash(\%{$collection->{'_objects'}}, $k);
 
- 		$iterator->add(@array); 	# the array can be undefined, that will check by the method add
- 		
+ 		$iterator->add(@array); 	
  	} 
 	return $iterator;
 }
@@ -396,17 +401,73 @@ print all the collection
 
 sub print_all_interactions {
 	my $collection = shift;
- 	while (my ($cle, $v) = each(%{$collection->{'_objects'}} )){
-# 	print "\n ___________________________________ \n";
- 		#print " clé :", $cle ,"\n";	
- 		#print " un peu plus d'info obj : ", $collection->{'_objects'}->{$cle}->[0]->object()->seq_id(),"\n";
-		for (my $i=0; $i <= $#{$v} ; $i++){
-			${$v}[$i]->printer_mini;
-		#	@{$v}[$i]->printer;#$iterator->add(@{$v});
-		#	print "\n      _________________________ \n\n";			
+	my @objects=$collection->get_objects();
+	foreach my $object (@objects) {
+		my $best =$collection->get_the_best_interaction($object);
+		$best->printer_mini('best'); 
+		foreach my $interaction ($collection->_get_interactions_object($object)) {
+			unless ($interaction->subject() == $best->subject()) {
+				$interaction->printer_mini();
+			}
 		}
-	} 
+	}  
 }
+
+
+
+=head1 get the_best_interaction
+
+Bio::SeqFeature::CollectionInteraction
+
+=head1 DESCRIPTION 
+
+my $interaction = $coll->get_the_best_interaction($feature);
+
+return the best interaction for a particular Feature. This is to say :   
+	- if there is a genic interaction it returns those with the maximal overlap in bp, otherwise it returns the closest
+=cut
+
+sub get_the_best_interaction {
+	my $collection = shift;
+	my $object= shift;
+	
+	my $best;
+	
+	#print STDERR "obj : $object\n";
+	foreach my $interaction  ($collection->_get_interactions_object($object)) {
+	#	print STDERR "inteearction : $interaction\n";
+			unless (defined $best) {
+				$best= $interaction;
+				next;
+			}	
+			if ($interaction->isGenic()) {
+				if ($best->isGenic) {
+					if ($interaction->overlap() > $best->overlap()) {
+						$best=$interaction;
+					}				
+				}
+				else {
+					$best=$interaction;
+				}
+			}
+			
+			if ($interaction->isInterGenic) {
+				if ($best->isGenic) {
+					next;
+				}
+				else {
+					if ($interaction->distance < $best->distance) {
+						$best=$interaction;
+					}
+				}	
+			}
+	}
+	
+	return $best;
+		
+
+}
+
 
 =head1 sayme_type
 
@@ -740,86 +801,7 @@ sub get_interactions_with_intervalle {
 	
 }
 
-=cut 
-=head1 get_best_interactions
 
- return Bio::SeqFeature::InteractionCollection
-$collection->get_best_interaction($collection, @lncRNA)
-
-=head1 DESCRIPTION 
-
-	Give you the better interaction of a list of lncRNA
-
-	
-=cut 
-sub get_best_interactions{
-	my $collection = shift;
-
-	 
-	my $coll = Bio::SeqFeature::InteractionCollection->new();
-	my @lncrna = @_;
-	my $nombre =0;
-	my $number =0;
-	my $prec = 0;
-	foreach my $lnc (@lncrna){
- 		$number ++;
-
-		if ($nombre%10 ==0 && $prec !=$nombre ){
-			print " ... Number of lncRNAs processed $nombre \n " ;
-			$prec = $nombre;
-		}
-		my $iterator = $collection->get_interactions_with_tags_values("_object"=>$lnc);
-		#print "----- le get interaction with tag val retourne ",$iterator->next(),"\n";
-		$coll->add_interaction(_sayme_the_best($collection->get_interactions_with_tags_values("_object"=>$lnc)));
-	
-	}
-	print " \t\t SUMMARY \n";
-	print " \t\t We were looking for : ", $number," lncRNA best interactions \n";
-
-		return $coll;
-}
-
-## private method : _say_me_the_best 
-# function : anwswer : between 2 interaction wich one is better?
-
-sub _sayme_the_best {
-	my  $iterator = shift;
-	my $interaction = $iterator->next();
-	# | var to make the code maintenable | 
-		my $type = $interaction->type(); # 0 intergenic 1 genic
-		my $distance = $interaction->distance();
-		#print $type, " ", $distance , " \n";
-	# | var to make the code maintainable |
-	
-		while (my $it =$iterator->next()){
-			if ($type == 1 ){ print "je quitte la boucle car génic \n";last; } ## leave the loop 
-		if ($type < $it->type() ){ # means that the new interaction is genic, and the old one intergenic
-			$interaction = $it;
-			$type = $interaction->type();
-			$distance = $interaction->distance();
-			#print " I ve found an genic interaction instead of an intergenic old one \n";
-			#$interaction->printer();
-			#sleep(2);
-		}else { #means that both have the same type
-			if($distance > $it->distance()){ 
-			#if it's an genic interaction than  the first one will be conserved 
-			#ameliorations have to be done at this point
-			
-			#	print " I ve found a better intergenic interaction \n";
-			#	print " old distance : $distance ";
-				
-				$interaction = $it;
-				$type = $interaction->type();
-				$distance = $interaction->distance();
-	
-			#	print " new distance : $distance \n";
-			#	sleep(2);
-			}
-		}
-		#print "----- le get interaction with tag val retourne ",$it,"\n";
-	}
-	return $interaction;
-}
 
 =cut 
 =head1 objects_list

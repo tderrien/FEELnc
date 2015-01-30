@@ -17,8 +17,7 @@ use Bio::SeqFeature::InteractionCollection;
 my $lncrna_file		="";
 my $mrna_file		="";
 my $window			= 10000; # 10kb
-my $minwindow		= 10; # 10nt
-my $maxwindow		= 10000000; # 10Mb
+my $maxwindow; 
 my $help			= 0;
 my $man				= 0;
 
@@ -28,6 +27,7 @@ GetOptions(
 	"window|w=i"	=> \$window,
     "lncrna|i=s"	=> \$lncrna_file,
     "mrna|a=s"		=> \$mrna_file,
+    "max_window|m=i" => \$maxwindow,
     "help|?"		=> \$help,
 	"man"		=> \$man,    
     ) or pod2usage(2);
@@ -40,11 +40,10 @@ my $progname=basename($0);
 # Test parameters
 pod2usage("Error: Cannot read your input lncRNA GTF file '$lncrna_file'...\nFor help, see:\n$progname --help\n") unless( -r $lncrna_file);
 pod2usage("Error: Cannot read your input annotation file '$mrna_file'...\nFor help, see:\n$progname --help\n") unless( -r $mrna_file);
-pod2usage ("- Error: \$window option '$window' should be between '$minwindow' and '$maxwindow'\n") unless ($window >= $minwindow and $window <= $maxwindow);
 
+unless (defined $maxwindow) {$maxwindow=$window}
 
-
-my $collection =  Bio::SeqFeature::LncRNAs_Factory->DoItForMe($window,$lncrna_file,$mrna_file);
+my $collection =  Bio::SeqFeature::LncRNAs_Factory->DoItForMe($window,$lncrna_file,$mrna_file,$maxwindow);
  
 $collection->print_all_interactions();
 exit(0);
@@ -116,7 +115,7 @@ The last step if the pipeline (FEELnc_classifier) consists in classifying new ln
 =head2 Filtering arguments
 
   -w,--window=200		Size of the window around the lncRNA to compute interactions/classification [default 10000]
-
+  -m, --maxwindow=10000 Maximal size of the window during the expansion process [default 10000]
 
 =head1 AUTHORS
 

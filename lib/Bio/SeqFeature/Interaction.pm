@@ -60,7 +60,7 @@ my $interaction;
 	  	$interaction = bless {
 		 _subject => undef,
 		 _object => undef,
-		 _overlaps => undef,
+		 _overlap => undef,
 		 _direction => undef,
 		 _distance => undef,
 		}, $pkg;
@@ -331,6 +331,62 @@ sub _set_distance {
 	}
 }
 
+
+=head1 overlap()
+
+returns the number of bases that are overlapping for a genic interaction 
+
+=head1 DESCRIPTION 
+this fucntions calculates the number of bases that overalps between the subject and object
+
+=cut
+
+sub interaction_overlap {
+	my $self = shift;
+	my $overlap = $self->_overlap();
+	return $overlap;
+}
+# protected
+
+sub _get_overlap {
+	my $self = shift;
+	my $object = $self->object();
+	my $subject = $self->subject();
+
+	if(_isDefined($self->{'_overlap'}) == 0) { #not defined
+		$self->_set_overlap($self->_calculate_overlap());
+	}
+	return ($self->{'_overlap'});
+}
+
+
+sub _calculate_overlap{
+	my $self = shift;
+	
+	if (_isComplete($self) == 0 ){
+		croak (" Interaction : get_distance : calculate_distance : You must have an object and a subject to have calculate a distance \n ");
+	}
+	else{
+		my $type = $self->type();
+		my $overlap =0;
+		if ( $type == 1) {
+			$overlap=$self->overlap();		
+		}
+		return $overlap;
+	}
+}
+# protected
+
+sub _set_overlap {
+	my $self = shift;
+	if (@_) {
+		$self->{'_overlap'} = shift;
+	}else{
+		croak (" Interaction : set_overlap needs a value \n ");
+	}
+}
+
+
 =head1 printer_mini()
 
 Bio::SeqFeature:Interaction
@@ -342,6 +398,9 @@ Bio::SeqFeature:Interaction
 
 sub printer_mini {
 	my $self=shift;
+	my $best = shift;
+	
+	if (defined $best) {print '*'}
 	print 	join ("\t", $self->object()->primary_tag(),  $self->object()->get_tag_values("transcript_id"),  $self->subject()->primary_tag(),  $self->subject()->get_tag_values("transcript_id"),  _conversion_direction($self->direction()), _conversion_type($self->type()), $self->distance());
 }
 
