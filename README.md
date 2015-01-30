@@ -2,7 +2,7 @@
 FEELnc Documentation
 Fast and Effective Extraction of Long non-coding RNAs
 ###############################################################
-Version (5/12/2014)
+Version (30/01/2015)
 
 
 ---------------
@@ -45,16 +45,13 @@ The following software and libraries must be installed on your machine:
 	2.b Installation
 
 # Download and extract FEELnc archive:
-tar xzvf FEELnc_XXX.tar.gz
+git clone https://github.com/tderrien/FEELnc.git
+
 # Go to FEELnc directory
-cd FEELnc_XXX
-# Install FEELnc
-perl Makefile.PL PREFIX=my_dir_of_install
-make
-make install
+cd FEELnc
 
 # export PERL5LIB, FEELNC PATH and add it to your PATH
-export PERL5LIB=$PERL5LIB:my_dir_of_install/
+export PERL5LIB=${PWD}/lib/
 export FEELNCPATH=${PWD}
 export PATH=$PATH:$FEELNCPATH/scripts/
 
