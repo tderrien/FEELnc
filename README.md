@@ -1,4 +1,5 @@
-# FEELnc : Fast and Effective Extraction of Long non-coding RNAs
+# FEELnc 
+ Fast and Effective Extraction of Long non-coding RNAs
 
 *Version (30/01/2015)*
 
@@ -13,10 +14,10 @@ Currently, FEELnc is composed of 3 modules (See 3- Launch FEELnc pipeline for mo
 	* FEELnc_classifier.pl: Classify lncRNAs based on their genomic localization wrt mRNAs 
 
 
-To get help on each of this module, type for instance:
+To get help on each module, you can type :
 
 	FEELnc_filter.pl --help
-	#Or
+	# Or
     FEELnc_filter.pl --man 
 
 
@@ -40,12 +41,11 @@ Basically, FEELnc users should have the following minimal input files:
 	
 The following software and libraries must be installed on your machine:
 
-	- Perl5+ : tested with version 5.18.2 (https://www.perl.org/)
-    	* [Bioperl](http://www.bioperl.org/wiki/Main_Page)  : tested with version BioPerl-1.6.924 )
-         
-        * [Parralell::ForkManager](http://search.cpan.org/~dlux/Parallel-ForkManager-0.7.5/ForkManager.pm "Title"): tested with version 1.06 (http://search.cpan.org/~dlux/Para
+    - Perl5+ : tested with version 5.18.2 (https://www.perl.org/)
+ * [Bioperl](http://www.bioperl.org/wiki/Main_Page)  : tested with version BioPerl-1.6.924 )
+ * [Parralell::ForkManager](http://search.cpan.org/~dlux/Parallel-ForkManager-0.7.5/ForkManager.pm "Title"): tested with version 1.06 (http://search.cpan.org/~dlux/Para
     - R [Rscript](http://cran.r-project.org): tested with version 3.1.0 
-    	* ROCR R library (type "install.packages('ROCR')" in a R session)
+ * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) R library (type "install.packages('ROCR')" in a R session)
 	- [CPAT tool](http://dldcc-web.brc.bcm.edu/lilab/liguow/CGI/cpat/_build/html/index.html): Coding Potential Assessment Tool (tested with version 1.2.2) : 
 
 
@@ -65,16 +65,17 @@ export PERL5LIB, FEELNC PATH and add it to your PATH
 	export FEELNCPATH=${PWD}
 	export PATH=$PATH:$FEELNCPATH/scripts/
 
-### Testing ( if everything is ok with toy example):
+### Test with toy example:
 
 	cd test/
+	
 	# Filter
 	FEELnc_filter.pl -i transcript_chr38.gtf -a annotation_chr38.gtf \
     -b transcript_biotype=protein_coding > candidate_lncRNA.gtf
 
 
 	# Coding_Potential
-    # Note1 : that this test is done on only 100 tx (-n 100 option)
+    # Note1 :  this test is only done on  100 tx (-n 100 option)
 	# Note2 : this module requires the CPAT tool and thus the variable PYTONPATH to be defined
 	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf     -g genome_chr38.fa -n 100 -v 20
     
