@@ -963,8 +963,11 @@ sub parseCPAT{
 
     while (<CPAT>){
 	
+		# increment counter independently of verbosity (bug for $i ==1 afterward)
+		$i++
+ 		
  		# verbose
-		Utils::showProgress($lc, $i++, "Parse input CPAT file: ") if ($verbosity > 5);
+		Utils::showProgress($lc, $i, "Parse input CPAT file: ") if ($verbosity > 5);
 		
 		chop;
 	    next if /^#/;
