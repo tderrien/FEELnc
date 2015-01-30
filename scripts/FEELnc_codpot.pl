@@ -235,7 +235,7 @@ if (!defined $cpatcut){
 	die "\nERROR: Something went wrong with best Cutoff computation\nPlease, make sure that you have :\nRscript in your PATH and R library ROCR installed (in a R session, type: \"install.packages('ROCR')\"\n"  if (!defined $cpatcut || !defined $snsp);
 	printf(">>TG-ROC Optimal CPAT cutoff = %.3f (achieves Sn/Sp = %.3f)\n", $cpatcut, $snsp);
 	print ">> Check TG-ROC image : ".$cpatout.".Cutoff.png\n";
-# 	unlink $cpatout.".Cutoff";
+ 	unlink $cpatout.".Cutoff";
 }
 
 # Create 2 files if input is in gtf : $infile.mRNA.gtf//lncRNA.gtf
@@ -259,7 +259,7 @@ if (Utils::guess_format($infile) eq "gtf"){
     	     unlink $file or warn "Could not unlink $file: $!";
 	}
 }
-# unlink $cpatout.".feature.xls";
+unlink $cpatout.".feature.xls";
 
 
 
