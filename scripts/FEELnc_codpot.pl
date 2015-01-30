@@ -235,7 +235,7 @@ if (!defined $cpatcut){
 	die "\nERROR: Something went wrong with best Cutoff computation\nPlease, make sure that you have :\nRscript in your PATH and R library ROCR installed (in a R session, type: \"install.packages('ROCR')\"\n"  if (!defined $cpatcut || !defined $snsp);
 	printf(">>TG-ROC Optimal CPAT cutoff = %.3f (achieves Sn/Sp = %.3f)\n", $cpatcut, $snsp);
 	print ">> Check TG-ROC image : ".$cpatout.".Cutoff.png\n";
-	unlink $cpatout.".Cutoff";
+# 	unlink $cpatout.".Cutoff";
 }
 
 # Create 2 files if input is in gtf : $infile.mRNA.gtf//lncRNA.gtf
@@ -259,7 +259,7 @@ if (Utils::guess_format($infile) eq "gtf"){
     	     unlink $file or warn "Could not unlink $file: $!";
 	}
 }
-unlink $cpatout.".feature.xls";
+# unlink $cpatout.".feature.xls";
 
 
 
@@ -337,6 +337,7 @@ sub computeOptCutoff {
 	
 	print STDERR "> Compute optimal coding potential cutoff:\n";
 	my $h 	= Parser::parseCPAT($featurefile, $verbosity);
+
 	Cpat::WriteRdmCPATFile($h, $outfile, $verbosity);
 # 	print STDERR "Cpat::WriteRdmCPATFile($h, $outfile, $verbosity);\n";
 
@@ -582,7 +583,7 @@ sub randomizedGTFtoFASTA{
 		next if ($id =~ /^KI|^GL/ ); # for human chromosome GRCh38 : Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa
 		$refgenomesize->{$id} = $db->length($id); # populate hash with id => seq_length
 	}
-	print Dumper $refgenomesize;
+# 	print Dumper $refgenomesize;
 	
 	#  hashref tx annotation sizes
 	my $refannotsize 	= ExtractFromHash::getCumulSizeFromGtfHash ($h,$verbosity, 0);
