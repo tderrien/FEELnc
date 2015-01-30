@@ -51,19 +51,19 @@ The following software and libraries must be installed on your machine:
 
 ### Installation
 
-- Download and extract FEELnc archive:
+Download and extract FEELnc archive:
 
 > git clone https://github.com/tderrien/FEELnc.git
 
-- Go to FEELnc directory
+Go to FEELnc directory
 
 > cd FEELnc
 
-- export PERL5LIB, FEELNC PATH and add it to your PATH
+export PERL5LIB, FEELNC PATH and add it to your PATH
 
-      export PERL5LIB=${PWD}/lib/
-      export FEELNCPATH=${PWD}
-      export PATH=$PATH:$FEELNCPATH/scripts/
+> export PERL5LIB=${PWD}/lib/
+> export FEELNCPATH=${PWD}
+> export PATH=$PATH:$FEELNCPATH/scripts/
 
 ### Testing ( if everything is ok with toy example):
 
