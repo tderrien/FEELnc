@@ -108,7 +108,7 @@ foreach my $tx (keys %{$reflnc}){
     
     # nb exon
     my $nbexon = ExtractFromFeature::features2nbExon($txfeatures, 0);
-    if (!$monoexonic && $nbexon == 1){
+    if (!$monoexonic && $nbexon == 1){ # if 0: removed all monoexonic tx
 		print LOG "Filter monoexonic ($monoexonic): $tx =  $nbexon exon...\n";
         $ctmonoexonic++;
         delete $reflnc->{$tx};    
@@ -163,26 +163,28 @@ $pm -> run_on_finish (
 ##########
 # Overlap
 print STDERR "Computing overlap (exon level) with reference annotation...\n";
-
-
-
 # Process 2 hash chr
 foreach my $chrlnc (keys %{$reflncchr} ) {
 
-	my %lnctorm; # hash storing tx IDs to remove
+	my %lnctorm; # hash tmp storing tx IDs to remove, the correct hash is : $refhchild
 	
-	# 2n chromosome
-	if (exists $refmRNAchr->{$chrlnc}) {
+	# if user wants monoexonic antisense and the lncRNA chr does not belong to the annotation, we remove all the lncRNA associated-chr
+	if (! exists $refmRNAchr->{$chrlnc} && $monoexonic == -1) {
+
+		my @idstorm =  keys %{$reflncchr->{$chrlnc}};
+		print LOG "Filter overlap ($minfrac_over-$monoexonic-$linconly): $_   not antisense...\n" for (@idstorm);
+    	delete @{$reflnc}{@idstorm};
+    	
+	} elsif (exists $refmRNAchr->{$chrlnc}) { # else we check for overlap
 		
 		print STDERR "$chrlnc\n";
 		# start fork
 	    my $pid = $pm->start($chrlnc) and next;
      	
      	# get ref on hash per chromosome
-     	my $refh1 = $reflncchr->{$chrlnc};
-        my $refh2 = $refmRNAchr->{$chrlnc};  
 
-        %lnctorm = Intersect::getOverlapping($refh1, $refh2, $strandedmode, $minfrac_over, $monoexonic, $linconly, $verbosity);
+        %lnctorm = Intersect::getOverlapping($reflncchr->{$chrlnc}, $refmRNAchr->{$chrlnc}, $strandedmode, $minfrac_over, $monoexonic, $linconly, $verbosity);
+
     }
     $pm->finish(0, \%lnctorm);
     
@@ -190,6 +192,7 @@ foreach my $chrlnc (keys %{$reflncchr} ) {
 
 # wait all sub process
 $pm->wait_all_children;
+
 
 # print Dumper \%refhchild;
 # remove matching transcripts from hash of process chr

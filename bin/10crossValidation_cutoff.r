@@ -1,16 +1,16 @@
 # Rscript to compute optimal cutoff
-# adpated from Liguo Wang : http://dldcc-web.brc.bcm.edu/lilab/liguow/CGI/cpat/_build/html/index.html
+# adpated from Liguo Wang : http:#dldcc-web.brc.bcm.edu/lilab/liguow/CGI/cpat/_build/html/index.html
 
 # Install ROCR package if missing
-# tx to : http://stackoverflow.com/questions/4090169/elegant-way-to-check-for-missing-packages-and-install-them
-# see also : http://statistics.berkeley.edu/computing/R-packages
+# tx to : http:#stackoverflow.com/questions/4090169/elegant-way-to-check-for-missing-packages-and-install-them
+# see also : http:#statistics.berkeley.edu/computing/R-packages
 # install in pwd by default
 # Note:  Better is that user types install.packages('ROCR') in a R session
 pwd <- Sys.getenv("PWD");
 .libPaths(c(pwd,.libPaths()))
 list.of.packages <- c("ROCR")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
-if(length(new.packages)) install.packages(new.packages, repos="http://cran.r-project.org/",  dependencies = TRUE)
+if(length(new.packages)) install.packages(new.packages, repos="http:#cran.r-project.org/",  dependencies = TRUE)
 
 # Load lib
 library('ROCR')
@@ -64,33 +64,36 @@ Labls = sapply(seq(1:nb_cross_val), function(i){output[[i]]$Label})
 # ROCR
 ROCR_data = list(predictions=Response,Labels=Labls)
 pred <- prediction(ROCR_data$predictions, ROCR_data$Labels)
+
 #perf <- performance(pred,"auc")
 
 
 
 png(paste(cpatinfile,".png",sep=""), h=800, w=800)
-par(mfrow=c(2,2),mar=c(5,4,2,2),cex.axis=1.2, cex.lab=1.2)
+# par(mfrow=c(2,2),mar=c(5,4,2,2),cex.axis=1.2, cex.lab=1.2)
+par(cex.axis=1.2, cex.lab=1.2)
+
 #ROC curve
 #pdf("Human_10fold.ROC.pdf")
-perf <- performance(pred,"tpr","fpr")
-plot(perf,col="blue",lty=3,xlab="1-Specificity",ylab="Sensitivity",ylim=c(0.7,1),xlim=c(0,0.3),main="",cex.axis=1.5,cex.label=1.5)	
-plot(perf,lwd=2,avg="vertical",add=TRUE,col="red",xlab="1-specificity",ylab="sensitivity",main="",cex.axis=1.2,cex.label=1.2) 
-#dev.off()
-
-#precision
-#pdf("Human_10fold.precision_vs_recall.pdf")
-d=performance(pred,measure="prec", x.measure="rec")
-plot(d,col="blue",lty=3,xlab="Recall (TPR)",ylab="Precision (PPV)",xlim=c(0.7,1),ylim=c(0.7,1),cex.axis=1.2,cex.label=1.2)
-plot(d,lwd=2,avg="vertical",col="red",xlab="Recall (TPR)",ylab="Precision (PPV)",add=T,cex.axis=1.2,cex.label=1.2)
-#dev.off()
-
-
-#Accuracy
-#pdf("Human_10fold.Accuracy.pdf")
-perf <- performance(pred,"acc")
-plot(perf,col="blue",lty=3,xlab="Coding probability cutoff",ylab="Accuracy",ylim=c(0.7,1),cex.axis=1.2,cex.label=1.2) 
-plot(perf,lwd=2,avg="vertical",add=TRUE,col="red",cex.axis=1.2,cex.label=1.2) 
-#dev.off()
+# perf <- performance(pred,"tpr","fpr")
+# plot(perf,col="blue",lty=3,xlab="1-Specificity",ylab="Sensitivity",ylim=c(0.7,1),xlim=c(0,0.3),main="",cex.axis=1.5,cex.label=1.5)	
+# plot(perf,lwd=2,avg="vertical",add=TRUE,col="red",xlab="1-specificity",ylab="sensitivity",main="",cex.axis=1.2,cex.label=1.2) 
+# #dev.off()
+# 
+# #precision
+# #pdf("Human_10fold.precision_vs_recall.pdf")
+# d=performance(pred,measure="prec", x.measure="rec")
+# plot(d,col="blue",lty=3,xlab="Recall (TPR)",ylab="Precision (PPV)",xlim=c(0.7,1),ylim=c(0.7,1),cex.axis=1.2,cex.label=1.2)
+# plot(d,lwd=2,avg="vertical",col="red",xlab="Recall (TPR)",ylab="Precision (PPV)",add=T,cex.axis=1.2,cex.label=1.2)
+# #dev.off()
+# 
+# 
+# #Accuracy
+# #pdf("Human_10fold.Accuracy.pdf")
+# perf <- performance(pred,"acc")
+# plot(perf,col="blue",lty=3,xlab="Coding probability cutoff",ylab="Accuracy",ylim=c(0.7,1),cex.axis=1.2,cex.label=1.2) 
+# plot(perf,lwd=2,avg="vertical",add=TRUE,col="red",cex.axis=1.2,cex.label=1.2) 
+# #dev.off()
 
 
 #sensitivity vs specificity
@@ -105,7 +108,7 @@ mean_Sn=mean(sapply(1:length(pred@predictions), function(i) { P@y.values[[i]][wh
 #pdf("Human_10fold_sens_vs_spec.pdf")
 ymin=0.5
 ymax=1
-plot(S,col="blue",lty=3,ylab="Performance",xlab="Coding Probability Cutoff",ylim=c(ymin,ymax),cex.axis=1.2,cex.label=1.2) 
+plot(S,col="blue",lty=3,ylab="Performance",xlab="Coding Probability Cutoff",ylim=c(ymin,ymax),cex.axis=1.2,cex.label=1.2, main="Two-Graph ROC curves") 
 plot(S,lwd=2,avg="vertical",add=TRUE,col="blue") 
 plot(P,col="red",lty=3, add=TRUE,) 
 plot(P,lwd=2,avg="vertical",add=TRUE,col="red") 

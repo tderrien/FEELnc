@@ -130,6 +130,8 @@ sub foverlap
 		warn "Warning: Mode stranded activated with strandA = '$s1' and strandB = '$s2' ($beg1-$end1 vs $beg2-$end2)\n" if ($s1 ne "+" && $s1 ne "-" && $s2 ne "+" && $s1 ne "-");
 	}
 	# if overlap
+		my $resustrand = strandmode($s1,$s2,$mode);
+# 	print STDERR "$resustrand == strandmode($s1,$s2,$mode) and ($end1>=$beg2)&&($beg1<=$end2)\n";
 	return ( strandmode($s1,$s2,$mode) and ($end1>=$beg2)&&($beg1<=$end2));
 
 
@@ -137,21 +139,26 @@ sub foverlap
 
 # return 1 if the two strands are ok wrt to mode 
 # mode  : mode 0 is unstranded // 1 if required same strandness // -1 for different strand
+# if strand is not specified "." and mode is stranded or different strand, return 0 (stringent way)
 sub strandmode{
 
 	my ($s1,$s2,$mode) = @_;
-	
-	if ($mode == 1){
-		($s1 eq $s2) ? return 1:0;
-	}elsif ($mode ==0){
-		return 1;
-	}elsif ($mode == -1){
-		if ($s1 eq "." || $s2 eq "."){return 0} # for opposite strand / antisense; we required that the 2 strand should be defined i.e + or -
-		($s1 ne $s2) ? return 1:0;
+
+	# if mode is stranded i.e (1 or -1)
+	if ($mode){
+		if ($s1 eq "." || $s2 eq "."){
+			return 0;
+		}else{
+			if ($mode == 1) {		# if mode is stranded sense
+				($s1 eq $s2) ? return 1:0;
+			} elsif ($mode == -1){ # if mode is stranded antisense
+				($s1 ne $s2) ? return 1:0;		
+			}
+		}
+	} else { # if mode is unstranded, return 1
+		return 1
 	}
 }
-
-
 
 
 # Sub routines for computing overlap between 2 ranges

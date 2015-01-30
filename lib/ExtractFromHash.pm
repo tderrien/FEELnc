@@ -198,6 +198,7 @@ sub printGTF{
 	# print if verbosity	
 	print STDERR "\nPrinting transcripts GTF...\n" if ($verbosity > 0);
 	
+# 	print Dumper $refh;
 	# Parse gtfHash to be printed
 	for my $tr (keys %{$refh}){
 		foreach my $feat1 (@{$refh->{$tr}->{"feature"}}) {
@@ -630,7 +631,6 @@ sub getCumulSizeFromGtfHash{
 
 	my %store_size;
 	
-# 	print Dumper %h;
 	# print if verbosity	
 	print STDERR "- Extract size from GtfHash (longest option set to $longest) ...\n" if ($verbosity > 0);	
 	
@@ -641,10 +641,10 @@ sub getCumulSizeFromGtfHash{
 		for my $tr (keys %{$refh}){
 		
 			#compute size
-			my $size			=	cumulSize($refh->{$tr}->{"feature"});
-			$store_size{$tr}	= $size;
+			my $size				=	cumulSize($refh->{$tr}->{"feature"});
+			$refh->{$tr}->{"size"}	=	$size;
 		}
-		return \%store_size;
+		return $refh;
 
 
 	} else { # MODE: get longest transcript per locus
@@ -652,61 +652,34 @@ sub getCumulSizeFromGtfHash{
 		# print if verbosity	
 		print STDERR "- Extract Longest feature per gene_id from GtfHash ...\n" if ($verbosity > 0);	
 		
-		# cp the hash into one that will only contain longest tx per locus 
-		my %h_filtered = %{$refh};
-		
-		# Hash for storing $tx/isoforms of equal sizes that should not be seen more than once 
-		# if not used, 2 txs of equal size will be removed themselves (line
-		my %notpassagain;
-		
-		# counter for progression
-		my $i=0;	
-		
-		# 1ST: Get size of the array ref and assign to transcript
-		#-----
-		for my $tr (keys %{$refh}){
-		
-			if ($verbosity> 10) {
+        my $refgene;
+        my %longest_tx;
+		my $i=0;
+		# Warning : sort keys to always get the same tx for reproducibility due to hash random storing and 2 isoforms of a same size
+        for my $tr (sort keys %{$refh}){
+
+ 			if ($verbosity> 10) {
 				Utils::showProgress(scalar(keys(%{$refh})), $i++, "Get longest Tx per gene: ");
 			}
 			
-			# For case of n isoforms of a same gene of equal size
-			next if ($notpassagain{$tr});
-			
-			#compute size
-			my $size	=	cumulSize($refh->{$tr}->{"feature"});
-			$refh->{$tr}->{"size"}	= $size;
+			# Get tx infos
+            my $size                =       ExtractFromHash::cumulSize($refh->{$tr}->{"feature"});
+            my $gene_id             =       $refh->{$tr}->{"gene_id"};
 
-			# counter for same size isoform
-			my $cpt =0;	
+            # initialize gene hash size
+            $refgene->{$gene_id}->{"size"}          = 0 if (!exists ($refgene->{$gene_id}->{"size"} ));
 
-			# 2ND : Loop on the cpied hash
-			#-----
-			for my $tr2 (keys %h_filtered){				
-								
-				# next if not same locus since we want biggest Tx *per* locus
-				next if ($refh->{$tr}->{"gene_id"} ne $h_filtered{$tr2}->{"gene_id"});
-				
-				# next if we are on the same tx!
-				next if ($tr eq $tr2);				
-				
+            if ($size > $refgene->{$gene_id}->{"size"} ){
+                    $refgene->{$gene_id}->{"size"}          =   $size;
+                    $longest_tx{$gene_id}					=	$tr;
+            }
+        }
 
-				#compute size
-				my $size2	=	cumulSize($h_filtered{$tr2}->{"feature"});
-				$h_filtered{$tr2}->{"size"}	= $size2;
-				
-				# if the 2 transcripts $tr and $tr2 have the same gene_id (isoforms of the same locus)
-				# if size of $tr > size $tr2
-				if ($refh->{$tr}->{"size"} >= $h_filtered{$tr2}->{"size"} ){
- 	 				# print "$tr $size >= $tr2 $size2 -- delete $tr2\n";
-					delete $h_filtered{$tr2};
-					
-					# Store $tr2 in hash in order that $tr when encounter in $h loop will not remove current $tr
-					$notpassagain{$tr2}++;
-				}
-			}
-		} 
-		return \%h_filtered;		
+		# map values 
+        my %new_hash = map { $_ => $refh->{$_} } values(%longest_tx);
+
+        return \%new_hash;
+		
 	}
 }
 

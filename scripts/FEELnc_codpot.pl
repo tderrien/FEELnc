@@ -135,7 +135,7 @@ if ($mRNAfileformat eq "gtf"){
 	# die if genome not specified
 	pod2usage("Error: Cannot read your genome file '$genome' (-g option)...\nFor help, see:\n$progname --help\n") if (! -r $genome && !-d $genome);
 
-	$refmrna		= Parser::parseGTF($mRNAfile, 'exon,CDS,stop_codon', undef , \%biotype , $verbosity);
+	$refmrna		= Parser::parseGTF($mRNAfile, 'exon,CDS,stop_codon,start_codon', undef , \%biotype , $verbosity);
 	my $sizeh		= keys(%{$refmrna});
 	
 	die "Your input mRNA file '", basename($mRNAfile),"' contains only *$sizeh* transcripts.\nNot enough to training the program (default option --numtx|-n == '$numtx')\n" if ($sizeh < $numtx);
@@ -202,14 +202,18 @@ if (defined $lncRNAfile){
 my $infile_outfa;
 my	$refin;
 if (Utils::guess_format($infile) eq "gtf"){
-	$refin			= Parser::parseGTF($infile, 'exon', undef , undef , $verbosity);
+	
+	$refin			=	Parser::parseGTF($infile, 'exon', undef , undef , $verbosity);
 	$infile_outfa	=	$infile.".fa";
 	ExtractFromHash::hash2fasta($refin, $genome, $infile_outfa,  $verbosity);
+	
 } elsif (Utils::guess_format($infile) eq "fasta"){
 	$infile_outfa = $infile;
+
 } else {
 	die "Error: Unrecognized format for input file '$infile'...\n";
 }
+
 print STDERR "> Run CPAT on '$infile_outfa':\n";
 my $cpatout 		= basename($infile);
 Cpat::runCPAT($orffile, $cdnafile, $lncfile, $cpatout, $infile_outfa, $verbosity);
@@ -217,14 +221,21 @@ print STDERR "> Check CPAT outfile '".$cpatout.".cpat':\n";
 
 
 # Compute Best cutoff if not defined
+# INFILE : INFILE.feature.xls
+#	- randomized INFILE with sub CPAT::WriteRdmCPATFile
+# 	- add header :  "mRNA_size	ORF_size	Fickett_score	Hexamer_score	coding_prob	label"
+#	- coding_prob is NA and will be recomputed in Rscript
+# OUTFILE : INFILE.Cutoff
+
 ####################################
 if (!defined $cpatcut){
 	my $snsp;
+	
 	($cpatcut, $snsp) = computeOptCutoff($cpatout.".feature.xls", $cpatout.".Cutoff", $rprogpath, $verbosity);
 	die "\nERROR: Something went wrong with best Cutoff computation\nPlease, make sure that you have :\nRscript in your PATH and R library ROCR installed (in a R session, type: \"install.packages('ROCR')\"\n"  if (!defined $cpatcut || !defined $snsp);
 	printf(">>TG-ROC Optimal CPAT cutoff = %.3f (achieves Sn/Sp = %.3f)\n", $cpatcut, $snsp);
 	print ">> Check TG-ROC image : ".$cpatout.".Cutoff.png\n";
-	unlink $cpatout.".Cutoff";
+# 	unlink $cpatout.".Cutoff";
 }
 
 # Create 2 files if input is in gtf : $infile.mRNA.gtf//lncRNA.gtf
@@ -245,10 +256,10 @@ if (Utils::guess_format($infile) eq "gtf"){
 if (Utils::guess_format($infile) eq "gtf"){
 	my @rmfiles = ($cdnafile, $orffile, $lncfile);
 	foreach my $file ( @rmfiles ) {
-    	     unlink $file or warn "Could not unlink $file: $!";
+#     	     unlink $file or warn "Could not unlink $file: $!";
 	}
 }
-unlink $cpatout.".feature.xls";
+# unlink $cpatout.".feature.xls";
 
 
 
@@ -287,7 +298,7 @@ sub writeGTFwrtCPAT{
 					my %tmph = %{$feat1};
 					delete @tmph{qw/feat_level start end strand frame/};
 					for (sort keys %tmph){
-						print LNC" $_ \"$tmph{$_}\";" if (defined $tmph{$_}); # id defined in order to test if parsinf $extrafield is OK (i.e in case people select FPKM and it does not exists in the file)
+						print LNC" $_ \"$tmph{$_}\";" if (defined $tmph{$_});
 					}
 					print LNC " CPAT_score \"",$refcpat->{uc($tr)}->{'coding_prob'},"\";";
 					print LNC "\n";
@@ -301,7 +312,7 @@ sub writeGTFwrtCPAT{
 					my %tmph = %{$feat1};
 					delete @tmph{qw/feat_level start end strand frame/};
 					for (sort keys %tmph){
-						print MRNA " $_ \"$tmph{$_}\";" if (defined $tmph{$_}); # id defined in order to test if parsinf $extrafield is OK (i.e in case people select FPKM and it does not exists in the file)
+						print MRNA " $_ \"$tmph{$_}\";" if (defined $tmph{$_}); 
 					}
 					print MRNA " CPAT_score \"",$refcpat->{uc($tr)}->{'coding_prob'},"\";";
 					print MRNA "\n";
@@ -327,7 +338,7 @@ sub computeOptCutoff {
 	print STDERR "> Compute optimal coding potential cutoff:\n";
 	my $h 	= Parser::parseCPAT($featurefile, $verbosity);
 	Cpat::WriteRdmCPATFile($h, $outfile, $verbosity);
-	print STDERR "Cpat::WriteRdmCPATFile($h, $outfile, $verbosity);\n";
+# 	print STDERR "Cpat::WriteRdmCPATFile($h, $outfile, $verbosity);\n";
 
 	# Launch 10 fold cross validation R script
 	#################
@@ -359,7 +370,6 @@ sub CreateORFcDNAFromGTF{
 	
 	# Note if $orffile is not defined, we just extract cDNA
 	
-	my $nbtxdiv2	= int ($nbtx/2);
 	my $orfob;
 	my $allow_no_start 	=	0;	# do not allow for CDS start not found
 	my $allow_no_stop 	=	0;	# do not allow for CDS stop not found
@@ -559,7 +569,6 @@ sub randomizedGTFtoFASTA{
 	$maxN			||= 5; 		# Proportion (in 100%) of N's authorized in new random sequence 
 	$verbosity		||= 0;  
 
-	my $nbtxdiv2	= int ($nbtx/2); # to create 2 files
 
 	my $split 			= 1;
 	my $hlightforover	= Parser::GTF2GTFgnlight ($h, $split, $verbosity);
@@ -570,12 +579,15 @@ sub randomizedGTFtoFASTA{
 	my $refgenomesize;
 	foreach my $id ( $db->ids){
 		next if ($id =~ /^AAEX|^JH/ ); # for dog chromosome
+		next if ($id =~ /^KI|^GL/ ); # for human chromosome GRCh38 : Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa
 		$refgenomesize->{$id} = $db->length($id); # populate hash with id => seq_length
 	}
+	print Dumper $refgenomesize;
 	
 	#  hashref tx annotation sizes
 	my $refannotsize 	= ExtractFromHash::getCumulSizeFromGtfHash ($h,$verbosity, 0);
 
+# 	print Dumper $refannotsize;
 
 	print STDERR "- Relocate Transcripts \n" if ($verbosity > 0);
 	my $i=0;
@@ -616,7 +628,7 @@ sub randomizedGTFtoFASTA{
 	
 			# define a random start/begin position on the random chr (and thus the end)
 			$beg		=  int(rand($refgenomesize->{$chrrdm}));
-			$end		=  $beg + $refannotsize->{$tx};		
+			$end		=  $beg + int( $refannotsize->{$tx}->{size} * $sizecorrec);
 		
 			# Self - Overlap			
 			$overlap = overlapwithH($chrrdm,$beg,$end, $hlightforover, $countTries, $verbosity);
