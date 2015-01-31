@@ -90,7 +90,7 @@ export PERL5LIB, FEELNC PATH and add it to your PATH
 -------------------------
 ## Launch the 3-step pipeline
 
-### - FEELnc_filter.pl
+### 1- FEELnc_filter.pl
 
 The first step of the pipeline (FEELnc_filter) consists in filtering out unwanted/spurious transcripts and/or transcripts overlapping (in sense) exons of the reference annotation 
 and especially protein_coding exons as they more probably correspond to new mRNA isoforms (see -b,--biotype option).
@@ -107,14 +107,42 @@ If your annotation contains transcript_biotype information (e.g protein_coding, 
 	> candidate_lncRNA.gtf
 
 This option is highly recommended if you don't want to remove transcripts 
-overlapping with other transcripts than mRNAs (e.g lincRNA, miRNA, pseudogene...)
+overlapping with other transcripts than mRNAs (e.g lincRNA, miRNA, pseudogene...).
+
+**- FULL OPTIONS (FEELnc_filter.pl --help) :**
+```
+  * General:
+      --help                Print this help
+      --man                 Open man page
+      --verbosity           Level of verbosity
+
+  * Mandatory arguments:
+      -i,--infile=file.gtf          Specify the GTF file to be filtered (such as a cufflinks transcripts/merged .GTF file) 
+      -a,--mRNAfile=file.gtf        Specify the annotation GTF file to be filtered on based on sense exon overlap (file of protein coding annotation)
+
+  * Filtering arguments:
+      -s,--size=200                 Keep transcript with a minimal size (default 200)
+      -b,--biotype                  Only consider transcript(s) from the reference annotation having this(these) biotype(s) (e.g : -b transcript_biotype=protein_coding,pseudogene) [default undef i.e all transcripts]
+      -l,--linconly                 Keep only long intergenic/interveaning ncRNAs [default FALSE]. 
+      --monoex=-1|0|1               Keep monoexonic transcript(s): mode to be selected from : -1 keep monoexonic antisense (for RNASeq stranded protocol), 1 keep all monoexonic, 0 remove all monoexonic   [default 0]
+      --biex=25                     Discard biexonic transcripts having one exon size lower to this value (default 25)
+
+  * Overlapping specification:
+      -f,--minfrac_over=0           minimal fraction out of the candidate lncRNA size to be considered for overlap [default 0 i.e 1nt]
+      -p,--proc=4                   number of thread for computing overlap [default 4]
+
+  * Log output:
+      -o,--outlog=file.log          Specify the log file of output which [default infile.log]
+
+```
 
 
-
-### - FEELnc_codpot.pl
+### 2- FEELnc_codpot.pl
 
 The second step of the pipeline (FEELnc_codpot) aims at computing the CPS i.e the coding potential score (between [0-1]) foreach of the candidate transcripts in the candidate_lncRNA.gtf file.
 
+**- INPUT :**
+ 
 It makes use of the CPAT tool which is an alignment-free program (thus very fast) which relies on  intrinsic properties of the fasta sequences of  two training files:
 	
 	- known_mRNA.gtf   : a set of known protein_coding transcripts
@@ -130,23 +158,51 @@ In this case, the reference genome file is required (ref_genome.FA)
 To calculate the CPS cutoff separating coding (mRNAs) versus long non-coding RNAs (lncRNAs), 
 FEELnc_codpot uses a R script that will make a 10 fold cross-validation on the input training files and finally,  extracts the CPS that maximizes sensitivity (Sn) and Specificity (Sp) (thanks to the ROCR library)
 
+**- OUTPUT :**
+
 If your input file is called **INPUT**, this second module will create 4 output files:
  
  	- INPUT.cpat		: gathering all CPAT metric together with the CPS for all input tx
-	 - INPUT.Cutoff.png  : the .png image of the Two Graphic ROC curves to determine the optimal cutoff value.
+	 - INPUT.Cutoff.png  : the .png image of the Two Graphic ROC curves to determine the optimal CPS cutoff value.
      - INPUT.lncRNA.gtf  : a .GTF file of the transcripts below the CPS (Your final set of lncRNAs)
      - INPUT.mRNA.gtf    : a .GTF file of the transcripts above the CPS (a a priori new set of mRNAs)
      
+**- FULL OPTIONS (FEELnc_codpot.pl --help) :**
  
+```
+  * General:
+      --help                Print this help
+      --man                 Open man page
+      --verbosity           Level of verbosity
 
+  * Mandatory arguments:
+      -i,--infile=file.gtf/.fasta           Specify the .GTF or .FASTA file  (such as a cufflinks transcripts/merged .GTF or .FASTA file) 
+      -a,--mRNAfile=file.gtf/.fasta         Specify the annotation .GTF or .FASTA file  (file of protein coding transcripts .GTF or .FASTA file)
 
-### - FEELnc_classifier.pl
+  * Optional arguments:
+      -g,--genome=genome.fa                         genome file or directory with chr files (mandatory if input is .GTF) [ default undef ]
+      -l,--lncRNAfile=file.gtf/.fasta       specify a known set of lncRNA for training .GTF or .FASTA  [ default undef ]
+      -b,--biotype                  only consider transcripts having this(these) biotype(s) from the reference annotation (e.g : -b transcript_biotype=protein_coding,pseudogene) [default undef i.e all transcripts]
+      -n,--numtx=2000               Number of transcripts required for the training [default 2000 ]
+      -c,--cpatcut=[0-1]                    CPAT coding potential cutoff [default undef i.e will compute best cutoff]
+
+  *Intergenic lncrna extraction:
+            -to be added
+
+```
+
+### 3- FEELnc_classifier.pl
 
 The last step of the pipeline consists in classifying new lncRNAs w.r.t to the annotation of mRNAs in order to annotate.
 
 Classifing lncRNAs with mRNA could help to predict functions for lncRNAs
 
-The classes are defined as in Derrien et al, Genome Research. 2012, i.e:
+	# Usage:
+    FEELnc_classifier.pl -i lncRNA.gtf -a mRNA.gtf > lncRNA_classes.txt
+
+**- OUTPUT :**
+
+The classes are defined as in Derrien et al, Genome Research. 2012, i.e :
 
 - **Intergenic lncRNAs** (i.e lincRNAs)
  - *divergent*  : when the lincRNA is transcribed in an opposite direction (head to head) w.r.t to the closest mRNA
@@ -163,7 +219,21 @@ The classes are defined as in Derrien et al, Genome Research. 2012, i.e:
  - *Nested*:
     - antisense : lncRNA intron overlaps antisense mRNA     
     - sense : lncRNA intron overlaps sense mRNA exons
-   
-    # Usage:
-    FEELnc_classifier.pl -i lncRNA.gtf -a mRNA.gtf > lncRNA_classes.txt
 
+
+**- FULL OPTIONS (FEELnc_classifier.pl --help) :**
+
+``` 
+    General:
+      --help                Print this help
+      --man                 Open man page
+      --verbosity           Level of verbosity
+
+    Mandatory arguments:
+      -i,--lncrna=file.gtf Specify the lncRNA GTF file 
+      -a,--mrna=file.gtf    Specify the annotation GTF file (file of protein coding annotaion)
+
+    Filtering arguments:
+      -w,--window=200               Size of the window around the lncRNA to compute interactins/classification [default 10000]
+      -m, --maxwindow=10000 Maximal size of the window during the expansion process [default 10000]
+```
