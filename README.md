@@ -27,14 +27,14 @@ The formats used to describe genes, transcripts, exon is **.GTF** and **.FASTA**
 
 Basically, FEELnc users should have the following minimal input files:
 
-	- Infile.GTF           : input GTF file (e.g cufflinks transcripts.GTF)
-	- ref_annotation.GTF   : GTF annotation file *
-	- ref_genome.FASTA     : genome FASTA file or directory with individual chrom FASTA files
+	- Infile.GTF          (-i,--infile)   : input GTF file (e.g cufflinks transcripts.GTF)
+	- ref_annotation.GTF  (-a,--mRNAfile) : GTF annotation file*
+	- ref_genome.FASTA    (-g,--genome)   : genome FASTA file or directory with individual chrom FASTA files
 
 
-* *Note: It is recommended to extract protein_coding transcripts (mRNAs) from the reference annotation file (ref_annotation.GTF) either manually or by using the option :*
-**--biotype transcript_biotype=protein_coding ** 
-
+\* *Note: It is recommended to only extract protein_coding transcripts (mRNAs) from the reference annotation file (ref_annotation.GTF) when this information is available, either manually or by using the option :*
+**--biotype transcript_biotype=protein_coding **. 
+In doing so, you will not remove lncRNAs overlapping other non-coding RNAs or pseudogenes.... 
    
  
 -------------------------
