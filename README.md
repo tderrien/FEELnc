@@ -5,9 +5,9 @@
 
 ## Introduction
 
-This document is intended to give a (minimal) description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNA).
+This document is intended to give a (minimal) description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs).
 
-Currently, FEELnc is composed of 3 modules (See 3- Launch FEELnc pipeline for more details):
+Currently, FEELnc is composed of 3 modules (See *Launch FEELnc pipeline* for more details):
 
 	* FEELnc_filter.pl	: Extract, filter candidate transcripts
 	* FEELnc_codpot.pl	: Compute the coding potential of candidate transcripts
@@ -21,37 +21,41 @@ To get help on each module, you can type :
     FEELnc_filter.pl --man 
 
 
+## Input files
+
 The formats used to describe genes, transcripts, exon is **.GTF** and **.FASTA** for genome file. 
 
 Basically, FEELnc users should have the following minimal input files:
 
-	- Infile.GTF		   : input GTF file (e.g cufflinks transcripts.GTF)
-	- ref_annotation.GTF   : GTF annotation file**
-	- ref_genome.FA		: genome FASTA file or directory with individual chrom FASTA files
+	- Infile.GTF           : input GTF file (e.g cufflinks transcripts.GTF)
+	- ref_annotation.GTF   : GTF annotation file *
+	- ref_genome.FASTA     : genome FASTA file or directory with individual chrom FASTA files
 
 
-*Note: It is recommended to extract protein_coding transcripts (mRNAs) from the reference annotation file (ref_annotation.GTF) either manually or by using the option :
+* *Note: It is recommended to extract protein_coding transcripts (mRNAs) from the reference annotation file (ref_annotation.GTF) either manually or by using the option :*
+**--biotype transcript_biotype=protein_coding ** 
 
-> --b transcript_biotype=protein_coding (see below)
-
-
+   
+ 
+-------------------------
 ## Installation and requirements
+
 
 ### Requirements
 	
 The following software and libraries must be installed on your machine:
 
-    - Perl5+ : tested with version 5.18.2 (https://www.perl.org/)
+- Perl5+ : tested with version 5.18.2 (https://www.perl.org/)
  * [Bioperl](http://www.bioperl.org/wiki/Main_Page)  : tested with version BioPerl-1.6.924 )
- * [Parralell::ForkManager](http://search.cpan.org/~dlux/Parallel-ForkManager-0.7.5/ForkManager.pm "Title"): tested with version 1.06 (http://search.cpan.org/~dlux/Para
-    - R [Rscript](http://cran.r-project.org): tested with version 3.1.0 
+ * [Parralell::ForkManager](http://search.cpan.org/~szabgab/Parallel-ForkManager-1.07/lib/Parallel/ForkManager.pm): tested with version 1.07
+- R [Rscript](http://cran.r-project.org): tested with version 3.1.0.
  * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) R library (type "install.packages('ROCR')" in a R session)
-	- [CPAT tool](http://dldcc-web.brc.bcm.edu/lilab/liguow/CGI/cpat/_build/html/index.html): Coding Potential Assessment Tool (tested with version 1.2.2) : 
+- [CPAT tool](http://dldcc-web.brc.bcm.edu/lilab/liguow/CGI/cpat/_build/html/index.html): Coding Potential Assessment Tool: tested with version 1.2.2. 
 
 
 ### Installation
 
-Download and extract FEELnc archive:
+Clone the FEELnc git:
 
 	git clone https://github.com/tderrien/FEELnc.git
 
@@ -84,7 +88,7 @@ export PERL5LIB, FEELNC PATH and add it to your PATH
 
 
 -------------------------
-## Launch FEELnc pipeline
+## Launch the 3-step pipeline
 
 ### - FEELnc_filter.pl
 
@@ -113,8 +117,8 @@ The second step of the pipeline (FEELnc_codpot) aims at computing the CPS i.e th
 
 It makes use of the CPAT tool which is an alignment-free program (thus very fast) which relies on  intrinsic properties of the fasta sequences of  two training files:
 	
- - known_mRNA.gtf   : a set of known protein_coding transcripts
- - known_lncRNA.gtf : a set of known lncRNA transcripts
+	- known_mRNA.gtf   : a set of known protein_coding transcripts
+	- known_lncRNA.gtf : a set of known lncRNA transcripts
 
 However, for most organisms, the set of known_lncRNA transcripts is not known and thus 
 a set of genomic intergenic regions are automatically extracted as the lncRNA training set. 
@@ -126,39 +130,40 @@ In this case, the reference genome file is required (ref_genome.FA)
 To calculate the CPS cutoff separating coding (mRNAs) versus long non-coding RNAs (lncRNAs), 
 FEELnc_codpot uses a R script that will make a 10 fold cross-validation on the input training files and finally,  extracts the CPS that maximizes sensitivity (Sn) and Specificity (Sp) (thanks to the ROCR library)
 
-* Output:
-
-Let's say your input file is called **INPUT**, this second module will create 4 output files 
+If your input file is called **INPUT**, this second module will create 4 output files:
  
- - INPUT.cpat: gathering all CPAT metric together with the CPS for all input tx
+ 	- INPUT.cpat		: gathering all CPAT metric together with the CPS for all input tx
+	 - INPUT.Cutoff.png  : the .png image of the Two Graphic ROC curves to determine the optimal cutoff value.
+     - INPUT.lncRNA.gtf  : a .GTF file of the transcripts below the CPS (Your final set of lncRNAs)
+     - INPUT.mRNA.gtf    : a .GTF file of the transcripts above the CPS (a a priori new set of mRNAs)
+     
  
- - INPUT.Cutoff.png: a .png image of the Two Graphic ROC curves to determine the optimal cutoff value.
- 
- - INPUT.lncRNA.gtf : a .GTF file of the transcripts below the CPS (Your final set of lncRNAs)
-
- - INPUT.mRNA.gtf : a .GTF file of the transcripts above the CPS (a a priori new set of mRNAs)
 
 
 ### - FEELnc_classifier.pl
 
-The last step of the pipeline consists in classifying new lncRNAs w.r.t to the annotation of mRNAs in order to annotate :
+The last step of the pipeline consists in classifying new lncRNAs w.r.t to the annotation of mRNAs in order to annotate.
 
-	* Intergenic lncRNAs i.e lincRNAs
-		- divergent : when the lincRNA is transcribed in an opposite direction (head to head) w.r.t to the closest mRNA
-		- convergent: when the lincRNA is transcribed in a convergent direction w.r.t to the closest mRNA
-		- same_strand: when the lincRNA is transcribed in a same starnd w.r.t to the closest mRNA
+Classifing lncRNAs with mRNA could help to predict functions for lncRNAs
 
-	* Genic lncRNAs:  lncRNAs overlapping mRNAs either
-		- Exonic:
-			antisense : at least one lncRNA exon overlaps in antisense an mRNA exon
-			sense : there should not be since there are filtered in the first step
-		- Intronic:
-			antisense : lncRNA exon overlaps in antisense mRNA introns (but none exons)
-			sense : lncRNA exon overlaps in sense mRNA introns (but none exons)
-		- Containing:
-			antisense : lncRNA intron overlaps antisense mRNA exons
-			sense : lncRNA intron overlaps sense mRNA exons
+The classes are defined as in Derrien et al, Genome Research. 2012, i.e:
 
-	# Usage:
+- **Intergenic lncRNAs** (i.e lincRNAs)
+ - *divergent*  : when the lincRNA is transcribed in an opposite direction (head to head) w.r.t to the closest mRNA
+ - *convergent*: when the lincRNA is transcribed in a convergent direction w.r.t to the closest mRNAs.
+ - *same_strand*: when the lincRNA is transcribed in a same starnd w.r.t to the closest mRNA
+
+- **Genic lncRNAs** (lncRNAs overlapping mRNAs)
+ - *Exonic* :
+    - antisense : at least one lncRNA exon overlaps in antisense an mRNA exon
+    - sense : there should not be since there are filtered in the first step
+ - *Intronic* :
+    - antisense : lncRNA exon overlaps in antisense mRNA introns (but none exons)
+    - sense : lncRNA exon overlaps in sense mRNA introns (but none exons)
+ - *Nested*:
+    - antisense : lncRNA intron overlaps antisense mRNA     
+    - sense : lncRNA intron overlaps sense mRNA exons
+   
+    # Usage:
     FEELnc_classifier.pl -i lncRNA.gtf -a mRNA.gtf > lncRNA_classes.txt
 
