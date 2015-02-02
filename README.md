@@ -45,9 +45,9 @@ In doing so, you will not remove lncRNAs overlapping other non-coding RNAs or ps
 	
 The following software and libraries must be installed on your machine:
 
-- Perl5+ : tested with version 5.18.2 (https://www.perl.org/)
- * [Bioperl](http://www.bioperl.org/wiki/Main_Page)  : tested with version BioPerl-1.6.924 )
- * [Parralell::ForkManager](http://search.cpan.org/~szabgab/Parallel-ForkManager-1.07/lib/Parallel/ForkManager.pm): tested with version 1.07
+- [Perl5+](https://www.perl.org/) : tested with version 5.18.2
+ * [Bioperl](http://www.bioperl.org/wiki/Main_Page)  : tested with version BioPerl-1.6.924
+ * [Parralell::ForkManager](http://search.cpan.org/~szabgab/Parallel-ForkManager-1.07/lib/Parallel/ForkManager.pm) : tested with version 1.07
 - R [Rscript](http://cran.r-project.org): tested with version 3.1.0.
  * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) R library (type "install.packages('ROCR')" in a R session)
 - [CPAT tool](http://dldcc-web.brc.bcm.edu/lilab/liguow/CGI/cpat/_build/html/index.html): Coding Potential Assessment Tool: tested with version 1.2.2. 
@@ -63,7 +63,7 @@ Go to FEELnc directory
 
 	cd FEELnc
 
-export PERL5LIB, FEELNC PATH and add it to your PATH
+export PERL5LIB, FEELNCPATH and add it to your PATH
 
 	export PERL5LIB=${PWD}/lib/
 	export FEELNCPATH=${PWD}
