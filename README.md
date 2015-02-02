@@ -33,7 +33,7 @@ Basically, FEELnc users should have the following minimal input files:
 
 
 \* *Note: It is recommended to only extract protein_coding transcripts (mRNAs) from the reference annotation file (ref_annotation.GTF) when this information is available, either manually or by using the option :*
-**--biotype transcript_biotype=protein_coding **. 
+**--biotype transcript_biotype=protein_coding**. 
 In doing so, you will not remove lncRNAs overlapping other non-coding RNAs or pseudogenes.... 
    
  
@@ -50,7 +50,7 @@ The following software and libraries must be installed on your machine:
  * [Parralell::ForkManager](http://search.cpan.org/~szabgab/Parallel-ForkManager-1.07/lib/Parallel/ForkManager.pm) : tested with version 1.07
 - R [Rscript](http://cran.r-project.org): tested with version 3.1.0.
  * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) R library (type "install.packages('ROCR')" in a R session)
-- [CPAT tool](http://dldcc-web.brc.bcm.edu/lilab/liguow/CGI/cpat/_build/html/index.html): Coding Potential Assessment Tool: tested with version 1.2.2. 
+- [CPAT tool](http://rna-cpat.sourceforge.net/#installation): Coding Potential Assessment Tool: tested with version 1.2.2. 
 
 
 ### Installation
@@ -79,12 +79,11 @@ export PERL5LIB, FEELNCPATH and add it to your PATH
 
 
 	# Coding_Potential
-    # Note1 :  this test is only done on  100 tx (-n 100 option)
-	# Note2 : this module requires the CPAT tool and thus the variable PYTONPATH to be defined
-	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf     -g genome_chr38.fa -n 100 -v 20
+    # Note1 :  as a test, the training is only done on  100 tx (-n 100 option)
+	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa -n 100 
     
     # Classifier
-	FEELnc_classifier.pl -i candidate_lncRNA.gtf.lncRNA.gtf  -a annotation_chr38.gtf    >  candidate_lncRNA_classes.txt
+	FEELnc_classifier.pl -i candidate_lncRNA.gtf.lncRNA.gtf -a annotation_chr38.gtf > candidate_lncRNA_classes.txt
 
 
 -------------------------
@@ -108,6 +107,14 @@ If your annotation contains transcript_biotype information (e.g protein_coding, 
 
 This option is highly recommended if you don't want to remove transcripts 
 overlapping with other transcripts than mRNAs (e.g lincRNA, miRNA, pseudogene...).
+For stranded RNASeq protocol, it is also possible  to include monoexonic lncRNAs that are antisense to mRNAs e.g 
+
+	FEELnc_filter.pl -i infile.gtf \
+	-a annotation_mRNA.gtf \
+	-b transcript_biotype=protein_coding \
+	--monoex=-1
+	> candidate_lncRNA.gtf
+
 
 **- FULL OPTIONS (FEELnc_filter.pl --help) :**
 ```
