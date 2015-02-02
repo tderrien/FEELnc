@@ -219,7 +219,7 @@ sub DoItForMe{
 	print "#lncRNA file :  lncrna : $lncrna_file \n";
 	print "#mRNA file : $mrna_file\n";
 	print "#Minimal window size : $window\n";
-	print "Maximal window size : $max_window\n";
+	print "#Maximal window size : $max_window\n";
 	print "#Number of lncRNA : $numberlnc \n";
 	print "#Number of mRNA : $nb_mrna\n";
 	print "#Number of interaction : $nombre \n";
