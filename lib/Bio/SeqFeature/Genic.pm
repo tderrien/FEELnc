@@ -437,7 +437,7 @@ sub printer {
 
 sub _print_subtype{
 	my $subtype = shift;
-	my %subtypes =( 1 => 'exonic', 2=>' intronic', 3 => 'containing');
+	my %subtypes =( 1 => 'exonic', 2=>'intronic', 3 => 'containing');
 	if (exists $subtypes{$subtype}) {
 		return $subtypes{$subtype};
 	}
