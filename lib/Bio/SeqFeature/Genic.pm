@@ -48,7 +48,7 @@ sub new {
 	$pkg->SUPER::new(
 		_type => 1,
 		_distance => 0, 
-		_nested => undef,
+		_status => undef,
 		_subtype => undef,
 		@_,
 	);
@@ -78,10 +78,12 @@ sub subtype{
 sub _set_subtype(){
 	my $self = shift;
 	my $sub_t = shift;
-	my %subtypes =( 1 => 'exonic', 2=>' intronic', 3 => 'overlapping');
+	my %subtypes =('exonic' => 1 ,'intronic' => 1, 'none'=> 1);
 	if (defined($subtypes{$sub_t})){
 		$self->{'_subtype'} = $sub_t;
-
+	}
+	else {
+		croak("Error unrecognized subtype : $sub_t\n");
 	}
 }
 
@@ -91,37 +93,11 @@ sub _set_subtype(){
 sub _get_subtype{
 	my $self = shift;
 	if ( _isDefined ($self->{'_subtype'}) == 0) { #undef
-
 		$self->_set_subtype($self->_calculate_subtype());
 	}
 	return $self->{'_subtype'};
 }
-=head1 isOverlapping() 
 
-Bio::SeqFeature::Interaction
-
-=head1 DESCRIPTION 
-
-if it's not intronic and not exonic it's overlapping
-see classification rules (T.Derrien)
-
-=cut
-
-sub isOverlapping{
-	
-	my $interaction = shift;
-	if ($interaction->_isComplete() == 0) {
-		
-		croak ("To look if your interaction is Overlapping, you must have an complete interaction \n");
-	}	
-	if(_isDefined($interaction->{'_subtype'})==0) {
-		$interaction->_set_subtype($interaction->_calculate_subtype()); # what is the subtype?
-	}
-	if($interaction->_get_subtype()==3){
-		return 1;
-	}else {return 0;}
-	
-}
 
 =head1 calculate_subtype() 
 
@@ -136,17 +112,16 @@ see classification rules (T.Derrien)
 
 sub _calculate_subtype(){
 	my $interaction = shift;
-	if ($interaction->_isComplete() == 0) {
-		
+	if ($interaction->_isComplete() == 0) {	
 		croak ("To make operation on interaction, you must have an complete interaction \n");
 	}	
+	
 	if (isExonic($interaction)){
- 
-			return 1;
+			return 'exonic';
 		}elsif ( isIntronic($interaction)){
-			return 2;
+			return 'intronic';
 		}else{
-			return 3; #overlapping
+			return 'none'; #overlapping
 		}
 }
 
@@ -166,7 +141,7 @@ sub isExonic{
 	my $interaction = shift;
 	if ($interaction->_isComplete() == 0) {
 		
-		croak ("To look if your interaction is Exonic, you must have an complete interaction \n");
+		croak ("To look if your interaction is Exonic, you must have a complete interaction \n");
 	}	
 	my $object = $interaction->object();
 	my $subject = $interaction->subject();
@@ -196,23 +171,45 @@ sub isIntronic {
 	#my $pkg = shift;
 	my $interaction = shift;
 	if ($interaction->_isComplete() == 0) {
-		
 		croak ("To look if your interaction is Intronic, you must have an complete interaction \n");
 	}	
-	my $object = $interaction->object();
-	my $subject = $interaction->subject();
-
-	my @introns_mRNA= _getIntrons($object);
-	my @exons_lncRNA = _getExons($subject);
-
-	#print "intronic call \n";
 	
-	if (_overlaps_btwn_feature_array(\@exons_lncRNA, \@introns_mRNA, 1) == 1){
-		return 1;
-	}else{
-		return 0;
+	my $lncrna = $interaction->object();
+	#print STDERR $lncrna->get_tag_values("transcript_id"), " start: ", $lncrna->start(), " end: ", $lncrna->end(), "\n";
+	
+	my @exons_lncRNA = _getExons($lncrna);
+	
+	my $mrna = $interaction->subject();
+	
+	my @introns_mRNA= _getIntrons($mrna);
+	
+	
+	#print "intronic call \n";
+	if (scalar(@introns_mRNA) == 0) {return 0}
+	
+	
+	foreach my $lncrna_exon (@exons_lncRNA) {
+		unless (_is_included($lncrna_exon, \@introns_mRNA)) {return 0}
 	}
+	
+	return 1;
 }
+
+
+# _is_included : private method
+# it returns true if the first argument is included into at least one of the following arguments
+
+sub _is_included {
+	my $first = shift;
+	my $others = shift;
+	
+	foreach my $other (@{$others}) {
+		if ($other->contains($first)) {return(1)}
+	}
+	
+	return (0);
+}
+
 
 #_overlaps_btwn_feature_array : private method
 # function : say if there is an overlap between the exons of 2 features
@@ -346,48 +343,13 @@ sub _getExons {
 				# ---------------------------------------------------- #
 
 sub _order_array_features {
-	
 	my @fs_array = @_; #features array
-	my @f_array = shuffle @fs_array;
-	my $i = 0;
-	my %hash=();
-	#print "taille array : ", $#f_array, "\n";
-	for ($i =0 ; $i<=$#f_array; $i++){
-		$hash{$i} = $f_array[$i]->start();
-		
-	}
- 
-	my @keys = sort { $hash{$a} <=> $hash{$b} } keys %hash; # sort the hash table on values 
- 	$i = 0;
-	foreach my $cle (@keys) {		
-		$fs_array[$i] = $f_array[$cle]; # cle : indice of the array 
-		
-		$i++;
-	}
-	return (@fs_array);
+	my @ordered_array = sort {$a->start() <=> $b->start()} @fs_array;
+	
+	
+	return (@ordered_array);
 }
-				# ---------------------------------------------------- #
-				# 					printer							   #
 
-				# ---------------------------------------------------- #
-=head1 printer() 
-
-=head1 DESCRIPTION 
-
-$interaction->printer()
-print interaction informations
-
-=cut	
-# this fonction use the SUPER printer and is also defined in intergenic
-# sub printer {
-# 	my $self = shift;
-# 	$self->SUPER::printer();
-# 	print "\t Other info \n";
-# 	Bio::SeqFeature::Genic->_ligne_carre();
-# 	print "\t Nested : ",$self->nested(),"\n";
-# 	print "\t Subtype : ",_print_subtype($self->subtype()),"\n";
-# 
-# }
 
 
 =head1 printer_mini() 
@@ -405,110 +367,86 @@ sub printer_mini {
 	my $best=shift;
 	$self->SUPER::printer_mini($best);
 	
-	my $status = 'not_nested';
-	if ($self->nested==1) {
-		$status='nested';
-	}
-	print "\t Status=",$status;
-	print "\t Subtype=",_print_subtype($self->subtype()),"\n";
+	print "\t Status=",$self->status();
+	print "\t Subtype=", $self->subtype(),"\n";
 
 }
 
-=head1 DESCRIPTION 
-
-$interaction->printer()
-print interaction informations
-
-=cut	
-# this fonction use the SUPER printer and is also defined in intergenic
-sub printer {
-	my $self = shift;
-	$self->SUPER::printer();
-	print "\t Other info \n";
-	Bio::SeqFeature::Genic->_ligne_carre();
-	print "\t Nested : ",$self->nested(),"\n";
-	print "\t Subtype : ",_print_subtype($self->subtype()),"\n";
-
-}
-				# ---------------------------------------------------- #
-				# ---------------------------------------------------- #
-#_print_subtype : private method
-# function : do the correspondance between the subtype number and the string corresponding
-
-sub _print_subtype{
-	my $subtype = shift;
-	my %subtypes =( 1 => 'exonic', 2=>'intronic', 3 => 'containing');
-	if (exists $subtypes{$subtype}) {
-		return $subtypes{$subtype};
-	}
-	return $subtype;
-}
-				# ---------------------------------------------------- #
-				# ---------------------------------------------------- #
-=head1 nested() 
+=head1 status() 
 
 Bio::SeqFeature::Generic
 
 =head1 DESCRIPTION 
 
-my $nested = $interaction->nested()
+my $status = $interaction->status()
 
-say if the interaction is nested or not (see classification rules Derrien et al 2011)
+says what is the interaction status (containing, nested or overlapping) or not (see classification rules Derrien et al 2011)
 =cut	
 
-sub nested {
+sub status {
 	my $self =shift;
-	my $nested = $self->_get_nested();
-	return $nested;
+	my $status = $self->_get_status();
+	return $status;
 }
-				# ---------------------------------------------------- #
-				# ---------------------------------------------------- #
-#_get_nested : private method
-# function : getter of nested attribute
-sub _get_nested{
+	
+	
+#_get_status : private method
+# function : getter of status attribute
 
+sub _get_status{
 	my $self = shift;
-	if ( _isDefined($self->{"_nested"}) == 0 ){
-		$self->_set_nested($self->_isNested());
+	if ( _isDefined($self->{"_status"}) == 0 ){
+		$self->_set_status($self->_calculate_status());
 	}
-	return $self->{'_nested'};
+	return $self->{'_status'};
 }
-				# ---------------------------------------------------- #
-				# ---------------------------------------------------- #
 
-#_set_nested : private method
-# function : setter of nested attribute
-sub _set_nested{
+
+#_set_status : private method
+# function : setter of status attribute
+
+
+sub _set_status{
 	my $self = shift;
-	if (@_) {
-		$self->{'_nested'} = shift;
-	}else {
-		croak ("Nested undefined, cannot set nested \n"); # i want it to die because it's a protected method; then the developper make an error 
+	if (@_) {	
+		my $status = shift;
+		my %status =('nested' => 1 ,'containing' => 1, 'overlapping'=> 1);
+		unless (exists $status{$status}) {
+			croak("Error unrecognized status : $status\n");
+		}
+		$self->{'_status'} = $status;
+	}
+	else {
+		croak ("type undefined, cannot set \n"); # i want it to die because it's a protected method; then the developper make an error 
 	}
 }
 	
 				# ---------------------------------------------------- #
 				# ---------------------------------------------------- #
-# isNested : private method
-# function : say if nested or not
 
-sub _isNested{
-	
+# calculate_status : private method
+# function : returns the status of the interaction (nested, containing or overlapping)
+
+sub _calculate_status{
 	my $self = shift;
 	
 	if ($self->_isComplete() == 0) {	
-		croak ("To look if your interaction is Nested, you must have an complete interaction \n");
+		croak ("To get the status of your interaction, you must have a complete interaction \n");
 	}	
-	my $object = $self->object();
-	my $subject = $self->subject();
+	
+	my $lncrna = $self->object();
+	my $mrna = $self->subject();	
  
-	if ($object->contains($subject)){
-	 
-		return 1;
-	}	else{
-	 
-		 return 0;
-	}
+ 	if ($lncrna->contains($mrna)) {
+ 		return 'containing';
+ 	}
+ 	
+ 	
+	if ($mrna->contains($lncrna)){	
+		return ('nested');
+	}	
+	
+	 return 'overlapping';
 }
 
 
