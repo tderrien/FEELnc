@@ -814,7 +814,7 @@ sub parseGTFgnlight {
     while (<GTFFILE>){
 	
 		# verbose
-		$i+;
+		$i++;
 		Utils::showProgress($lc, $i, "Parse input file: ") if ($verbosity > 0);
 		
 		# 
