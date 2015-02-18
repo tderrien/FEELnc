@@ -656,8 +656,9 @@ sub randomizedGTFtoFASTA{
 		$h_cdna_rdm{$id}	=	$seq;
 
 		# verbosity
+		$i++;
 		if ($verbosity > 0){
-			Utils::showProgress($nbtx, $i++, "Print ".$tx.": ");
+			Utils::showProgress($nbtx, $i, "Print ".$tx.": ");
 		}
 	}
 	

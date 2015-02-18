@@ -103,8 +103,9 @@ sub getOverlapping{
 	
     foreach my $tr1 ( ExtractFromHash::sortTxsStartt($refh1) ) {
 		
+		$i++;
 		# verbose on file1
-	    if ($verbosity > 10){ Utils::showProgress( $nb_tx1, $i++, "Intersect fileA: ");}
+	    if ($verbosity > 10){ Utils::showProgress( $nb_tx1, $i, "Intersect fileA: ");}
 
 		# tx1 data
 		my $start1	 	= $refh1->{$tr1}->{"startt"};
@@ -197,7 +198,8 @@ sub Intersect2Hsplit{
 # 		print STDERR "$tr1\n";
         
         # verbose on file1
-	    if ($verbosity > 0){ Utils::showProgress( $nb_tx1, $i++, "Analyse fileA: ");}
+        $i++;
+	    if ($verbosity > 0){ Utils::showProgress( $nb_tx1, $i, "Analyse fileA: ");}
 
 
 	    # Sort both hash by chr and transcript start ie startt
@@ -299,7 +301,7 @@ sub Intersect2HsplitFork_clean{
 		$i++;
 		
 		# verbose on file1
-	    if ($verbosity > 10){ Utils::showProgress( $nb_tx1, $i++, "Analyse fileA: ");}
+	    if ($verbosity > 10){ Utils::showProgress( $nb_tx1, $i, "Analyse fileA: ");}
 
 
 	    # Sort both hash by chr and transcript start ie startt
@@ -401,7 +403,7 @@ sub Intersect2HsplitFork_compare{
 		$i++;
 		
 		# verbose on file1
-	    if ($verbosity > 10){ Utils::showProgress( $nb_tx1, $i++, "Analyse fileA: ");}
+	    if ($verbosity > 10){ Utils::showProgress( $nb_tx1, $i, "Analyse fileA: ");}
 
 
 	    # Sort both hash by chr and transcript start ie startt

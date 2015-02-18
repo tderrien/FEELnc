@@ -83,7 +83,8 @@ sub parseGTF{
     while (<GTFFILE>){
 	
  		# verbose
-		Utils::showProgress($lc, $i++, "Parse input file: ") if ($verbosity > 5);
+ 		$i++;
+		Utils::showProgress($lc, $i, "Parse input file: ") if ($verbosity > 5);
 		
 		chop;
 	    next if /^#/;
@@ -397,7 +398,8 @@ sub parseGTFgene{
     while (<GTFFILE>){
 	
 		# verbose
-		Utils::showProgress($lc, $i++, "Parse input file: ") if ($verbosity > 0);
+		$i++;
+		Utils::showProgress($lc, $i, "Parse input file: ") if ($verbosity > 0);
 		
 		# 
 		chomp;
@@ -547,7 +549,8 @@ sub parsedoubleGTF{
 	
 		
  		# verbose
-		Utils::showProgress(scalar @lines, $i++, "Parse input file: ") if ($verbosity > 5);
+ 		$i++;
+		Utils::showProgress(scalar @lines, $i, "Parse input file: ") if ($verbosity > 5);
 		
 		chomp $line;
 		next if (($line =~ /^#/) || ($line =~ /^\s*$/) || $line =~ /^track/); # remove weird line
@@ -750,7 +753,8 @@ sub parseBed{
 		}
 # 		verbose
 		if ($verbosity > 0){
-    	    Utils::showProgress(scalar @lines, $i++, "Parse input file: ");
+			$i++;
+    	    Utils::showProgress(scalar @lines, $i, "Parse input file: ");
     	}
 	}
 	
@@ -810,7 +814,8 @@ sub parseGTFgnlight {
     while (<GTFFILE>){
 	
 		# verbose
-		Utils::showProgress($lc, $i++, "Parse input file: ") if ($verbosity > 0);
+		$i+;
+		Utils::showProgress($lc, $i, "Parse input file: ") if ($verbosity > 0);
 		
 		# 
 		chop;
