@@ -39,7 +39,7 @@ my $help 		=	0;
 my $verbosity	=	0;
 # my $outputlog;
 my $numtx		=	2000;	# number of tx for training
-my $minnumtx	=	10;		# Min number of tx for training (for debug)
+my $minnumtx	=	100;		# Min number of tx for training (a too small value will result in a bad regression)
 
 # If CPAT cutoff is defined, no need to compute it on TP lncRNA and mRNA
 my $cpatcut		= undef;
@@ -128,6 +128,11 @@ if (defined $lncRNAfile){
 	$lncfile	=	Utils::renamefile($mRNAfile, ".mRNAlinctrain.fa");		
 }
 
+
+# add a refhash that will contain the mRNA ID that passed cDNA and ORF steps
+# Will be used to checked for randomization
+my $ref_cDNA_passed;
+
 # if GTF
 # ------
 if ($mRNAfileformat eq "gtf"){
@@ -138,11 +143,12 @@ if ($mRNAfileformat eq "gtf"){
 	$refmrna		= Parser::parseGTF($mRNAfile, 'exon,CDS,stop_codon,start_codon', undef , \%biotype , $verbosity);
 	my $sizeh		= keys(%{$refmrna});
 	
+
 	die "Your input mRNA file '", basename($mRNAfile),"' contains only *$sizeh* transcripts.\nNot enough to training the program (default option --numtx|-n == '$numtx')\n" if ($sizeh < $numtx);
 	print STDERR "\tYour input mRNA training file '", basename($mRNAfile),"' contains *$sizeh* transcripts\n" if ($verbosity > 0 );
 	
 	# Create cDNA and ORF 2 files for training and testing CPAT
-	&CreateORFcDNAFromGTF($refmrna, $cdnafile, $orffile, $numtx, $genome, $verbosity);
+	$ref_cDNA_passed		=	&CreateORFcDNAFromGTF($refmrna, $cdnafile, $orffile, $numtx, $genome, $verbosity); # for reproducibility
 	
 # if FASTA
 # ------
@@ -175,7 +181,7 @@ if (defined $lncRNAfile){
 		print STDERR "\tYour lncRNA training file '", basename($lncRNAfile),"' contains *$sizeh* transcripts\n" if ($verbosity > 0 );		
 	
 		# Create cDNA and ORF 2 files for training and testing CPAT
-		&CreateORFcDNAFromGTF($reflnc, $lncfile, $computeORF, $numtx, $genome, $verbosity);
+		$ref_cDNA_passed	=	&CreateORFcDNAFromGTF($reflnc, $lncfile, $computeORF, $numtx, $genome, $verbosity);
 	
 	# if FASTA
 	# ------
@@ -193,7 +199,8 @@ if (defined $lncRNAfile){
 	print STDERR "> The lncRNA training file is not set...will extract intergenic region for training (can take a while...)\n";
 	
 	# RElcoated mRNA sequence in intergenic regions to be used as a training lncRNA file
-	&randomizedGTFtoFASTA ($refmrna, $lncfile, $genome, $numtx, $maxTries, $maxN, $verbosity);
+	
+	&randomizedGTFtoFASTA ($refmrna, $ref_cDNA_passed, $lncfile, $genome, $numtx, $maxTries, $maxN, $verbosity);
 	
 }
 
@@ -235,7 +242,7 @@ if (!defined $cpatcut){
 	die "\nERROR: Something went wrong with best Cutoff computation\nPlease, make sure that you have :\nRscript in your PATH and R library ROCR installed (in a R session, type: \"install.packages('ROCR')\"\n"  if (!defined $cpatcut || !defined $snsp);
 	printf(">>TG-ROC Optimal CPAT cutoff = %.3f (achieves Sn/Sp = %.3f)\n", $cpatcut, $snsp);
 	print ">> Check TG-ROC image : ".$cpatout.".Cutoff.png\n";
- 	unlink $cpatout.".Cutoff";
+	unlink $cpatout.".Cutoff";
 }
 
 # Create 2 files if input is in gtf : $infile.mRNA.gtf//lncRNA.gtf
@@ -262,7 +269,8 @@ if (Utils::guess_format($infile) eq "gtf"){
 unlink $cpatout.".feature.xls";
 
 
-
+# print Dumper %INC;
+#================================================================================================================================
 #
 # write 2 gtf files wrt to cpat cutoff
 # 
@@ -338,6 +346,7 @@ sub computeOptCutoff {
 	print STDERR "> Compute optimal coding potential cutoff:\n";
 	my $h 	= Parser::parseCPAT($featurefile, $verbosity);
 
+# 	print Dumper $h;
 	Cpat::WriteRdmCPATFile($h, $outfile, $verbosity);
 # 	print STDERR "Cpat::WriteRdmCPATFile($h, $outfile, $verbosity);\n";
 
@@ -380,7 +389,7 @@ sub CreateORFcDNAFromGTF{
 	my $filterforCDS	=	0;		# get only line with CDS level
 
 
-	for my $tr (keys(%{$h})){
+	for my $tr (sort keys(%{$h})){ # for reproducibility
 
 		# shortcut for feature2seq sub
 		my $chr 	= $h->{$tr}->{'chr'};
@@ -449,6 +458,7 @@ sub CreateORFcDNAFromGTF{
 		&writefastafile(\%h_cdna, $cdnafile, $verbosity);
 
 
+
 	# we write only  cDNA file
 	} else {
 	
@@ -456,6 +466,8 @@ sub CreateORFcDNAFromGTF{
 		die "The number of cDNA sequences is *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $numtx);
 		&writefastafile(\%h_cdna, $cdnafile, $verbosity);
 	}
+	
+	return \%h_cdna;
 
 }
 
@@ -563,7 +575,7 @@ sub writefastafile{
 
 sub randomizedGTFtoFASTA{
 
-	my ($h, $cdnafile, $genome, $nbtx, $maxTries, $maxN, $verbosity)	=	@_;
+	my ($h, $ref_cDNA_passed, $cdnafile, $genome, $nbtx, $maxTries, $maxN, $verbosity)	=	@_;
 	
 	$nbtx			||= 1000;	# number of random tx required
 	$maxTries		||= 10;	 	# max tries to for computing both overlap and N
@@ -597,7 +609,10 @@ sub randomizedGTFtoFASTA{
 	my %h_cdna_rdm; # to store correclty relocated sequences
 
 	TX: 
-	foreach my $tx (keys %{$refannotsize}){
+	foreach my $tx (sort keys %{$refannotsize}){ # sort for reproducibility
+	
+		next if ( ! exists $ref_cDNA_passed->{$tx}); # only keep mRNA tx that are in the cDNA fasat file for sorting CPAT :  for reproducibility
+
 
 		my $overlap 	= 1; # Initialize variable for iterative search for selfoverlap
 		my $includeN	= 1; # Initialize variable for iterative search for N
@@ -622,9 +637,12 @@ sub randomizedGTFtoFASTA{
 				next TX;
 			}
 		
+			my $seed = $i+$countTries; # the seed is initiated accroding to the $i (tx) and the nb of try... if only $i, the same chr:pos will be returned...
+			# Initialize srand foreach tx
+			srand($seed);
 			# define a rand indice for all chr hash
 			my $randindex	=	int( rand(scalar keys %{$refgenomesize}) );
-			my @chrrdm		=	keys(%{$refgenomesize});
+			my @chrrdm		=	sort keys(%{$refgenomesize}); # sort hash for reproducibility 
 			$chrrdm			=	$chrrdm[$randindex];
 	
 			# define a random start/begin position on the random chr (and thus the end)
