@@ -305,3 +305,17 @@ Therefore, the possibly newly identified mRNAs in the previous step are not incl
       -w,--window=200               Size of the window around the lncRNA to compute interactins/classification [default 10000]
       -m, --maxwindow=10000 Maximal size of the window during the expansion process [default 10000]
 ```
+
+## Warnings
+ 
+ - In the installation (and/or) the classifier step, you may see a warning like 
+```
+Can't call method "close" on an undefined value
+```
+
+## Authors
+
+ - Fabrice Legeai
+ - Thomas Derrien
+
+## Acknowledgments
