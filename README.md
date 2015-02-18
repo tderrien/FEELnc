@@ -284,10 +284,13 @@ The 3 best interactions are of classes and sub-classes:
 	- genic      -> exonic     -> antrisense  : TCONS_00027880::ENS00000007999
 	- intergenic -> convergent -> upstream    : TCONS_00011066::ENS00000002091 (  with a distance between the lncRNA and the mRNA of 9,386bp.)
 	
-\* *Note: At the moment, the interactions are computed with the reference file (-a option).
+\* **Note1**: At the moment, the interactions are computed with the reference file (-a option).
 Therefore, the possibly newly identified mRNAs in the previous step are not included by default (but you could include them by (cuff)merging with you reference annotation).
 
+\* **Note2*:  you may see a warning message like this:
 
+	lncRNA_ID and ENSXXXX are overlapping in the same strand
+Depending on your filtering options, this may correspond to a non-protein-coding transcript (pseudogene, miRNA) which overlaps the lncRNA
 	
 **- FULL OPTIONS (FEELnc_classifier.pl --help) :**
 
@@ -310,7 +313,7 @@ Therefore, the possibly newly identified mRNAs in the previous step are not incl
  
  - In the installation (and/or) the classifier step, you may see a warning like 
 ```
-Can't call method "close" on an undefined value
+Can't call method "close" on an undefined value Bio/DB/SeqFeature/Store/berkeleydb.pm
 ```
 
 ## Authors
@@ -319,3 +322,4 @@ Can't call method "close" on an undefined value
  - Thomas Derrien
 
 ## Acknowledgments
+
