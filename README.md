@@ -1,7 +1,7 @@
 # FEELnc 
  Fast and Effective Extraction of Long non-coding RNAs
 
-*Version (30/01/2015)*
+*Version (18/02/2015)*
 
 ## Introduction
 
@@ -98,10 +98,10 @@ and especially protein_coding exons as they more probably correspond to new mRNA
     FEELnc_filter.pl -i infile.gtf -a annotation_mRNA.gtf > candidate_lncRNA.gtf
 
 
-If your annotation contains transcript_biotype information (e.g protein_coding, pseudogene, miRNA...), you can subselect a specific transcript biotype to make the overlap with.
+If your reference annotation ("*ref_annotation.GTF*") contains transcript_biotype information (e.g protein_coding, pseudogene, miRNA...), you can subselect a specific transcript biotype to make the overlap with.
 
     FEELnc_filter.pl -i infile.gtf \
-	-a annotation_mRNA.gtf \
+	-a ref_annotation.GTF \
 	-b transcript_biotype=protein_coding \
 	> candidate_lncRNA.gtf
 
@@ -110,7 +110,7 @@ overlapping with other transcripts than mRNAs (e.g lincRNA, miRNA, pseudogene...
 For stranded RNASeq protocol, it is also possible  to include monoexonic lncRNAs that are antisense to mRNAs e.g 
 
 	FEELnc_filter.pl -i infile.gtf \
-	-a annotation_mRNA.gtf \
+	-a ref_annotation.GTF \
 	-b transcript_biotype=protein_coding \
 	--monoex=-1
 	> candidate_lncRNA.gtf
@@ -125,7 +125,7 @@ For stranded RNASeq protocol, it is also possible  to include monoexonic lncRNAs
 
   * Mandatory arguments:
       -i,--infile=file.gtf          Specify the GTF file to be filtered (such as a cufflinks transcripts/merged .GTF file) 
-      -a,--mRNAfile=file.gtf        Specify the annotation GTF file to be filtered on based on sense exon overlap (file of protein coding annotation)
+      -a,--mRNAfile=file.gtf        Specify the annotation GTF file to be filtered on based on sense exon overlap (file of protein coding annotation or whole reference annotation 'ref_annotation.GTF')
 
   * Filtering arguments:
       -s,--size=200                 Keep transcript with a minimal size (default 200)
@@ -154,16 +154,29 @@ It makes use of the CPAT tool which is an alignment-free program (thus very fast
 	
 	- known_mRNA.gtf   : a set of known protein_coding transcripts
 	- known_lncRNA.gtf : a set of known lncRNA transcripts
+    
+If you have a set of known lncRNAs, you could run the module like:
+
+	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -l known_lncRNA.gtf
 
 However, for most organisms, the set of known_lncRNA transcripts is not known and thus 
 a set of genomic intergenic regions are automatically extracted as the lncRNA training set. 
 In this case, the reference genome file is required (ref_genome.FA)
 
-	# Usage:
     FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -g ref_genome.FA 
+
+
+As in the previous module, if your reference annotation file  ("*ref_annotation.GTF*") contains additionnal fields such **transcript_biotype** and/or **transcript_status** in the [GENCODE annotation](http://www.gencodegenes.org/gencodeformat.html) or [ENSEMBL](http://www.ensembl.org), you can extract them manually or by using the **-b option** (as  to get the best training set of known mRNAs.
+
+    FEELnc_codpot.pl -i candidate_lncRNA.gtf -a ref_annotation.GTF \
+    -g ref_genome.FA \
+    -b transcript_biotype=protein_coding -b transcript_status=KNOWN
+
+
 
 To calculate the CPS cutoff separating coding (mRNAs) versus long non-coding RNAs (lncRNAs), 
 FEELnc_codpot uses a R script that will make a 10 fold cross-validation on the input training files and finally,  extracts the CPS that maximizes sensitivity (Sn) and Specificity (Sp) (thanks to the ROCR library)
+
 
 **- OUTPUT :**
 
@@ -200,17 +213,31 @@ If your input file is called **INPUT**, this second module will create 4 output 
 
 ### 3- FEELnc_classifier.pl
 
-The last step of the pipeline consists in classifying new lncRNAs w.r.t to the annotation of mRNAs in order to annotate.
+The last step of the pipeline consists in classifying new lncRNAs w.r.t to the localisation and the direction of transcription of proximal mRNAs.
 
-Classifing lncRNAs with mRNA could help to predict functions for lncRNAs
+Indeed, classifying lncRNAs with mRNA could help to predict functions for lncRNAs.
+For all newly identified lncRNAs transcripts, a sliding window strategy is used to check for possible overlap with transcripts in the reference annotation.
+
+If an overlap is found, the lncRNAs is considered as **GENIC** otherwise it is **INTERGENIC** (lincRNA) . 
+
+Then, subclasses are defined according the features and direction of overlap (See OUTPUT for full details). 
+
+Foreach lncRNA interaction, a best lncRNA:mRNA interaction is identified in the output file by a line starting with '*' and defined as followed:
+
+ - for **INTERGNIC** : the best mRNA partner is the closest to the lincRNA
+ - for **GENIC**	: the best mRNA partner is by rule of priority (exonic then the fraction of exonicof overlap) then intronic then containing.
+
 
 	# Usage:
-    FEELnc_classifier.pl -i lncRNA.gtf -a mRNA.gtf > lncRNA_classes.txt
+    FEELnc_classifier.pl -i lncRNA.gtf -a  ref_annotation.GTF > lncRNA_classes.txt
 
 **- OUTPUT :**
 
-The classes are defined as in Derrien et al, Genome Research. 2012, i.e :
 
+A summary of the number of the input parameters and numbers of interactions is given in the beginning of the file.
+
+The classes are defined as in Derrien et al, Genome Research. 2012, and can be prioritized according to :
+ 
 - **Intergenic lncRNAs** (i.e lincRNAs)
  - *divergent*  : when the lincRNA is transcribed in an opposite direction (head to head) w.r.t to the closest mRNA
  - *convergent*: when the lincRNA is transcribed in a convergent direction w.r.t to the closest mRNAs.
@@ -223,11 +250,45 @@ The classes are defined as in Derrien et al, Genome Research. 2012, i.e :
  - *Intronic* :
     - antisense : lncRNA exon overlaps in antisense mRNA introns (but none exons)
     - sense : lncRNA exon overlaps in sense mRNA introns (but none exons)
- - *Nested*:
+ - *containing*:
     - antisense : lncRNA intron overlaps antisense mRNA     
     - sense : lncRNA intron overlaps sense mRNA exons
 
 
+Example:
+
+```
+#FEELnc Classification
+#lncRNA file :  lncrna : candidate_lncRNA.gtf.lncRNA.gtf 
+#mRNA file : REF_ANNOTATION.gtf
+#Minimal window size : 10000
+#Maximal window size : 10000
+#Number of lncRNA : 3027 
+#Number of mRNA : 17954
+#Number of interaction : 2132 
+#Number of lncRNA without interaction : 1819
+#List of lncRNA without interaction : (...)
+#INTERACTIONS
+*lncRNA        TCONS_00018990  mRNA         ENS00000029020            sense        genic                            0      Status=containing   Subtype=none
+lncRNA         TCONS_00018990  mRNA         ENS00000001947            antisense    intergenic                       5441   Status=divergent    Subtype=downstream
+*lncRNA        TCONS_00027880  mRNA         ENS00000007999            antisense    genic                            0      Status=overlapping  Subtype=exonic
+*lncRNA        TCONS_00011066  mRNA         ENS00000002091            antisense    intergenic                       9386   Status=convergent   Subtype=upstream
+```
+
+Here is showed 4 interactions concerning 3 lncRNAs (TCONS_00018990, TCONS_00027880 and TCONS_00011066) where one lncRNA (TCONS_00018990) has 2 interactions with a window size of 10,000 nt.
+(The best interactions are marked as ***lncRNA**)
+
+The 3 best interactions are of classes and sub-classes:
+
+	- genic      -> containing -> sense       : TCONS_00018990::ENS00000029020
+	- genic      -> exonic     -> antrisense  : TCONS_00027880::ENS00000007999
+	- intergenic -> convergent -> upstream    : TCONS_00011066::ENS00000002091 (  with a distance between the lncRNA and the mRNA of 9,386bp.)
+	
+\* *Note: At the moment, the interactions are computed with the reference file (-a option).
+Therefore, the possibly newly identified mRNAs in the previous step are not included by default (but you could include them by (cuff)merging with you reference annotation).
+
+
+	
 **- FULL OPTIONS (FEELnc_classifier.pl --help) :**
 
 ``` 
