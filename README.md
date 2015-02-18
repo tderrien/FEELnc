@@ -7,7 +7,7 @@
 
 This document is intended to give a (minimal) description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs).
 
-Currently, FEELnc is composed of 3 modules (See *Launch FEELnc pipeline* for more details):
+Currently, FEELnc is composed of 3 modules (See *Launch FEELnc 3-step pipeline* for more details):
 
 	* FEELnc_filter.pl	: Extract, filter candidate transcripts
 	* FEELnc_codpot.pl	: Compute the coding potential of candidate transcripts
