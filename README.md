@@ -228,7 +228,6 @@ Foreach lncRNA interaction, a best lncRNA:mRNA interaction is identified in the 
  - for **GENIC**	: the best mRNA partner is by rule of priority (exonic then the fraction of exonicof overlap) then intronic then containing.
 
 
-	# Usage:
     FEELnc_classifier.pl -i lncRNA.gtf -a  ref_annotation.GTF > lncRNA_classes.txt
 
 **- OUTPUT :**
@@ -287,7 +286,7 @@ The 3 best interactions are of classes and sub-classes:
 \* **Note1**: At the moment, the interactions are computed with the reference file (-a option).
 Therefore, the possibly newly identified mRNAs in the previous step are not included by default (but you could include them by (cuff)merging with you reference annotation).
 
-\* **Note2*:  you may see a warning message like this:
+\* **Note2**:  you may see a warning message like this:
 
 	lncRNA_ID and ENSXXXX are overlapping in the same strand
 Depending on your filtering options, this may correspond to a non-protein-coding transcript (pseudogene, miRNA) which overlaps the lncRNA
