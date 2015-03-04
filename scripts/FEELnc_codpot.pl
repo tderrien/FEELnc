@@ -38,7 +38,7 @@ my $man 		=	0;
 my $help 		=	0;
 my $verbosity	=	0;
 # my $outputlog;
-my $numtx		=	2000;	# number of tx for training
+my $numtx		=	3000;	# number of tx for training
 my $minnumtx	=	100;		# Min number of tx for training (a too small value will result in a bad regression)
 
 # If CPAT cutoff is defined, no need to compute it on TP lncRNA and mRNA
