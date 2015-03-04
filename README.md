@@ -32,7 +32,7 @@ Basically, FEELnc users should have the following minimal input files:
 	- ref_genome.FASTA    (-g,--genome)   : genome FASTA file or directory with individual chrom FASTA files
 
 
-\* *Note: It is recommended to only extract protein_coding transcripts (mRNAs) from the reference annotation file (ref_annotation.GTF) when this information is available, either manually or by using the option :*
+\* *Note: It is recommended to only extract protein_coding transcripts (mRNAs) from the reference annotation file (ref_annotation.GTF) when this information is available, either manually or better by using the option :*
 **--biotype transcript_biotype=protein_coding**. 
 In doing so, you will not remove lncRNAs overlapping other non-coding RNAs or pseudogenes.... 
    
@@ -228,7 +228,10 @@ Foreach lncRNA interaction, a best lncRNA:mRNA interaction is identified in the 
  - for **GENIC**	: the best mRNA partner is by rule of priority (exonic then the fraction of exonicof overlap) then intronic then containing.
 
 
-    FEELnc_classifier.pl -i lncRNA.gtf -a  ref_annotation.GTF > lncRNA_classes.txt
+```
+	FEELnc_classifier.pl -i lncRNA.gtf -a  ref_annotation.GTF > lncRNA_classes.txt
+```
+
 
 **- OUTPUT :**
 
