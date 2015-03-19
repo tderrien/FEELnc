@@ -7,7 +7,6 @@ use Bio::DB::SeqFeature::Store::GFF3Loader;
 
 use Bio::Tools::GFF;
 use Bio::SeqIO;
-use DBI;
 
 
 my $BASEDIR="/tmp";
