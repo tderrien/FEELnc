@@ -298,7 +298,7 @@ sub orfSeq2orfOb{
 	# Put all data in hash
 	my %orfobj =(start		=> undef, 
 				end			=> undef, 
-				seqlength 	=> undef, # we not known the length of the mRNA
+				seqlength 	=> undef, # we do not known the length of the mRNA
 				cds_seq 	=> $seq, 
 				prot_seq 	=> $seqprot, 
 				strand 		=> $strand,  
