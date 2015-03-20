@@ -67,7 +67,7 @@ version 0.01
 
 =head1 SYNOPSIS
 
-FEELnc_filter.pl -i lncRNA.gtf -a mRNA.gtf  > lncRNA_classes.txt
+FEELnc_classifier.pl -i lncRNA.gtf -a mRNA.gtf  > lncRNA_classes.txt
 
 =head1 DESCRIPTION
 
