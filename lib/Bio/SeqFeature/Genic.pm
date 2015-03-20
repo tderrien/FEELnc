@@ -189,6 +189,8 @@ sub isIntronic {
 	
 	
 	foreach my $lncrna_exon (@exons_lncRNA) {
+		next if ($lncrna_exon->end() < $mrna->start());
+		next if ($lncrna_exon->start() > $mrna->end());
 		unless (_is_included($lncrna_exon, \@introns_mRNA)) {return 0}
 	}
 	
