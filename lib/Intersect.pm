@@ -161,6 +161,72 @@ sub getOverlapping{
 	return %matchingtx;
 }
 
+sub getIntersect{
+
+	my ($refh1, $refh2, $stranded, $fraction, $verbosity)	= @_;
+
+	$stranded 		||= 0; 	# default unstranded (see also monoexonic test)
+	$fraction 		||= 0;	# if the fraction of the lncRNA candidate overlap with >0 nt (ie 1bp) a mRNA, it will be removed
+	$verbosity 		||= 0;
+    
+    # nb tx1 and
+	my $nb_tx1 = keys( %{$refh1} );
+	my $i = 0;
+
+	# array that will contain the hashes of matching transcripts
+   	my @matchingpairs = ();	
+
+    foreach my $tr1 ( ExtractFromHash::sortTxsStartt($refh1) ) {
+				
+		$i++;
+		# verbose on file1
+	    if ($verbosity > 10){ Utils::showProgress( $nb_tx1, $i, "Intersect fileA: ");}
+
+		# tx1 data
+		my $start1	 	= $refh1->{$tr1}->{"startt"};
+		my $end1	 	= $refh1->{$tr1}->{"endt"};
+		my $strand1 	= $refh1->{$tr1}->{"strand"};
+		
+
+		# 2nd tx
+	    foreach my $tr2 (  ExtractFromHash::sortTxsStartt($refh2) ){			
+
+			# tx1 data
+			my $start2	 	= $refh2->{$tr2}->{"startt"};
+			my $end2	 	= $refh2->{$tr2}->{"endt"};
+			my $strand2 	= $refh2->{$tr2}->{"strand"};
+
+			# trick to speed  loop
+			last if ($start2	> $end1);
+			next if ($end2		< $start1);            
+
+	
+			##### Overlap window  ########
+			
+			# get cumulsize of lncRNA cDNA (exon level)
+			my $tr1_cdna_size		= ExtractFromHash::cumulSize($refh1->{$tr1}->{"feature"});
+			
+			# Get the number  of bp overlap
+			my $cumul_overlap_size	=	ExtractFromFeature::intersectFeatures($refh1->{$tr1}->{'feature'}, $refh2->{$tr2}->{'feature'}, $stranded, $verbosity);
+			my $fractionoverexon1	=	$cumul_overlap_size/$tr1_cdna_size;
+			
+			# intersectFeatures returns > 0 if there is an OVERLAP with respect to strand
+			# 	* if s = 0 [default] and A and B on SAME or DIFFERENT strand : return size of overlap or 0 if not overlap
+			# 	* if s = 1           and A and B on SAME              strand : return size of overlap or 0 if not overlap or of overlap but different strand
+# 			print STDERR "===> $tr1 $tr2 : $fractionoverexon1  = ($cumul_overlap_size/$tr1_cdna_size) > $fraction \n";
+			if ($cumul_overlap_size > 0 && $fractionoverexon1 > $fraction){
+				my %matchingtx;
+				$matchingtx{$tr1}	=	$tr2;
+				push @matchingpairs, \%matchingtx;
+
+# 				last if $uniquexa;
+			}
+		}
+
+	}
+	return \@matchingpairs;
+
+}
 # if we consider all features from transcripts
 sub Intersect2Hsplit{
 
@@ -289,6 +355,7 @@ sub Intersect2HsplitFork_clean{
     # Sort both hash by chr and transcript start ie startt
     foreach my $tr1 (sort { $refh1->{$a}->{'startt'} <=> $refh1->{$b}->{'startt'} } keys %{$refh1}) {
 	
+
 		############
 		# skip tx if removed from 1st loop in 2nd hash;
 		###########
@@ -307,7 +374,6 @@ sub Intersect2HsplitFork_clean{
 	    # Sort both hash by chr and transcript start ie startt
 	    foreach my $tr2 (sort { $refh2->{$a}->{'startt'} <=> $refh2->{$b}->{'startt'} } keys %{$refh2}){			
 			
-
 			# trick to speed (?) loop
 			last if ($refh2->{$tr2}->{"startt"} > $refh1->{$tr1}->{"endt"});
 			next if ($refh2->{$tr2}->{"endt"} < $refh1->{$tr1}->{"startt"});            
@@ -326,7 +392,7 @@ sub Intersect2HsplitFork_clean{
 				# proportion
 				my $fractionoverexon1	=	$cumul_overlap_size/$tr1_cdna_size;
 				my $fractionoverexon2	=	$cumul_overlap_size/$tr2_exon_size;
-								
+												
 				# remove same tx exons in 2
 				if ( ($tr1 ne $tr2) && ($fractionoverexon1 == 1) && ($fractionoverexon2 ==1) ){
 
@@ -424,6 +490,8 @@ sub Intersect2HsplitFork_compare{
 			# proportion
 			my $fractionoverexon1	=	$cumul_overlap_size/$tr1_cdna_size;
 			my $fractionoverexon2	=	$cumul_overlap_size/$tr2_exon_size;
+
+			print STDERR "($tr1 ne $tr2) && $fractionoverexon1 >= $fraction  && $fractionoverexon2 >= $fraction\n";
 							
 			#  same tx exons in 2
 			if ( $fractionoverexon1 >= $fraction  && $fractionoverexon2 >= $fraction ){

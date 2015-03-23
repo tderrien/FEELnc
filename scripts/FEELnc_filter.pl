@@ -182,7 +182,6 @@ foreach my $chrlnc (keys %{$reflncchr} ) {
 	    my $pid = $pm->start($chrlnc) and next;
      	
      	# get ref on hash per chromosome
-
         %lnctorm = Intersect::getOverlapping($reflncchr->{$chrlnc}, $refmRNAchr->{$chrlnc}, $strandedmode, $minfrac_over, $monoexonic, $linconly, $verbosity);
 
     }

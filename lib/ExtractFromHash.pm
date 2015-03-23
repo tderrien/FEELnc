@@ -69,13 +69,18 @@ sub hash2fasta{
 
 # Print double gtf transcript having the same number of exons/features
 sub printDoubleGTF{
-	# parsing a hash in sub need dereference in shift
+
 	my ($refh1, $refh2, $arefmatch, $mode,  $verbosity)	= @_;
 	$mode 			||= "all"; 		# number of fields to be printed
 	$verbosity 		||= 0;
 
 # 	print Dumper $arefmatch;
-
+	# 	$VAR1 = [
+	#           {
+	#             'ENSCAFT00000000121' => 'ENSCAFT00000000121',
+	#             'ENSCAFT00000000971' => 'ENSCAFT00000000971',
+	# 		}
+	# 		]
 	# print if verbosity	
 	print STDERR "\nPrinting transcripts GTF...\n" if ($verbosity > 5);
 
@@ -84,28 +89,27 @@ sub printDoubleGTF{
 		for my $tx1 (keys %$href){
 		
 			my $tx2 = $href->{$tx1};
-			
 			# if not the same number of exons in 2 transcripts...
 			# WARNING : updated
 			# see 		    next if (!Utils::foverlap($feat1->{"start"}, $feat1->{"end"}, $feat2->{"start"}, $feat2->{"end"})); and last
 			warn "warnings: $tx1 has ",scalar (@{$refh1->{$tx1}->{"feature"}}),"feature(s) whereas $tx2 has",scalar (@{$refh2->{$tx2}->{"feature"}}),"feature(s)\n" unless (scalar (@{$refh1->{$tx1}->{"feature"}}) == scalar (@{$refh2->{$tx2}->{"feature"}}));
-		
-		
+	
+	
 			# Printing both hash with indices $j 
 			##########
-# 			foreach my $feat1 (@{$refh1->{$tx1}->{"feature"}}) {
+	# 		foreach my $feat1 (@{$refh1->{$tx1}->{"feature"}}) {
 			for (my $j=0; $j < scalar @{$refh1->{$tx1}->{"feature"}}; $j++){
-				 
+			 
 				 my $feat1 = ${ $refh1->{$tx1}->{"feature"} }[$j];
-				 
-				
+			 
+			
 				# 1st part
 				##########
 				print join("\t",$refh1->{$tx1}->{"chr"}, $refh1->{$tx1}->{"source"}, $feat1->{"feat_level"}, $feat1->{"start"}, $feat1->{"end"}, $refh1->{$tx1}->{"score"}, $refh1->{$tx1}->{"strand"}, $feat1->{"frame"});
 				print "\tgene_id \"".$refh1->{$tx1}->{"gene_id"}."\"; transcript_id \"$tx1\";";			 			
-			
+		
 				my @ar= qw/feat_level start end strand frame/;
-				
+			
 				if ($mode eq "all"){
 					my %tmph = %{$feat1};
 					delete @tmph{@ar};
@@ -113,34 +117,33 @@ sub printDoubleGTF{
 						print " $_ \"$tmph{$_}\";" if (defined $tmph{$_}); # id defined in order to test if parsinf $extrafield is OK (i.e in case people select FPKM and it does not exists in the file)
 					}
 				}				
-		
+	
 				print "\t";
 				# 2nd part
 				##########
-				
+			
 				# Check if different number of exons: At the moment, we only report all exon of A
 				# if B tx has less exons, we print simple GTF of A for the extra-line(s) of A
 				if ( $j >= scalar @{$refh2->{$tx2}->{"feature"}} ){
 					print "\n";
 					next;
 				}
-				
+			
 				my $feat2 = ${ $refh2->{$tx2}->{"feature"} }[$j];
 
 				print join("\t",$refh2->{$tx2}->{"chr"}, $refh2->{$tx2}->{"source"}, $feat2->{"feat_level"}, $feat2->{"start"}, $feat2->{"end"}, $refh2->{$tx2}->{"score"}, $refh2->{$tx2}->{"strand"}, $feat2->{"frame"});
 				print "\tgene_id \"".$refh2->{$tx2}->{"gene_id"}."\"; transcript_id \"$tx2\";";			 			
-			
+		
 				if ($mode eq "all"){
 					my %tmph = %{$feat2};
 					delete @tmph{@ar};
 					for (keys %tmph){
 						print " $_ \"$tmph{$_}\";" if (defined $tmph{$_}); # id defined in order to test if parsinf $extrafield is OK (i.e in case people select FPKM and it does not exists in the file)
 					}
-				}
-				print "\n";
-			} # END 1st HASH
-		
-		}
+				}	
+			print "\n";
+			}			
+		} # END 1st HASH
 	}
 }
 

@@ -92,7 +92,6 @@ sub runCPAT{
 
 sub WriteRdmCPATFile{
 
-
 	my ($h, $outfile, $verbosity) = @_;
 
 	# Create a tmp file which shuffle lncRNA and mRNA used to compute 10 cross validation Sn Sp by R
@@ -100,7 +99,8 @@ sub WriteRdmCPATFile{
 	
 	# header
 	print CPATVAL "\tmRNA_size\tORF_size\tFickett_score\tHexamer_score\tcoding_prob\tlabel\n";
-	foreach my $id ( sort  keys (%$h) ){# sort CPAT Ids for reproducibility of Sn and Sp with Random intergenic extraction(replace shuffle which was implicit with perl hashes...)
+	#foreach my $id ( sort  keys (%$h) ){# sort CPAT Ids for reproducibility of Sn and Sp with Random intergenic extraction(replace shuffle which was implicit with perl hashes...)
+	foreach my $id ( keys (%$h) ){# bug with sort when input lncRNA training is given
 		my @ar = ($id,
 				 $h->{$id}->{'mRNA_size'}, 
 				 $h->{$id}->{'ORF_size'}, 
