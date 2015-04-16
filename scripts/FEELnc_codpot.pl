@@ -24,46 +24,46 @@ use Orf;
 use Cpat;
 
 # my $pathRcrossvalidation = "~tderrien/bin/perl/script/FEELnc/bin/crossValidation_cutoff.r";
-my $rprog = "10crossValidation_cutoff.r";
-my $progname=basename($0);
+my $rprog    = "10crossValidation_cutoff.r";
+my $progname = basename($0);
 
 
 # Variables
-my $infile		= '';
-my $mRNAfile   	= '';
-my $genome   	= undef;
-my $lncRNAfile 	= undef;
+my $infile     = '';
+my $mRNAfile   = '';
+my $genome     = undef;
+my $lncRNAfile = undef;
 my %biotype;
-my $man 		=	0;
-my $help 		=	0;
-my $verbosity	=	0;
+my $man        = 0;
+my $help       = 0;
+my $verbosity  = 0;
 # my $outputlog;
-my $numtx		=	3000;	# number of tx for training
-my $minnumtx	=	100;		# Min number of tx for training (a too small value will result in a bad regression)
+my $numtx    = 3000;	# number of tx for training
+my $minnumtx = 100;	# Min number of tx for training (a too small value will result in a bad regression)
 
 # If CPAT cutoff is defined, no need to compute it on TP lncRNA and mRNA
-my $cpatcut		= undef;
-my $sn_sp		= undef;
+my $cpatcut = undef;
+my $sn_sp   = undef;
 
 # Intergenic extraction:
-my $maxTries	= 10;
-my $maxN		= 5;
-my $sizecorrec	= 1; # a float value between 0 and 1		
+my $maxTries   = 10;
+my $maxN       = 5;
+my $sizecorrec = 1; # a float value between 0 and 1		
 
 ## Parse options and print usage if there is a syntax error,
 ## or if usage was explicitly requested.
 GetOptions(
-	'i|infile=s'	 	=> \$infile,
-	'a|mRNAfile=s'      => \$mRNAfile,	
-	'l|lncRNAfile=s'	=> \$lncRNAfile,	
-	'g|genome=s'		=> \$genome,		
-	"n|numtx=i"			=> \$numtx,
-	"b|biotype=s"       => \%biotype,
-	"c|cpatcut=f"       => \$cpatcut,
-# 	"o|outlog=s"		=> \$outputlog,	
-	'v|verbosity=i'		=> \$verbosity,
-	'help|?' 			=> \$help,
-	'man' 				=> \$man
+	'i|infile=s'     => \$infile,
+	'a|mRNAfile=s'   => \$mRNAfile,	
+	'l|lncRNAfile=s' => \$lncRNAfile,	
+	'g|genome=s'     => \$genome,		
+	"n|numtx=i"      => \$numtx,
+	"b|biotype=s"    => \%biotype,
+	"c|cpatcut=f"    => \$cpatcut,
+	'v|verbosity=i'  => \$verbosity,
+	'help|?'         => \$help,
+	'man'            => \$man
+# 	"o|outlog=s"     => \$outputlog,	
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -81,10 +81,10 @@ if (defined $cpatcut){
 
 # test path
 die "Error: You should set the environnment variable FEELNCPATH to the dir of installtion\nexport FEELNCPATH=my_dir_of_install/\n(See README)\n" unless (defined $ENV{'FEELNCPATH'});
-my $rprogpath		=	$ENV{'FEELNCPATH'}."/bin/".$rprog;
+my $rprogpath   = $ENV{'FEELNCPATH'}."/bin/".$rprog;
 pod2usage("Error: Cannot access FEELnc bin dir with path '$rprogpath'...\nCheck the environnment variable FEELNCPATH\n") unless( -r $rprogpath);
-my $pathRscript		=   Utils::pathProg("Rscript");
-my $pathlogit		=   Utils::pathProg("cpat.py");
+my $pathRscript = Utils::pathProg("Rscript");
+my $pathlogit   = Utils::pathProg("cpat.py");
 # test PYTHONPATH from CPAT : http://dldcc-web.brc.bcm.edu/lilab/liguow/CGI/cpat/_build/html/index.html#installation
 # die "Error: You should set the PYTHONPATH env. variable to CPAT installation
 # export PYTHONPATH=/home/user/CPAT/usr/local/lib/python2.7/site-packages:\$PYTHONPATH. #setup PYTHONPATH
@@ -104,7 +104,7 @@ my $pathlogit		=   Utils::pathProg("cpat.py");
 
 
 # Die if lnc training file is not set and mRNA file is in FASTA: no possibility of intergenic extraction
-my $mRNAfileformat		=	Utils::guess_format($mRNAfile);
+my $mRNAfileformat = Utils::guess_format($mRNAfile);
 pod2usage ("- Error: Cannot train the program if lncRNA training file (-l option) is not defined and mRNA file (-a option) is in FASTA format!\nPlease, provide the mRNA/annotation file in .GTF format so that I could extract intergenic sequences for training...\n") if (!defined $lncRNAfile && $mRNAfileformat eq "fasta");
 
 
@@ -119,13 +119,13 @@ warn "> Preparing CPAT files...\n";
 # mRNA file
 #######
 # Training file
-my $cdnafile	=	Utils::renamefile($mRNAfile, ".cdnatrain.fa");
-my $orffile		=	Utils::renamefile($mRNAfile, ".orftrain.fa");
+my $cdnafile = Utils::renamefile($mRNAfile, ".cdnatrain.fa");
+my $orffile  = Utils::renamefile($mRNAfile, ".orftrain.fa");
 my $lncfile;
 if (defined $lncRNAfile){
-	$lncfile	=	Utils::renamefile($lncRNAfile, ".lnctrain.fa");
+	$lncfile = Utils::renamefile($lncRNAfile, ".lnctrain.fa");
 } else {
-	$lncfile	=	Utils::renamefile($mRNAfile, ".mRNAlinctrain.fa");		
+	$lncfile = Utils::renamefile($mRNAfile, ".mRNAlinctrain.fa");		
 }
 
 
@@ -140,15 +140,15 @@ if ($mRNAfileformat eq "gtf"){
 	# die if genome not specified
 	pod2usage("Error: Cannot read your genome file '$genome' (-g option)...\nFor help, see:\n$progname --help\n") if (! -r $genome && !-d $genome);
 
-	$refmrna		= Parser::parseGTF($mRNAfile, 'exon,CDS,stop_codon,start_codon', undef , \%biotype , $verbosity);
-	my $sizeh		= keys(%{$refmrna});
+	$refmrna  = Parser::parseGTF($mRNAfile, 'exon,CDS,stop_codon,start_codon', undef , \%biotype , $verbosity);
+	my $sizeh = keys(%{$refmrna});
 	
 
 	die "Your input mRNA file '", basename($mRNAfile),"' contains only *$sizeh* transcripts.\nNot enough to training the program (default option --numtx|-n == '$numtx')\n" if ($sizeh < $numtx);
 	print STDERR "\tYour input mRNA training file '", basename($mRNAfile),"' contains *$sizeh* transcripts\n" if ($verbosity > 0 );
 	
 	# Create cDNA and ORF 2 files for training and testing CPAT
-	$ref_cDNA_passed		=	&CreateORFcDNAFromGTF($refmrna, $cdnafile, $orffile, $numtx, $genome, $verbosity); # for reproducibility
+	$ref_cDNA_passed = &CreateORFcDNAFromGTF($refmrna, $cdnafile, $orffile, $numtx, $genome, $verbosity); # for reproducibility
 	
 # if FASTA
 # ------
@@ -167,21 +167,21 @@ if ($mRNAfileformat eq "gtf"){
 # if file is defined, it means that we do not have to extract from intergenic
 if (defined $lncRNAfile){
 
-	my $computeORF			=	undef; # we do not have to compute/extract ORF
-	my $lncRNAfileformat	=	Utils::guess_format($lncRNAfile);
+	my $computeORF       = undef; # we do not have to compute/extract ORF
+	my $lncRNAfileformat = Utils::guess_format($lncRNAfile);
 
 	# if GTF
 	# ------
 	if ($lncRNAfileformat eq "gtf"){
 
-		my $reflnc		=	Parser::parseGTF($lncRNAfile, 'exon' , undef, undef, $verbosity);
-		my $sizeh		=	scalar keys(%{$reflnc});
+		my $reflnc = Parser::parseGTF($lncRNAfile, 'exon' , undef, undef, $verbosity);
+		my $sizeh  = scalar keys(%{$reflnc});
 	
 		die "Your input lncRNA training file '", basename($lncRNAfile),"' contains only *$sizeh* transcripts.\nNot enough to training the program (default option --numtx|-n == '$numtx')\n" if ($sizeh < $numtx);
 		print STDERR "\tYour lncRNA training file '", basename($lncRNAfile),"' contains *$sizeh* transcripts\n" if ($verbosity > 0 );		
 	
 		# Create cDNA and ORF 2 files for training and testing CPAT
-		$ref_cDNA_passed	=	&CreateORFcDNAFromGTF($reflnc, $lncfile, $computeORF, $numtx, $genome, $verbosity);
+		$ref_cDNA_passed = &CreateORFcDNAFromGTF($reflnc, $lncfile, $computeORF, $numtx, $genome, $verbosity);
 	
 	# if FASTA
 	# ------
@@ -207,11 +207,11 @@ if (defined $lncRNAfile){
 #################################
 # Launch CPAT logit on $infile in fasta
 my $infile_outfa;
-my	$refin;
+my $refin;
 if (Utils::guess_format($infile) eq "gtf"){
 	
-	$refin			=	Parser::parseGTF($infile, 'exon', undef , undef , $verbosity);
-	$infile_outfa	=	$infile.".fa";
+	$refin        = Parser::parseGTF($infile, 'exon', undef , undef , $verbosity);
+	$infile_outfa = $infile.".fa";
 	ExtractFromHash::hash2fasta($refin, $genome, $infile_outfa,  $verbosity);
 	
 } elsif (Utils::guess_format($infile) eq "fasta"){
@@ -222,7 +222,7 @@ if (Utils::guess_format($infile) eq "gtf"){
 }
 
 print STDERR "> Run CPAT on '$infile_outfa':\n";
-my $cpatout 		= basename($infile);
+my $cpatout = basename($infile);
 Cpat::runCPAT($orffile, $cdnafile, $lncfile, $cpatout, $infile_outfa, $verbosity);
 print STDERR "> Check CPAT outfile '".$cpatout.".cpat':\n";
 
@@ -250,8 +250,8 @@ if (!defined $cpatcut){
 if (Utils::guess_format($infile) eq "gtf"){
 	
 	print STDERR "> Create 2 files (mRNAs and lncRNAs) wrt to cutoff '$cpatcut':\n";
-	my $hcpat 	= Parser::parseCPAT($cpatout.".cpat", $verbosity);
-	my $prefix 		= basename($infile);
+	my $hcpat  = Parser::parseCPAT($cpatout.".cpat", $verbosity);
+	my $prefix = basename($infile);
  	&writeGTFwrtCPAT($refin, $hcpat, $cpatcut, $prefix, $verbosity);
 
 }
@@ -276,11 +276,11 @@ unlink $cpatout.".feature.xls";
 # 
 sub writeGTFwrtCPAT{
 
-	my ($refh, $refcpat, $cpatcut, $prefix, $verbosity)	= @_;
-	$verbosity 		||= 0;
+	my ($refh, $refcpat, $cpatcut, $prefix, $verbosity) = @_;
+	$verbosity ||= 0;
 	
-	my $lncfile		= $prefix.".lncRNA.gtf";
-	my $mrnafile	= $prefix.".mRNA.gtf";
+	my $lncfile  = $prefix.".lncRNA.gtf";
+	my $mrnafile = $prefix.".mRNA.gtf";
 	
 	# print if verbosity	
 	print STDERR "\tPrint lncRNA and mRNA GTF file ...\n" if ($verbosity > 0);
@@ -340,11 +340,11 @@ sub computeOptCutoff {
 
 	my ($featurefile, $outfile, $scriptR, $verbosity) = @_;
 	
-	my $bestcutoff	= undef;
-	my $bestsnsp	= undef;
+	my $bestcutoff = undef;
+	my $bestsnsp   = undef;
 	
 	print STDERR "> Compute optimal coding potential cutoff:\n";
-	my $h 	= Parser::parseCPAT($featurefile, $verbosity);
+	my $h = Parser::parseCPAT($featurefile, $verbosity);
 
 # 	print Dumper $h;
 	Cpat::WriteRdmCPATFile($h, $outfile, $verbosity);
@@ -361,11 +361,11 @@ sub computeOptCutoff {
 	while (<$command_out>) {
 		chomp;
 		if ($_ =~ /Cutoff_SnSp/){
-			my $line 	= $_;
-			$line		=~ s/"//g;
-			my @tmp 	= 	split (/\s+/, $line);
-			$bestcutoff	=	$tmp[-2];
-			$bestsnsp		=	$tmp[-1];	
+			my $line    =  $_;
+			$line       =~ s/"//g;
+			my @tmp     =  split (/\s+/, $line);
+			$bestcutoff =  $tmp[-2];
+			$bestsnsp   =  $tmp[-1];	
 		}
 	}   
 	return ($bestcutoff, $bestsnsp);  	
@@ -376,54 +376,54 @@ sub computeOptCutoff {
 
 sub CreateORFcDNAFromGTF{
 
-	my  ($h, $cdnafile, $orffile, $nbtx, $genome, $verbosity)	=	@_;
+	my ($h, $cdnafile, $orffile, $nbtx, $genome, $verbosity) = @_;
 	
 	# Note if $orffile is not defined, we just extract cDNA
 	
 	my $orfob;
-	my $allow_no_start 	=	0;	# do not allow for CDS start not found
-	my $allow_no_stop 	=	0;	# do not allow for CDS stop not found
-	my %h_orf;					# for storing and printing ORF sequence
-	my %h_cdna;					# for storing and printing cDNA sequence
-	my $countseqok		=	0;			# counter on good ORF (start and end found)
-	my $filterforCDS	=	0;		# get only line with CDS level
+	my %h_orf;              # for storing and printing ORF sequence
+	my %h_cdna;             # for storing and printing cDNA sequence
+	my $allow_no_start = 0; # do not allow for CDS start not found
+	my $allow_no_stop  = 0; # do not allow for CDS stop not found
+	my $countseqok     = 0; # counter on good ORF (start and end found)
+	my $filterforCDS   = 0; # get only line with CDS level
 
 
 	for my $tr (sort keys(%{$h})){ # for reproducibility
 
 		# shortcut for feature2seq sub
-		my $chr 	= $h->{$tr}->{'chr'};
-		my $strand 	= $h->{$tr}->{'strand'};
+		my $chr    = $h->{$tr}->{'chr'};
+		my $strand = $h->{$tr}->{'strand'};
 
 		# Check Biotype
 		my $biotype = $h->{$tr}->{'feature'}[0]->{'transcript_biotype'} if (defined $h->{$tr}->{'feature'}[0]->{'transcript_biotype'});
 
  
 		# get cDNA sequence for transcript tr
-		$filterforCDS		=	0; # do we filter seq for CDS
-		my $cdnaseq 		=	ExtractFromFeature::feature2seq($h->{$tr}->{'feature'}, $genome, $chr , $strand, $filterforCDS, $verbosity);	
+		$filterforCDS = 0; # do we filter seq for CDS
+		my $cdnaseq   = ExtractFromFeature::feature2seq($h->{$tr}->{'feature'}, $genome, $chr , $strand, $filterforCDS, $verbosity);	
 		die "ERROR: Tx '$tr' returns an empty sequence...\n" if (!defined $cdnaseq);
 		#######################################
 		# ORF
 		if (defined $orffile){
-			my $containCDS =   ExtractFromFeature::checkCDS($h->{$tr}->{'feature'});
+			my $containCDS = ExtractFromFeature::checkCDS($h->{$tr}->{'feature'});
 			if (! $containCDS ){
 				warn "\tYour input GTF file does not contain CDS information... the program will extract the longest one for each transcript...\n" if ($countseqok < 1 && $verbosity > 5);
 				# we create an ORF hash based on extraction of longest ORF
-				$orfob	=	Orf::longestORF2($cdnaseq,$strand, $allow_no_start, $allow_no_stop, undef, 1);
+				$orfob = Orf::longestORF2($cdnaseq,$strand, $allow_no_start, $allow_no_stop, undef, 1);
 		
 			} else {
 				warn "\tYour input GTF file does contain CDS information...\n" if ($countseqok < 1 && $verbosity > 5);
-				$filterforCDS 	= 1; # we activate filter to get only CDS and stop codon DNA sequence
-				my $orfseq			= ExtractFromFeature::feature2seq($h->{$tr}->{'feature'}, $genome, $chr , $strand, $filterforCDS, $verbosity);
+				$filterforCDS = 1; # we activate filter to get only CDS and stop codon DNA sequence
+				my $orfseq    = ExtractFromFeature::feature2seq($h->{$tr}->{'feature'}, $genome, $chr , $strand, $filterforCDS, $verbosity);
 				# we create an ORF hash 
-				$orfob	        = Orf::orfSeq2orfOb($orfseq, $strand, $verbosity);
+				$orfob        = Orf::orfSeq2orfOb($orfseq, $strand, $verbosity);
 		
 			}
 		
 			# Add ORF to a hash %h_orf only if the ORF is complete
 			if ($orfob->{'check_start'} && $orfob->{'check_stop'}){
-				$h_orf{$tr}	=	$orfob->{'cds_seq'};
+				$h_orf{$tr} = $orfob->{'cds_seq'};
 				print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$numtx...\r";
 			
 			} else {
@@ -438,7 +438,7 @@ sub CreateORFcDNAFromGTF{
 		if (!defined $orffile){
 			print STDERR "\tExtracting cDNAs ", $countseqok++,"/$numtx...\r";
 		}
-	    $h_cdna{$tr}	=	$cdnaseq;
+	    $h_cdna{$tr} = $cdnaseq;
 		
 	
 		if ($countseqok == $numtx){
@@ -479,51 +479,51 @@ sub CreateORFcDNAFromFASTA{
 	
 	print STDERR "Extract ORF/cDNA from fasta file '$fastafile'..\n";
 
-	my %h_orf;					# for storing and printing ORF sequence
-	my %h_cdna;					# for storing and printing cDNA sequence
+	my %h_orf;              # for storing and printing ORF sequence
+	my %h_cdna;             # for storing and printing cDNA sequence
 	
-	my $allow_no_start 	=	0;	# do not allow for CDS start not found
-	my $allow_no_stop 	=	0;	# do not allow for CDS stop not found
+	my $allow_no_start = 0; # do not allow for CDS start not found
+	my $allow_no_stop  = 0; # do not allow for CDS stop not found
 
 	# counter for seq with ORF ok
-	my $countseqok	=	0;
-	my $strand		=	".";
+	my $countseqok = 0;
+	my $strand     = ".";
 
 	# Create SeqIO objects 
-	my $seqin  = Bio::SeqIO->new(-file => $fastafile,      -format => "fasta");
+	my $seqin = Bio::SeqIO->new(-file => $fastafile, -format => "fasta");
 
 	# count the nb of sequences
-	my $nbseq	=0;
+	my $nbseq = 0;
 	$nbseq++ while( my $seq = $seqin->next_seq());
 	die "Your input FASTA '$fastafile' contains only *$nbseq* sequences.\nNot enough to training the program (default option --ntx|-n)\n" if ($nbseq < $numtx);
 	
 	# weird have to recreate a seqio object
-	$seqin  = Bio::SeqIO->new(-file => $fastafile,      -format => "fasta");
+	$seqin = Bio::SeqIO->new(-file => $fastafile, -format => "fasta");
 	
 	# Go through each sequences
 	while(my $seq = $seqin->next_seq()) {
 	
-		my $tr		= $seq->id();
+		my $tr = $seq->id();
 		
 		# if not orf
 		if (!defined $orffile){
 			# store cDNA sequence
 # 			my $new_seq = Bio::Seq->new(-id => $tr, -seq => $seq->seq(), -alphabet => 'dna');
-			$h_cdna{$tr}	=	$seq->seq();
+			$h_cdna{$tr} = $seq->seq();
             print STDERR "\tExtracting cDNAs from FASTA ", $countseqok++,"/$numtx complete cDNA(s)...\r";
 
 
 		} else {# get also ORF
 
-			my $orfob	=	Orf::longestORF2($seq->seq(),$strand, $allow_no_start, $allow_no_stop) 	if (defined $orffile);		
+			my $orfob = Orf::longestORF2($seq->seq(),$strand, $allow_no_start, $allow_no_stop) if (defined $orffile);		
 			# Add ORF to a hash %h_orf only if the ORF is complete
 			if ($orfob->{'check_start'} && $orfob->{'check_stop'}){
-				$h_orf{$tr}	=	$orfob->{'cds_seq'};
+				$h_orf{$tr} = $orfob->{'cds_seq'};
 				print STDERR "\tExtracting ORFs&cDNAs from FASTA ", $countseqok++,"/$numtx complete ORF(s)...\r";
 			
 				# store cDNA sequence
 # 				my $new_seq = Bio::Seq->new(-id => $tr, -seq => $seq, -alphabet => 'dna');
-				$h_cdna{$tr}	=	$seq->seq();
+				$h_cdna{$tr} = $seq->seq();
 					
 			} else {
 				warn "Tx: $tr : ORF is not complete...skipping for training\n" if ($verbosity > 5);
@@ -565,7 +565,7 @@ sub writefastafile{
 	print STDERR "\tWriting FASTA file '$filename'\n" if ($verbosity > 5);
 	
 	# cDNA
-	my $seq		=	Bio::SeqIO ->new(-format => 'fasta', -file => '>'.$filename, -alphabet =>'dna');
+	my $seq = Bio::SeqIO ->new(-format => 'fasta', -file => '>'.$filename, -alphabet =>'dna');
 	foreach my $id (keys %{$h}){
 		my $new_seq = Bio::Seq->new(-id => $id, -seq => $h->{$id});	
 		$seq->write_seq($new_seq);
@@ -575,20 +575,20 @@ sub writefastafile{
 
 sub randomizedGTFtoFASTA{
 
-	my ($h, $ref_cDNA_passed, $cdnafile, $genome, $nbtx, $maxTries, $maxN, $verbosity)	=	@_;
+	my ($h, $ref_cDNA_passed, $cdnafile, $genome, $nbtx, $maxTries, $maxN, $verbosity) = @_;
 	
-	$nbtx			||= 1000;	# number of random tx required
-	$maxTries		||= 10;	 	# max tries to for computing both overlap and N
-	$maxN			||= 5; 		# Proportion (in 100%) of N's authorized in new random sequence 
-	$verbosity		||= 0;  
+	$nbtx      ||= 1000; # number of random tx required
+	$maxTries  ||= 10;   # max tries to for computing both overlap and N
+	$maxN      ||= 5;    # Proportion (in 100%) of N's authorized in new random sequence 
+	$verbosity ||= 0;  
 
 
-	my $split 			= 1;
-	my $hlightforover	= Parser::GTF2GTFgnlight ($h, $split, $verbosity);
+	my $split         = 1;
+	my $hlightforover = Parser::GTF2GTFgnlight ($h, $split, $verbosity);
 	
 	# Get genome sequences size
 	print STDERR "- Get chromosome sizes \n" if ($verbosity > 0);
-	my $db      = Bio::DB::Fasta->new($genome);
+	my $db = Bio::DB::Fasta->new($genome);
 	my $refgenomesize;
 	foreach my $id ( $db->ids){
 		next if ($id =~ /^AAEX|^JH/ ); # for dog chromosome
@@ -598,13 +598,13 @@ sub randomizedGTFtoFASTA{
 # 	print Dumper $refgenomesize;
 	
 	#  hashref tx annotation sizes
-	my $refannotsize 	= ExtractFromHash::getCumulSizeFromGtfHash ($h,$verbosity, 0);
+	my $refannotsize = ExtractFromHash::getCumulSizeFromGtfHash ($h,$verbosity, 0);
 
 # 	print Dumper $refannotsize;
 
 	print STDERR "- Relocate Transcripts \n" if ($verbosity > 0);
-	my $i=0;
-	my $h_transcript_size	= keys(%{$h}); 
+	my $i = 0;
+	my $h_transcript_size = keys(%{$h}); 
 
 	my %h_cdna_rdm; # to store correclty relocated sequences
 
@@ -614,13 +614,13 @@ sub randomizedGTFtoFASTA{
 		next if ( ! exists $ref_cDNA_passed->{$tx}); # only keep mRNA tx that are in the cDNA fasat file for sorting CPAT :  for reproducibility
 
 
-		my $overlap 	= 1; # Initialize variable for iterative search for selfoverlap
-		my $includeN	= 1; # Initialize variable for iterative search for N
-		my $countTries	= 0; # Number of tries
+		my $overlap    = 1; # Initialize variable for iterative search for selfoverlap
+		my $includeN   = 1; # Initialize variable for iterative search for N
+		my $countTries = 0; # Number of tries
 	
 		# data for new sequence
 		my ($chrrdm, $beg, $end, $seq);
-		$seq			=  ""; # new fasta sequence ==> initialize in case pb with bio::db index
+		$seq = ""; # new fasta sequence ==> initialize in case pb with bio::db index
 
 		if (defined $nbtx && $i == $nbtx){
 			print STDERR "- Max number of transcripts (--nbtx == $nbtx) reached... ending!\n";
@@ -641,13 +641,13 @@ sub randomizedGTFtoFASTA{
 			# Initialize srand foreach tx
 			srand($seed);
 			# define a rand indice for all chr hash
-			my $randindex	=	int( rand(scalar keys %{$refgenomesize}) );
-			my @chrrdm		=	sort keys(%{$refgenomesize}); # sort hash for reproducibility 
-			$chrrdm			=	$chrrdm[$randindex];
+			my $randindex = int( rand(scalar keys %{$refgenomesize}) );
+			my @chrrdm    = sort keys(%{$refgenomesize}); # sort hash for reproducibility 
+			$chrrdm       = $chrrdm[$randindex];
 	
 			# define a random start/begin position on the random chr (and thus the end)
-			$beg		=  int(rand($refgenomesize->{$chrrdm}));
-			$end		=  $beg + int( $refannotsize->{$tx}->{size} * $sizecorrec);
+			$beg = int(rand($refgenomesize->{$chrrdm}));
+			$end = $beg + int( $refannotsize->{$tx}->{size} * $sizecorrec);
 		
 			# Self - Overlap			
 			$overlap = overlapwithH($chrrdm,$beg,$end, $hlightforover, $countTries, $verbosity);
@@ -660,7 +660,7 @@ sub randomizedGTFtoFASTA{
 			# Test for Ns
 			#############
 			my $propN;
-			($propN,$seq) 	=	getPropN($chrrdm,$beg,$end, $db, 'N');
+			($propN,$seq) = getPropN($chrrdm,$beg,$end, $db, 'N');
 			if ($propN == -1){
 				warn "Try: $countTries -> Extract sequences for $tx ($chrrdm:$beg-$end) returns an undefined sequence... skipping it\n" if ($verbosity > 10);		
 			} elsif ($propN > $maxN){
@@ -670,8 +670,8 @@ sub randomizedGTFtoFASTA{
 			}
 		}
 		# Write New random sequence
-		my $id				= $tx."_random_($chrrdm:$beg-$end)";
-		$h_cdna_rdm{$id}	=	$seq;
+		my $id           = $tx."_random_($chrrdm:$beg-$end)";
+		$h_cdna_rdm{$id} = $seq;
 
 		# verbosity
 		$i++;
@@ -694,19 +694,19 @@ sub overlapwithH{
 	my $overlap = 0;			
 	if (exists $rehchr->{$chr}){ # for the chromosome in the annotation test overlap
 				
-		my $refhchr	=	$rehchr->{$chr}; 
+		my $refhchr = $rehchr->{$chr}; 
 		
 		# Test for overlap with annotation $h	
 		foreach my $locus (ExtractFromHash::sortGnsStartg($refhchr)){
 		
-			my $annbeg	= $rehchr->{$chr}->{$locus}->{"startg"};
-			my $annend	= $rehchr->{$chr}->{$locus}->{"endg"};
-			my $strand	= $rehchr->{$chr}->{$locus}->{"strand"};
+			my $annbeg = $rehchr->{$chr}->{$locus}->{"startg"};
+			my $annend = $rehchr->{$chr}->{$locus}->{"endg"};
+			my $strand = $rehchr->{$chr}->{$locus}->{"strand"};
 			
 			# trick to speed  loop
-			next if ($annend	< $start); 
-			if 		($annbeg	> $end){
-				$overlap =0;
+			next if ($annend < $start); 
+			if      ($annbeg > $end){
+				$overlap = 0;
 				last;
 			}
 			
@@ -733,8 +733,8 @@ sub getPropN{
 
 	my ($chr,$start,$end, $db, $nucleotide) = @_;
 
-	my $propN	= -1; # default values
-	my $seq = "";	
+	my $propN = -1; # default values
+	my $seq   = "";	
 	
 	# Get sequence
 	$seq = $db->seq($chr, $start => $end);
@@ -743,7 +743,7 @@ sub getPropN{
 		warn "getPropN:: Sequence ($chr:$start-$end) returns an empty string!...skipping it\n";
 	} else {
 		my $numberofN = () = $seq  =~ /$nucleotide/gi;
-		$propN = int( $numberofN *100 / ($end-$start) );
+		$propN        = int( $numberofN *100 / ($end-$start) );
 	}
 	
 	return ($propN, $seq);
