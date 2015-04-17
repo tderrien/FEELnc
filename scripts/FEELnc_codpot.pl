@@ -2,6 +2,13 @@
 
 
 
+#
+# Modification by V.Wucher april 16 2015:
+# 	Modification of the predicting method: use now random forest (package R randomForest)
+#
+
+
+
 # Perl libs
 use warnings;
 use strict;
@@ -21,7 +28,8 @@ use ExtractFromFeature;
 use Intersect;
 use Utils;
 use Orf;
-use Cpat;
+#VW use Cpat;
+use RandomForest;
 
 # my $pathRcrossvalidation = "~tderrien/bin/perl/script/FEELnc/bin/crossValidation_cutoff.r";
 my $rprog    = "10crossValidation_cutoff.r";
@@ -41,9 +49,18 @@ my $verbosity  = 0;
 my $numtx    = 3000;	# number of tx for training
 my $minnumtx = 100;	# Min number of tx for training (a too small value will result in a bad regression)
 
+
+
+# VW: put CPAT in commentary
 # If CPAT cutoff is defined, no need to compute it on TP lncRNA and mRNA
-my $cpatcut = undef;
-my $sn_sp   = undef;
+#my $cpatcut = undef;
+#my $sn_sp   = undef;
+
+# If random forest (rf/RF) cutoff is defined, no need to compute it on TP lncRNA and mRNA
+my $rfcut = undef;
+my $sn_sp = undef;
+
+
 
 # Intergenic extraction:
 my $maxTries   = 10;
@@ -59,7 +76,8 @@ GetOptions(
 	'g|genome=s'     => \$genome,		
 	"n|numtx=i"      => \$numtx,
 	"b|biotype=s"    => \%biotype,
-	"c|cpatcut=f"    => \$cpatcut,
+#	"c|cpatcut=f"    => \$cpatcut,
+	"r|rfcut=f"      => \$rfcut,
 	'v|verbosity=i'  => \$verbosity,
 	'help|?'         => \$help,
 	'man'            => \$man
@@ -74,8 +92,8 @@ pod2usage(-verbose => 2) if $man;
 pod2usage("Error: Cannot read your input GTF file '$infile'...\nFor help, see:\n$progname --help\n") unless( -r $infile);
 pod2usage("Error: Cannot read your input annotation file '$mRNAfile'...\nFor help, see:\n$progname --help\n") unless( -r $mRNAfile);
 pod2usage ("- Error: \$numtx option (number of transcripts for training) '$numtx' should be greater than $minnumtx  \n") unless ($numtx >= $minnumtx);
-if (defined $cpatcut){
-	pod2usage ("- Error: \$cpatcut option '$cpatcut' should be a float between 0 and 1 [0-1] \n") unless ($cpatcut >= 0 and $cpatcut <= 1);
+if (defined $rfcut){
+	pod2usage ("- Error: \$rfcut option '$rfcut' should be a float between 0 and 1 [0-1] \n") unless ($rfcut >= 0 and $rfcut <= 1);
 }
 #############################################################
 
@@ -84,7 +102,7 @@ die "Error: You should set the environnment variable FEELNCPATH to the dir of in
 my $rprogpath   = $ENV{'FEELNCPATH'}."/bin/".$rprog;
 pod2usage("Error: Cannot access FEELnc bin dir with path '$rprogpath'...\nCheck the environnment variable FEELNCPATH\n") unless( -r $rprogpath);
 my $pathRscript = Utils::pathProg("Rscript");
-my $pathlogit   = Utils::pathProg("cpat.py");
+#VW: don't need cpat anymore my $pathlogit   = Utils::pathProg("cpat.py");
 # test PYTHONPATH from CPAT : http://dldcc-web.brc.bcm.edu/lilab/liguow/CGI/cpat/_build/html/index.html#installation
 # die "Error: You should set the PYTHONPATH env. variable to CPAT installation
 # export PYTHONPATH=/home/user/CPAT/usr/local/lib/python2.7/site-packages:\$PYTHONPATH. #setup PYTHONPATH
@@ -113,7 +131,7 @@ my $refmrna;
 
 
 
-warn "> Preparing CPAT files...\n";
+warn "> Preparing files for random forest...\n";
 
 ##########################################################
 # mRNA file
@@ -205,7 +223,7 @@ if (defined $lncRNAfile){
 }
 
 #################################
-# Launch CPAT logit on $infile in fasta
+# Launch RF on $infile in fasta
 my $infile_outfa;
 my $refin;
 if (Utils::guess_format($infile) eq "gtf"){
@@ -221,9 +239,9 @@ if (Utils::guess_format($infile) eq "gtf"){
 	die "Error: Unrecognized format for input file '$infile'...\n";
 }
 
-print STDERR "> Run CPAT on '$infile_outfa':\n";
-my $cpatout = basename($infile);
-Cpat::runCPAT($orffile, $cdnafile, $lncfile, $cpatout, $infile_outfa, $verbosity);
+print STDERR "> Run random Forest on '$infile_outfa':\n";
+my $rfout = basename($infile);
+Cpat::runCPAT($orffile, $cdnafile, $lncfile, $rfout, $infile_outfa, $verbosity);
 print STDERR "> Check CPAT outfile '".$cpatout.".cpat':\n";
 
 
@@ -235,7 +253,7 @@ print STDERR "> Check CPAT outfile '".$cpatout.".cpat':\n";
 # OUTFILE : INFILE.Cutoff
 
 ####################################
-if (!defined $cpatcut){
+if (!defined $rfcut){
 	my $snsp;
 	
 	($cpatcut, $snsp) = computeOptCutoff($cpatout.".feature.xls", $cpatout.".Cutoff", $rprogpath, $verbosity);
