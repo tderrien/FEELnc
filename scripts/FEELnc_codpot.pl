@@ -247,7 +247,7 @@ my $testOrfFile = "./test_ORF.fa";
 
 &CreateORFcDNAFromFASTA($lncfile, "/tmp/poubelle1", $lncOrfFile, $numtx, $verbosity);
 # VW : Récupère les ORF du jeu de test, crade !!!!
-&CreateORFcDNAFromGTF($refin, "/tmp/poubelle2",  $testOrfFile, $numtx, $genome, $verbosity);
+&CreateORFcDNAFromGTF($refin, "/tmp/poubelle2",  $testOrfFile, 10000, $genome, $verbosity);
 
 exit();
 
@@ -497,7 +497,7 @@ sub CreateORFcDNAFromGTF{
 	if (defined $orffile){
 		# Final Check if the number of complete ORF is ok
 		my $sizehorf = keys(%h_orf);
-		die "The number of complete ORF found with computeORF mode is *$sizehorf* transcripts... That's not enough to training the program\n" if ($sizehorf < $nbtx);
+		die "The number of complete ORF found with computeORF mode is *$sizehorf* transcripts... That's not enough to training the program\n" if ($sizehorf < $minnumtx);
 
 		&writefastafile(\%h_orf,  $orffile, $verbosity);
 		&writefastafile(\%h_cdna, $cdnafile, $verbosity);
@@ -508,7 +508,7 @@ sub CreateORFcDNAFromGTF{
 	} else {
 	
 		my $sizeh = keys(%h_cdna);
-		die "The number of cDNA sequences is *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $nbtx);
+		die "The number of cDNA sequences is *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $minnumtx);
 		&writefastafile(\%h_cdna, $cdnafile, $verbosity);
 	}
 	
@@ -540,7 +540,7 @@ sub CreateORFcDNAFromFASTA{
 	# count the nb of sequences
 	my $nbseq = 0;
 	$nbseq++ while( my $seq = $seqin->next_seq());
-	die "Your input FASTA '$fastafile' contains only *$nbseq* sequences.\nNot enough to training the program (default option --ntx|-n)\n" if ($nbseq < $nbtx);
+	die "Your input FASTA '$fastafile' contains only *$nbseq* sequences.\nNot enough to training the program (default option --ntx|-n)\n" if ($nbseq < $minnumtx);
 	
 	# weird have to recreate a seqio object
 	$seqin = Bio::SeqIO->new(-file => $fastafile, -format => "fasta");
@@ -587,7 +587,7 @@ sub CreateORFcDNAFromFASTA{
 	
 		# Final Check if the number of complete ORF is ok
 		my $sizehorf = keys(%h_orf);
-		die "The number of complete ORF found with computeORF mode is *$sizehorf* ... That's not enough to training the program\n" if ($sizehorf < $nbtx);
+		die "The number of complete ORF found with computeORF mode is *$sizehorf* ... That's not enough to training the program\n" if ($sizehorf < $minnumtx);
 
 		&writefastafile(\%h_orf,  $orffile, $verbosity);
 		&writefastafile(\%h_cdna, $cdnafile, $verbosity);
@@ -597,7 +597,7 @@ sub CreateORFcDNAFromFASTA{
 	} else {
 	
 		my $sizeh = keys(%h_cdna);
-		die "The number of cDNA sequences is *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $nbtx);
+		die "The number of cDNA sequences is *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $minnumtx);
 		&writefastafile(\%h_cdna, $cdnafile, $verbosity);
 	}
 }
@@ -726,7 +726,7 @@ sub randomizedGTFtoFASTA{
 	}
 	
 	my $sizeh = keys(%h_cdna_rdm);
-	die "The number of RANDOMLY relocated cDNA sequences =  *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $nbtx);
+	die "The number of RANDOMLY relocated cDNA sequences =  *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $minnumtx);
 	&writefastafile(\%h_cdna_rdm, $cdnafile, $verbosity);
 
 }
