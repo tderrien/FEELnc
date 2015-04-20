@@ -249,8 +249,6 @@ my $testOrfFile = "./test_ORF.fa";
 # VW : Récupère les ORF du jeu de test, crade !!!!
 &CreateORFcDNAFromGTF($refin, "/tmp/poubelle2",  $testOrfFile, 10000, $genome, $verbosity);
 
-exit();
-
 print STDERR "> Run random Forest on '$infile_outfa':\n";
 my $rfout = basename($infile)."_RF.out";
 
