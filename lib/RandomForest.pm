@@ -63,6 +63,10 @@ getRunModel: Get a threshold using 10-fold cross-validation on training data if 
 
 runRF: Run all the process using ORF from coding sequences, fasta from coding and non coding sequences, ORF and fasta from test sequences, a list of kmer size and a threshold (if defined)
 
+=item .
+
+rfPredToGTF: With a .gtf and a result file from a random forest, write 2 .gtf file, each one respectively for coding and non coding genes
+
 =back
 
 =cut
@@ -662,6 +666,101 @@ sub runRF
 
 
 
+
+
+# With a .gtf and a result file from a random forest, write 2 .gtf file, each one respectively for coding and non coding genes
+#	$testGTF = the GTF file of the unknown transcripts
+#	$reFile  = the output file from the random forest giving ranscripts class (0: non coding; 1: coding)
+sub rfPredToGTF
+{
+    my($testGTF, $rfFile) = @_;
+    $testGTF ||= undef;
+    $rfFile  ||= undef;
+
+
+    # Check if mendatory arguments have been given
+    die "Parsing random forest output: GTF file with the new transcripts is not defined... exiting\n" if(!defined $testGTF);
+    die "Parsing random forest output: random forest output file is not defined... exiting\n"         if(!defined $rfFile);
+
+    # emtpy
+    die "Parsing random forest output: GTF file with the new transcripts '$testGTF' is empty... exiting\n" unless (-s $testGTF);
+    die "Parsing random forest output: random forest output file '$rfFile' is empty... exiting\n"          unless (-s $rfFile);
+
+
+    # Start by reading the result file from the random forest
+    open FILE, "$rfFile" or die "Error! Cannot access to the random forest output file ". $rfFile . ": ".$!;
+    # Put transcript names on 2 tab, one for coding genes and the other for non coding genes
+    my %nonHas;
+    my %codHas;
+    my @info;
+    my $flag = 0;
+
+    while(<FILE>)
+    {
+	chop;
+	@info = split(/\t/);
+
+	# Check for the first line...
+	if($flag==0)
+	{
+	    $flag = 1;
+	    next;
+	}
+
+	# Check if the transcript is annotated as non coding (0) or coding (1)
+	if($info[-1] == 0)
+	{
+	    $nonHas{$info[0]} = 0;
+	}
+	elsif($info[-1] == 1)
+	{
+	    $codHas{$info[0]} = 1;
+	}
+	else
+	{
+	    die "Not a valid value for coding label for the transcript $info[0].Exit.\n";
+	}
+    }
+    close FILE;
+
+    # Read the GTF file and put the line in the right file depending on which tab the transcript is
+    my $outNon = basename($testGTF).".lncRNA.gtf";
+    my $outCod = basename($testGTF).".mRNA.gtf";
+    my $line   = "";
+    my $name   = "";
+
+    print "Writing the two GTF output files: $outNon and $outCod\n";
+
+    open FILE,  "$testGTF" or die "Error! Cannot access to the gtf file for new transcripts ". $testGTF . ": ".$!;
+    open LNC, "> $outNon"  or die "Error! Cannot access to the lncRNA gtf output file ". $outNon . ": ".$!;
+    open RNA, "> $outCod"  or die "Error! Cannot access to the mRNA gtf output file ". $outCod . ": ".$!;
+
+    while(<FILE>)
+    {
+	#VW moche moche moche !!!
+	$line = $_;
+	$name = ($line =~ /.*transcript_id "(.*)"; class.*/);
+	$name = $1;
+
+	# Check if the name is in the non coding or coding array
+	if(exists $nonHas{$name})
+	{
+	    print LNC $line;
+	}
+	elsif(exists $codHas{$name})
+	{
+	    print RNA $line;
+	}
+	else
+	{
+	    warn "Warning: $name is not in the random forest output file...\n";
+	}
+    }
+    close FILE;
+    close LNC;
+    close RNA;
+}
+
 1;
 
 
@@ -706,8 +805,6 @@ number of proc to be use for minidsk
 
 Return value: Return the array of the log ratio value
 
-=cut
-
 ##############################################################################
 
 =head2 scoreORF
@@ -742,8 +839,6 @@ number of proc to be use for minidsk
 
 =back
 
-=cut
-
 ##############################################################################
 
 =head2 getSizeFastaFile
@@ -765,8 +860,6 @@ output file
 header to print after the name
 
 =back
-
-=cut
 
 ##############################################################################
 
@@ -794,8 +887,6 @@ file to write the merge of all kmer scores and ORF/mRNA size
 
 =back
 
-=cut
-
 #############################################################################
 
 =head2 getRunModel
@@ -821,8 +912,6 @@ file where the kmerscores, mRNA and ORF size are put for test sequences
 if it is given, the threshold for random forest (>$thres = coding), if undef then the threshold is obtain by 10-fold cross validation
 
 =back
-
-=cut
 
 ##############################################################################
 
@@ -867,6 +956,24 @@ list of size of kmer as '2,3,4,5,6' (default value) as a string
 =item $thres
 
 the threshold for the random forest, if it is not defined then it is set using a 10-fold cross-validation on learning data
+
+=back
+
+##############################################################################
+
+=head2 rfPredToGTF
+
+With a .gtf and a result file from a random forest, write 2 .gtf file, each one respectively for coding and non coding genes
+
+=over
+
+=item $testGTF
+
+the GTF file of the unknown transcripts
+
+=item $reFile
+
+the output file from the random forest giving ranscripts class (0: non coding; 1: coding)
 
 =back
 
