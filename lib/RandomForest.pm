@@ -86,24 +86,24 @@ sub getKmerRatio
     $outFile ||= undef;
     $codStep ||= 3;
     $nonStep ||= 1;
-    $proc    ||= 1;    
-   
+    $proc    ||= 1;
+
     # Check if mendatory arguments have been given
     die "Bulding model: ORF coding genes training file not defined... exiting\n" if (!defined $codFile);
     die "Bulding model: lncRNA training file not defined... exiting\n"           if (!defined $nonFile);
     die "Bulding model: output file for kmer model is missing... exiting\n"      if (!defined $outFile);
-    
+
     # emtpy
     die "Bulding model: ORF coding genes training file '$codFile' is empty... exiting\n" unless (-s $codFile);
     die "Bulding model: lncRNA training file '$nonFile' is empty... exiting\n"           unless (-s $nonFile);
-    
+
     # Path to minidsk
     my $minidskPath = Utils::pathProg("minidsk");
     my $cmd = "";
     # Temporary files to put kmer counting for ORF coding genes and non coding genes
     my $codOut = "/tmp/cod_".int(rand(1000)).".tmp";
     my $nonOut = "/tmp/non_".int(rand(1000)).".tmp";
-    
+
     # Run minidsk on ORF for coding genes
     print "Running minidsk on $codFile:\n";
     $cmd = "$minidskPath -file $codFile -nb-cores $proc -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
@@ -121,7 +121,7 @@ sub getKmerRatio
     my @nonVal;
     my $nonTot = 0;
     my $i;
-    
+
     # Read the kmer counting for ORF on coding genes
     print "Read kmer counting for coding genes of size $kmerSize in $codOut\n";
     # Open file
@@ -139,7 +139,7 @@ sub getKmerRatio
 	$i = $i+1;
     }
     close FILE;
-    
+
     # Read the kmer counting for non coding genes
     print "Read kmer counting for non coding genes of size $kmerSize in $nonOut\n";
     # Open file
@@ -166,7 +166,7 @@ sub getKmerRatio
     my $nbKmer = @kmerTab;
     my $log    = 0;
     my @logTab;
-    
+
     # Print the file header
     print FILE "kmer\tkmerSize_logRatio\n";
     for($i=0; $i<$nbKmer; $i++)
@@ -209,7 +209,7 @@ sub getKmerRatio
 # Temporary function to compute the scoring function of a multifasta file of ORF
 #	$orfFile  = multi fasta file with the ORF of the genes to be scored
 #	$modFile  = file with the log ratio score compute on learning files
-#	$outFile  = file where the logRatio of kmer frequency need to be written 
+#	$outFile  = file where the logRatio of kmer frequency need to be written
 #	$kmerSize = size of the kmer
 #	$step     = step for the counting of kmer
 #	$proc     = number of proc to be use for minidsk
@@ -245,7 +245,7 @@ sub scoreORF
 	push(@seqTab, $seq);
     }
     # Fermer le fichier ou autres ?
-    
+
 
     # Read the model file
     print "Read the log ratio file $modFile\n";
@@ -260,7 +260,7 @@ sub scoreORF
 	    $flag = 1;
 	    next;
 	}
-	
+
 	chop;
 	my ($kmer, $log) = split(/\t/);
 	push(@kmerTab, $kmer);
@@ -278,7 +278,7 @@ sub scoreORF
     open FILEOUT, "> $outFile" or die "Error! Cannot access output file ". $outFile . ": ".$!;
 
     # Print the header of the output file
-    print FILEOUT "name\t".$kmerSize."_score\n";
+    print FILEOUT "name\tkmerScore_".$kmerSize."mer\n";
     # For each ORF, print the sequence on a temporary file $tmpFile and run minidsk on this sequence and print the result in $tmpFileOut
     foreach $seq (@seqTab)
     {
@@ -296,7 +296,7 @@ sub scoreORF
 	my $seqout  = Bio::SeqIO->new(-format => 'fasta', -file => '> '.$tmpFile, -alphabet =>'dna', ); # la ',' à la fin chelou
 	my $new_seq = Bio::Seq->new(-id => $id, -seq => $seq->seq());
 	$seqout->write_seq($new_seq);
-	
+
 	# Run minidsk on this sequence
 	my $cmd = "$minidskPath -file $tmpFile -nb-cores $proc -kmer-size $kmerSize -out $tmpFileOut -dont-reverse -step $step 1>/dev/null 2>/dev/null";
 	system($cmd);
@@ -309,7 +309,7 @@ sub scoreORF
 	    chop;
 	    my ($kmer, $nbr) = split(/\t/);
 	    die "Error: kmer order is not the same between $modFile and $tmpFileOut.\nExit." if($kmerTab[$i] ne $kmer);
-	    
+
 	    $logSum  = $logSum + ( int($nbr)*$logTab[$i] );
 	    $totKmer = $totKmer + int($nbr);
 	    $i = $i+1;
@@ -358,7 +358,7 @@ sub mergeKmerScoreSize
     my @head;
     my $flag = 0;
     my $file;
-    
+
     # Read kmer score files
     foreach $file (@{$RefKmerFileList})
     {
@@ -368,7 +368,7 @@ sub mergeKmerScoreSize
 	{
 	    chop;
 	    my ($name, $val) = split(/\t/);
-	    
+
 	    if($flag != 0)
 	    {
 		if(!exists $seq{$name})
@@ -397,7 +397,7 @@ sub mergeKmerScoreSize
     {
 	chop;
 	my($name, $orfSize) = split(/\t/);
-	
+
 	if($flag != 0)
 	{
 	    if(!exists $seq{$name})
@@ -415,7 +415,7 @@ sub mergeKmerScoreSize
     }
     close FILE;
     unlink $orfSizeFile;
-    
+
     # Read mRNA size
     $flag = 0;
     open FILE, "$rnaSizeFile" or die "Error! Cannot access mRNA size file ". $rnaSizeFile . ": ".$!;
@@ -423,7 +423,7 @@ sub mergeKmerScoreSize
     {
 	chop;
 	my($name, $rnaSize) = split(/\t/);
-	
+
 	if($flag != 0)
 	{
 	    if(!exists $seq{$name})
@@ -441,14 +441,15 @@ sub mergeKmerScoreSize
     }
     close FILE;
     unlink $rnaSizeFile;
-    
+
     # Write the output file
     open FILE, "> $outFile" or die "Error! Cannot access to the output file ". $outFile . ": ".$!;
     my $seqId;
 
     #print Dumper @head;
-    
+
     # Write the header
+    print FILE "name\t";
     print FILE join("\t", @head), "\n";
 
     # Write the values
@@ -478,7 +479,7 @@ sub getSizeFastaFile
 
     # empty
     die "Get size: input file $inFile is empty... exiting\n" unless(-s $inFile);
- 
+
     # Put all input sequence in array
     my $multiFasta = new Bio::SeqIO(-file  => $inFile);
     my @seq_array;
@@ -494,7 +495,7 @@ sub getSizeFastaFile
     my $id;
 
     print FILE "name\t$header\n";
-    foreach my $seq ( @seq_array ) 
+    foreach my $seq ( @seq_array )
     {
         $length = $seq->length;
         $id     = $seq->id();
@@ -531,25 +532,25 @@ sub getRunModel
 
 
     # Get the path to RSCRIPT_RF.R to run the learning and assignment of the sequences
-    print "Running RSCRIPT_RF.R\n";
-    my $rprogpath = $ENV{'FEELNCPATH'}."/bin/RSCRIPT_RF.R";
+    print "Running codpot_randomforest.r\n";
+    my $rprogpath = $ENV{'FEELNCPATH'}."/bin/codpot_randomforest.r";
     my $cmd       = "";
-    
-    # Not a valid value for the threshold
-    # It is done in FEELnc_codpot.pl
-    # No threshold given
+
+    # test for a valid value for the threshold is done in FEELnc_codpot.pl
     if(!defined $thres)
     {
+	# If no threshold given, run codpot_randomforest.r without threshold (4 arguments)
 	print "The threshold for the voting in random forest is not defined. Use 10-fold cross-validation to determine the best threshold.\n";
 	$cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile";
     }
     else
     {
+	# If a threshold is given, run codpot_randomforest.r with this threshold (5 arguments)
 	print "The threshold for the voting in random forest is $thres.\n";
 	$cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile $thres";
     }
-    #system($cmd);
-    print "LA COMMANDE : $cmd\n";
+    system($cmd);
+    #print "LA COMMANDE : $cmd\n";
 }
 
 
@@ -571,7 +572,7 @@ sub runRF
 
     #print "$codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres\n";
 
-    
+
     # 1. Compute the size of each sequence and ORF
     print "1. Compute the size of each sequence and ORF\n";
     my $sizeCodLearnFile    = "/tmp/".basename($codLearnFile)."_mRNASize".int(rand(1000)).".tmp";
@@ -606,7 +607,7 @@ sub runRF
     my $proc        = 1;
     my $lenKmerList = @kmerList;
     my $i           = 0;
-    
+
     foreach $kmerSize ( @kmerList )
     {
 	$kmerFile = "/tmp/".basename($orfCodLearnFile)."_".int(rand(10000))."_kmerRatio.tmp";
@@ -614,7 +615,7 @@ sub runRF
 
 	&getKmerRatio($orfCodLearnFile, $nonLearnFile, $kmerFile, $kmerSize, $codStep, $nonStep, $proc);
     }
-    
+
     # 3. Compute the kmer score for each kmer size on learning and test ORF and for each type
     print "3. Compute the kmer score for each kmer size on learning and test ORF\n";
     $kmerFile = "";
@@ -633,9 +634,9 @@ sub runRF
 
 	# Test
 	$kmerFile = "/tmp/".basename($orfTestFile)."_".int(rand(10000))."_kmerScoreTest.tmp";
-	push(@kmerScoreTestFileList, $kmerFile);	
+	push(@kmerScoreTestFileList, $kmerFile);
 	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc);
-    }    
+    }
 
 
     # 4. Merge the score and size files into one file for each type (learning coding and non coding and test)
@@ -643,7 +644,7 @@ sub runRF
     my $outModCodLearn = basename("$outFile").".modelCoding.out";
     my $outModNonLearn = basename("$outFile").".modelNonCoding.out";
     my $outModTest     = basename("$outFile").".modelTest.out";
-    
+
     # Learning
     ## Coding
     &mergeKmerScoreSize(\@kmerScoreCodLearnFileList, $sizeOrfCodLearnFile, $sizeCodLearnFile, $outModCodLearn);
@@ -725,7 +726,7 @@ file with the log ratio score compute on learning files
 
 =item $outFile
 
-file where the logRatio of kmer frequency need to be written 
+file where the logRatio of kmer frequency need to be written
 
 =item $kmerSize
 

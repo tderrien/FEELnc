@@ -199,7 +199,7 @@ write.table(x=cbind(c("Sensitivity","Specificity","Precision","Accuracy"), c(sen
 res <- rep(0, length.out=nrow(testMat))
 res[dat.rf$test$votes[,2]>=thres] <- 1
 
-## Write on the output
+## Write the output
 cat("Write the coding label for ", testFile, " in ", outFile, ".\n", sep="")
 write.table(x=cbind(testMat, label=res), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
 
