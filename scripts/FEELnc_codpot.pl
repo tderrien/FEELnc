@@ -239,8 +239,35 @@ if (Utils::guess_format($infile) eq "gtf"){
 	die "Error: Unrecognized format for input file '$infile'...\n";
 }
 
+
+# VW modif crade !
+# besoin des ORF pour lnc et test
+my $lncOrfFile  = "./lncRNA_ORF.fa";
+my $testOrfFile = "./test_ORF.fa";
+
+&CreateORFcDNAFromFASTA($lncfile, "/tmp/poubelle1", $lncOrfFile, $numtx, $verbosity);
+# VW : Récupère les ORF du jeu de test, crade !!!!
+&CreateORFcDNAFromGTF($refin, "/tmp/poubelle2",  $testOrfFile, $numtx, $genome, $verbosity);
+
+exit();
+
 print STDERR "> Run random Forest on '$infile_outfa':\n";
-my $rfout = basename($infile);
+my $rfout = basename($infile)."_RF.out";
+
+
+# VW: Run de façon crade !
+RandomForest::runRF($cdnafile, $orffile, $lncfile, $lncOrfFile, $infile_outfa, $testOrfFile, $rfout, "2,3,4,5,6", $rfcut);
+
+
+
+
+# VW modif
+exit();
+
+# VW juste pour eviter les pb de compile...
+my $cpatout = "";
+my $cpatcut = "";
+
 Cpat::runCPAT($orffile, $cdnafile, $lncfile, $rfout, $infile_outfa, $verbosity);
 print STDERR "> Check CPAT outfile '".$cpatout.".cpat':\n";
 
@@ -442,7 +469,7 @@ sub CreateORFcDNAFromGTF{
 			# Add ORF to a hash %h_orf only if the ORF is complete
 			if ($orfob->{'check_start'} && $orfob->{'check_stop'}){
 				$h_orf{$tr} = $orfob->{'cds_seq'};
-				print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$numtx...\r";
+				print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$nbtx...\r";
 			
 			} else {
 				warn "Tx: $tr ('$biotype') with CDS features: $containCDS is not complete...skipping for training\n" if ($verbosity > 10);
@@ -454,13 +481,13 @@ sub CreateORFcDNAFromGTF{
 		# ADD cDNA only (if ORF is OK) : see next in above block
 		# store cDNA seq
 		if (!defined $orffile){
-			print STDERR "\tExtracting cDNAs ", $countseqok++,"/$numtx...\r";
+			print STDERR "\tExtracting cDNAs ", $countseqok++,"/$nbtx...\r";
 		}
 	    $h_cdna{$tr} = $cdnaseq;
 		
 	
-		if ($countseqok == $numtx){
-			print STDERR "\tMax ORF/cDNAs sequences '$numtx' reached..ending!\n";
+		if ($countseqok == $nbtx){
+			print STDERR "\tMax ORF/cDNAs sequences '$nbtx' reached..ending!\n";
 			last;
 		}
 	
@@ -470,7 +497,7 @@ sub CreateORFcDNAFromGTF{
 	if (defined $orffile){
 		# Final Check if the number of complete ORF is ok
 		my $sizehorf = keys(%h_orf);
-		die "The number of complete ORF found with computeORF mode is *$sizehorf* transcripts... That's not enough to training the program\n" if ($sizehorf < $numtx);
+		die "The number of complete ORF found with computeORF mode is *$sizehorf* transcripts... That's not enough to training the program\n" if ($sizehorf < $nbtx);
 
 		&writefastafile(\%h_orf,  $orffile, $verbosity);
 		&writefastafile(\%h_cdna, $cdnafile, $verbosity);
@@ -481,7 +508,7 @@ sub CreateORFcDNAFromGTF{
 	} else {
 	
 		my $sizeh = keys(%h_cdna);
-		die "The number of cDNA sequences is *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $numtx);
+		die "The number of cDNA sequences is *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $nbtx);
 		&writefastafile(\%h_cdna, $cdnafile, $verbosity);
 	}
 	
@@ -513,7 +540,7 @@ sub CreateORFcDNAFromFASTA{
 	# count the nb of sequences
 	my $nbseq = 0;
 	$nbseq++ while( my $seq = $seqin->next_seq());
-	die "Your input FASTA '$fastafile' contains only *$nbseq* sequences.\nNot enough to training the program (default option --ntx|-n)\n" if ($nbseq < $numtx);
+	die "Your input FASTA '$fastafile' contains only *$nbseq* sequences.\nNot enough to training the program (default option --ntx|-n)\n" if ($nbseq < $nbtx);
 	
 	# weird have to recreate a seqio object
 	$seqin = Bio::SeqIO->new(-file => $fastafile, -format => "fasta");
@@ -528,7 +555,7 @@ sub CreateORFcDNAFromFASTA{
 			# store cDNA sequence
 # 			my $new_seq = Bio::Seq->new(-id => $tr, -seq => $seq->seq(), -alphabet => 'dna');
 			$h_cdna{$tr} = $seq->seq();
-            print STDERR "\tExtracting cDNAs from FASTA ", $countseqok++,"/$numtx complete cDNA(s)...\r";
+            print STDERR "\tExtracting cDNAs from FASTA ", $countseqok++,"/$nbtx complete cDNA(s)...\r";
 
 
 		} else {# get also ORF
@@ -537,7 +564,7 @@ sub CreateORFcDNAFromFASTA{
 			# Add ORF to a hash %h_orf only if the ORF is complete
 			if ($orfob->{'check_start'} && $orfob->{'check_stop'}){
 				$h_orf{$tr} = $orfob->{'cds_seq'};
-				print STDERR "\tExtracting ORFs&cDNAs from FASTA ", $countseqok++,"/$numtx complete ORF(s)...\r";
+				print STDERR "\tExtracting ORFs&cDNAs from FASTA ", $countseqok++,"/$nbtx complete ORF(s)...\r";
 			
 				# store cDNA sequence
 # 				my $new_seq = Bio::Seq->new(-id => $tr, -seq => $seq, -alphabet => 'dna');
@@ -549,8 +576,8 @@ sub CreateORFcDNAFromFASTA{
 			}
 		}
 		# Check if numtx is reached
-		if ($countseqok == $numtx){
-			print STDERR "Max cDNAs/ORF sequences '$numtx' reached..ending!\n";
+		if ($countseqok == $nbtx){
+			print STDERR "Max cDNAs/ORF sequences '$nbtx' reached..ending!\n";
 			last;
 		}
 			
@@ -560,7 +587,7 @@ sub CreateORFcDNAFromFASTA{
 	
 		# Final Check if the number of complete ORF is ok
 		my $sizehorf = keys(%h_orf);
-		die "The number of complete ORF found with computeORF mode is *$sizehorf* ... That's not enough to training the program\n" if ($sizehorf < $numtx);
+		die "The number of complete ORF found with computeORF mode is *$sizehorf* ... That's not enough to training the program\n" if ($sizehorf < $nbtx);
 
 		&writefastafile(\%h_orf,  $orffile, $verbosity);
 		&writefastafile(\%h_cdna, $cdnafile, $verbosity);
@@ -570,7 +597,7 @@ sub CreateORFcDNAFromFASTA{
 	} else {
 	
 		my $sizeh = keys(%h_cdna);
-		die "The number of cDNA sequences is *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $numtx);
+		die "The number of cDNA sequences is *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $nbtx);
 		&writefastafile(\%h_cdna, $cdnafile, $verbosity);
 	}
 }
@@ -699,7 +726,7 @@ sub randomizedGTFtoFASTA{
 	}
 	
 	my $sizeh = keys(%h_cdna_rdm);
-	die "The number of RANDOMLY relocated cDNA sequences =  *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $numtx);
+	die "The number of RANDOMLY relocated cDNA sequences =  *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $nbtx);
 	&writefastafile(\%h_cdna_rdm, $cdnafile, $verbosity);
 
 }
