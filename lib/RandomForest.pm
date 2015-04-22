@@ -83,17 +83,19 @@ rfPredToGTF: With a .gtf and a result file from a random forest, write 2 .gtf fi
 #	$nonStep   = step for the counting of kmer for the non coding genes
 #	$proc      = number of proc to be use for minidsk
 #	$verbosity = value to define the verbosity
+#	$keepTmp   = keeping or not the temporary files
 #	Return value:
 #		Return the array of the log ratio value
 sub getKmerRatio
 {
-    my($codFile, $nonFile, $outFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity) = @_;
+    my($codFile, $nonFile, $outFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp) = @_;
     $codFile ||= undef;
     $nonFile ||= undef;
     $outFile ||= undef;
     $codStep ||= 3;
     $nonStep ||= 1;
     $proc    ||= 1;
+    $keepTmp ||= 0;
 
     # Check if mendatory arguments have been given
     die "Bulding model: ORF coding genes training file not defined... exiting\n" if (!defined $codFile);
@@ -166,7 +168,6 @@ sub getKmerRatio
     }
     close FILE;
 
-
     # Write the output file with the log ratio directly
     print "Write the log ratio of kmer bewteen coding and non coding genes frequency for a size of kmer of $kmerSize\n" if($verbosity >= 5);
     open FILE, "> $outFile" or die "Error! Cannot access output file ". $outFile . ": ".$!;
@@ -204,9 +205,12 @@ sub getKmerRatio
     }
     close FILE;
 
-    # Delete the temporary files
-    unlink $codOut;
-    unlink $nonOut;
+    # Delete the temporary files if keepTmp != 0
+    if($keepTmp == 0)
+    {
+	unlink $codOut;
+	unlink $nonOut;
+    }
 
     return(@logTab);
 }
@@ -221,9 +225,10 @@ sub getKmerRatio
 #	$step      = step for the counting of kmer
 #	$proc      = number of proc to be use for minidsk
 #	$verbosity = value to define the verbosity
+#	$keepTmp   = keep or not the temporary files
 sub scoreORF
 {
-    my($orfFile, $modFile, $outFile, $kmerSize, $step, $proc, $verbosity) = @_;
+    my($orfFile, $modFile, $outFile, $kmerSize, $step, $proc, $verbosity, $keepTmp) = @_;
     $orfFile  ||= undef;
     $modFile  ||= undef;
     $outFile  ||= undef;
@@ -330,8 +335,11 @@ sub scoreORF
 
 
     # Delete temporary files
-    unlink $tmpFile;
-    unlink $tmpFileOut;
+    if($keepTmp == 0)
+    {
+	unlink $tmpFile;
+	unlink $tmpFileOut;
+    }
 }
 
 
@@ -342,9 +350,10 @@ sub scoreORF
 #	$orfSizeFile  = file with the size of the ORF as name\tORFSize
 #	$rnaSizeFile  = file with the size of the mRNA as name\tmRNASize
 #	$outFile      = file to write the merge of all kmer scores and ORF and mRNA size
+#	$keepTmp      = keep or not temporary files
 sub mergeKmerScoreSize
 {
-    my ($RefKmerFileList, $orfSizeFile, $rnaSizeFile, $outFile) = @_;
+    my ($RefKmerFileList, $orfSizeFile, $rnaSizeFile, $outFile, $keepTmp) = @_;
     $RefKmerFileList ||= undef;
     $orfSizeFile     ||= undef;
     $rnaSizeFile     ||= undef;
@@ -395,7 +404,7 @@ sub mergeKmerScoreSize
 	    }
 	}
 	close FILE;
-	unlink $file;
+	unlink $file unless($keepTmp != 0);
     }
 
     # Read ORF size
@@ -422,7 +431,7 @@ sub mergeKmerScoreSize
 	}
     }
     close FILE;
-    unlink $orfSizeFile;
+    unlink $orfSizeFile unless($keepTmp != 0);
 
     # Read mRNA size
     $flag = 0;
@@ -450,7 +459,7 @@ sub mergeKmerScoreSize
 	}
     }
     close FILE;
-    unlink $rnaSizeFile;
+    unlink $rnaSizeFile unless($keepTmp != 0);
 
     # Write the output file
     open FILE, "> $outFile" or die "Error! Cannot access to the output file ". $outFile . ": ".$!;
@@ -574,10 +583,11 @@ sub getRunModel
 #	$outFile         = file to write the result of the random forest
 #	$kmerListString  = list of size of kmer as '2,3,4,5,6' (default value) as string
 #	$thres           = the threshold for the random forest, if it is not defined then it is set using a 10-fold cross-validation on learning data
-#	$verb            = value for level of verbosity
+#	$verbosity       = value for level of verbosity
+#	$keepTmp         = keep or not the temporary files
 sub runRF
 {
-    my ($codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $verbosity) = @_;
+    my ($codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $verbosity, $keepTmp) = @_;
     $kmerListString ||= "2,3,4,5,6";
     $verbosity      ||= 0;
 
@@ -622,7 +632,7 @@ sub runRF
 	$kmerFile = "/tmp/".basename($orfCodLearnFile)."_".int(rand(10000))."_kmerRatio.tmp";
 	push(@kmerRatioFileList, $kmerFile);
 
-	&getKmerRatio($orfCodLearnFile, $nonLearnFile, $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity);
+	&getKmerRatio($orfCodLearnFile, $nonLearnFile, $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp);
     }
 
     # 3. Compute the kmer score for each kmer size on learning and test ORF and for each type
@@ -634,17 +644,17 @@ sub runRF
 	## Coding
 	$kmerFile = "/tmp/".basename($orfCodLearnFile)."_".int(rand(10000))."_kmerScoreCodLearn.tmp";
 	push(@kmerScoreCodLearnFileList, $kmerFile);
-	scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
+	scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp);
 
 	## Non coding
 	$kmerFile = "/tmp/".basename($orfNonLearnFile)."_".int(rand(10000))."_kmerScoreNonLearn.tmp";
 	push(@kmerScoreNonLearnFileList, $kmerFile);
-	scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
+	scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp);
 
 	# Test
 	$kmerFile = "/tmp/".basename($orfTestFile)."_".int(rand(10000))."_kmerScoreTest.tmp";
 	push(@kmerScoreTestFileList, $kmerFile);
-	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
+	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp);
     }
 
 
@@ -656,17 +666,48 @@ sub runRF
 
     # Learning
     ## Coding
-    &mergeKmerScoreSize(\@kmerScoreCodLearnFileList, $sizeOrfCodLearnFile, $sizeCodLearnFile, $outModCodLearn);
+    &mergeKmerScoreSize(\@kmerScoreCodLearnFileList, $sizeOrfCodLearnFile, $sizeCodLearnFile, $outModCodLearn, $keepTmp);
     ## Non coding
-    &mergeKmerScoreSize(\@kmerScoreNonLearnFileList, $sizeOrfNonLearnFile, $sizeNonLearnFile, $outModNonLearn);
+    &mergeKmerScoreSize(\@kmerScoreNonLearnFileList, $sizeOrfNonLearnFile, $sizeNonLearnFile, $outModNonLearn, $keepTmp);
     # Test
-    &mergeKmerScoreSize(\@kmerScoreTestFileList,     $sizeOrfTestFile,     $sizeTestFile,     $outModTest);
+    &mergeKmerScoreSize(\@kmerScoreTestFileList,     $sizeOrfTestFile,     $sizeTestFile,     $outModTest,     $keepTmp);
 
 
     # 5. Make the model on learning sequences and apply it on test sequences
     print "5. Make the model on learning sequences and apply it on test sequences\n";
 
     &getRunModel($outModCodLearn, $outModNonLearn, $outModTest, $outFile);
+
+    # Delete temporary files
+    if($keepTmp == 0)
+    {
+	my $file = "";
+	unlink $sizeCodLearnFile;
+	unlink $sizeOrfCodLearnFile;
+	unlink $sizeNonLearnFile;
+	unlink $sizeOrfNonLearnFile;
+	unlink $sizeTestFile;
+	unlink $sizeOrfTestFile;
+	foreach $file (@kmerRatioFileList)
+	{
+	    unlink $file;
+	}
+	foreach $file (@kmerScoreCodLearnFileList)
+	{
+	    unlink $file;
+	}
+	foreach $file (@kmerScoreNonLearnFileList)
+	{
+	    unlink $file;
+	}
+	foreach $file (@kmerScoreTestFileList)
+	{
+	    unlink $file;
+	}
+	unlink $outModCodLearn;
+	unlink $outModNonLearn;
+	unlink $outModTest;
+    }
 }
 
 
@@ -742,7 +783,6 @@ sub rfPredToGTF
 
     while(<FILE>)
     {
-	#VW moche moche moche !!!
 	$line = $_;
 	$name = ($line =~/.*transcript_id "([^ ]*)";/);
 	$name = $1;
@@ -812,6 +852,10 @@ number of proc to be use for minidsk
 
 define the verbosity of the program
 
+=item $keepTmp
+
+if the temporary files need to be kept (0: delete; !0: keep)
+
 =back
 
 Return value: Return the array of the log ratio value
@@ -851,6 +895,10 @@ number of proc to be use for minidsk
 =item $verbosity
 
 define the verbosity of the program
+
+=item $keepTmp
+
+if the temporary files need to be kept (0: delete; !0: keep)
 
 =back
 
@@ -899,6 +947,10 @@ file with the mRNA size as name\tmRNASize
 =item $outFile
 
 file to write the merge of all kmer scores and ORF/mRNA size
+
+=item $keepTmp
+
+if the temporary files need to be kept (0: delete; !0: keep)
 
 =back
 
@@ -975,6 +1027,10 @@ the threshold for the random forest, if it is not defined then it is set using a
 =item $verbosity
 
 define the verbosity of the program
+
+=item $keepTmp
+
+if the temporary files need to be kept (0: delete; !0: keep)
 
 =back
 

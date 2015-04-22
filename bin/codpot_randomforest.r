@@ -67,8 +67,15 @@ codMat <- cbind(codMat, label=rep(x=1, length.out=nrow(codMat)))
 nonMat <- cbind(nonMat, label=rep(x=0, length.out=nrow(nonMat)))
 
 ## Define the matrix -dat- with codMat and nonMat and random order
+## and write the full matrix with label
+## Write step
+dat    <- rbind(codMat, nonMat)
+outDat <- paste(file_path_sans_ext(outFile), "_learningData.out", sep="")
+write.table(x=dat, file=outDat, sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
+
+## Random step
 randomOrder <- sample(nrow(codMat)+nrow(nonMat))
-dat         <- rbind(codMat, nonMat)[randomOrder,]
+dat         <- dat[randomOrder,]
 dat.nameID  <- 1
 dat.featID  <- (2:(ncol(dat)-1))
 dat.labelID <- ncol(dat)
@@ -86,6 +93,7 @@ if(is.null(thres))
         nb_cross_val <- 10
 
         ## Progress bar
+        cat("10-fold cross-validation progress:\n")
         progress <- txtProgressBar(1, nb_cross_val, style=3)
         setTxtProgressBar(progress, 0)
 
@@ -149,7 +157,7 @@ if(is.null(thres))
         ## Legend
         legend("right",col=c("blue","red"),lwd=2,legend=c("Sensitivity","Specificity"))
 
-        dev.off()
+        tt=dev.off()
 ####################################
 ##### END THE PLOT OF THE ROCR #####
 ####################################
