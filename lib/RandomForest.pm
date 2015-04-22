@@ -34,6 +34,8 @@ use Utils;
 use Orf;
 
 
+=encoding UTF-8
+
 =head1 RandomForest.pm
 
 =over
@@ -406,7 +408,7 @@ sub mergeKmerScoreSize
 	{
 	    if(!exists $seq{$name})
 	    {
-		die "Error! $name is not in the kmer score files: ".$!;
+		die "Error at merge ORF size step! $name is not in the kmer score files: ".$!;
 	    }
 
 	    push(@{$seq{$name}}, $orfSize);
@@ -432,7 +434,9 @@ sub mergeKmerScoreSize
 	{
 	    if(!exists $seq{$name})
 	    {
-		die "Error! $name is not in the kmer score files: ".$!;
+		warn "The sequence id $name didn't have an ORF with a start and stop codon. Skip this sequence...\n";
+		next;
+		#die "Error at merge mRNA size step! $name is not in the kmer score files: ".$!;
 	    }
 
 	    push(@{$seq{$name}}, $rnaSize);
@@ -739,7 +743,7 @@ sub rfPredToGTF
     {
 	#VW moche moche moche !!!
 	$line = $_;
-	$name = ($line =~ /.*transcript_id "(.*)"; class.*/);
+	$name = ($line =~/.*transcript_id "([^ ]*)";/);
 	$name = $1;
 
 	# Check if the name is in the non coding or coding array
@@ -766,6 +770,8 @@ sub rfPredToGTF
 
 
 __END__
+
+=encoding UTF-8
 
 =head2 getKmerRatio
 

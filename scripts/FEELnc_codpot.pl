@@ -66,6 +66,7 @@ my $sn_sp = undef;
 my $maxTries   = 10;
 my $maxN       = 5;
 my $sizecorrec = 1; # a float value between 0 and 1
+#my $sizecorrec = 0.1; # VW
 
 ## Parse options and print usage if there is a syntax error,
 ## or if usage was explicitly requested.
@@ -76,7 +77,7 @@ GetOptions(
 	'g|genome=s'     => \$genome,
 	"n|numtx=i"      => \$numtx,
 	"b|biotype=s"    => \%biotype,
-#	"c|cpatcut=f"    => \$cpatcut,
+#VW	"c|cpatcut=f"    => \$cpatcut,
 	"r|rfcut=f"      => \$rfcut,
 	'v|verbosity=i'  => \$verbosity,
 	'help|?'         => \$help,
@@ -98,7 +99,7 @@ if (defined $rfcut){
 #############################################################
 
 # test path
-die "Error: You should set the environnment variable FEELNCPATH to the dir of installtion\nexport FEELNCPATH=my_dir_of_install/\n(See README)\n" unless (defined $ENV{'FEELNCPATH'});
+die "Error: You should set the environnment variable FEELNCPATH to the dir of installation\nexport FEELNCPATH=my_dir_of_install/\n(See README)\n" unless (defined $ENV{'FEELNCPATH'});
 my $rprogpath   = $ENV{'FEELNCPATH'}."/bin/".$rprog;
 pod2usage("Error: Cannot access FEELnc bin dir with path '$rprogpath'...\nCheck the environnment variable FEELNCPATH\n") unless( -r $rprogpath);
 my $pathRscript = Utils::pathProg("Rscript");
@@ -162,7 +163,7 @@ if ($mRNAfileformat eq "gtf"){
 	my $sizeh = keys(%{$refmrna});
 
 
-	die "Your input mRNA file '", basename($mRNAfile),"' contains only *$sizeh* transcripts.\nNot enough to training the program (default option --numtx|-n == '$numtx')\n" if ($sizeh < $numtx);
+	die "Your input mRNA file '", basename($mRNAfile),"' contains only *$sizeh* transcripts.\nNot enough to training the program with the --numtx|n '$numtx' option (default option == 3000)\n" if ($sizeh < $numtx);
 	print STDERR "\tYour input mRNA training file '", basename($mRNAfile),"' contains *$sizeh* transcripts\n" if ($verbosity > 0 );
 
 	# Create cDNA and ORF 2 files for training and testing CPAT
@@ -195,7 +196,7 @@ if (defined $lncRNAfile){
 		my $reflnc = Parser::parseGTF($lncRNAfile, 'exon' , undef, undef, $verbosity);
 		my $sizeh  = scalar keys(%{$reflnc});
 
-		die "Your input lncRNA training file '", basename($lncRNAfile),"' contains only *$sizeh* transcripts.\nNot enough to training the program (default option --numtx|-n == '$numtx')\n" if ($sizeh < $numtx);
+		die "Your input lncRNA training file '", basename($lncRNAfile),"' contains only *$sizeh* transcripts.\nNot enough to training the program with the --numtx|n '$numtx' option (default option == 3000)\n" if ($sizeh < $numtx);
 		print STDERR "\tYour lncRNA training file '", basename($lncRNAfile),"' contains *$sizeh* transcripts\n" if ($verbosity > 0 );
 
 		# Create cDNA and ORF 2 files for training and testing CPAT
@@ -216,7 +217,7 @@ if (defined $lncRNAfile){
 
 	print STDERR "> The lncRNA training file is not set...will extract intergenic region for training (can take a while...)\n";
 
-	# RElcoated mRNA sequence in intergenic regions to be used as a training lncRNA file
+	# Relocated mRNA sequence in intergenic regions to be used as a training lncRNA file
 
 	&randomizedGTFtoFASTA ($refmrna, $ref_cDNA_passed, $lncfile, $genome, $numtx, $maxTries, $maxN, $verbosity);
 
@@ -245,9 +246,11 @@ if (Utils::guess_format($infile) eq "gtf"){
 my $lncOrfFile  = "./lncRNA_ORF.fa";
 my $testOrfFile = "./test_ORF.fa";
 
+# VW : Récupère les ORF du jeu lncRNA et test, crade !!!!
 &CreateORFcDNAFromFASTA($lncfile, "/tmp/poubelle1", $lncOrfFile, $numtx, $verbosity);
-# VW : Récupère les ORF du jeu de test, crade !!!!
-&CreateORFcDNAFromGTF($refin, "/tmp/poubelle2",  $testOrfFile, 10000, $genome, $verbosity);
+# VW : en dur une valeur de 10000 pour avoir l'ensemble des ORF
+#&CreateORFcDNAFromGTF($refin, "/tmp/poubelle2",  $testOrfFile, 10000, $genome, $verbosity);
+&CreateORFcDNAFromGTF($refin, "/tmp/poubelle2",  $testOrfFile, undef, $genome, $verbosity);
 
 print STDERR "> Run random Forest on '$infile_outfa':\n";
 my $rfout = basename($infile)."_RF.out";
@@ -422,6 +425,7 @@ sub CreateORFcDNAFromGTF{
 	my ($h, $cdnafile, $orffile, $nbtx, $genome, $verbosity) = @_;
 
 	# Note if $orffile is not defined, we just extract cDNA
+	# Note if $nbtx is undefined, we extract all ORF and cDNA
 
 	my $orfob;
 	my %h_orf;              # for storing and printing ORF sequence
@@ -467,8 +471,8 @@ sub CreateORFcDNAFromGTF{
 			# Add ORF to a hash %h_orf only if the ORF is complete
 			if ($orfob->{'check_start'} && $orfob->{'check_stop'}){
 				$h_orf{$tr} = $orfob->{'cds_seq'};
-				print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$nbtx...\r";
-
+				print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$nbtx...\r" if( defined $nbtx);
+				print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"...\r"       if(!defined $nbtx);
 			} else {
 				warn "Tx: $tr ('$biotype') with CDS features: $containCDS is not complete...skipping for training\n" if ($verbosity > 10);
 				next; # next if ORF is not OK
@@ -479,12 +483,13 @@ sub CreateORFcDNAFromGTF{
 		# ADD cDNA only (if ORF is OK) : see next in above block
 		# store cDNA seq
 		if (!defined $orffile){
-			print STDERR "\tExtracting cDNAs ", $countseqok++,"/$nbtx...\r";
+			print STDERR "\tExtracting cDNAs ", $countseqok++,"/$nbtx...\r" if( defined $nbtx);
+			print STDERR "\tExtracting cDNAs ", $countseqok++,"...\r"       if(!defined $nbtx);
 		}
-	    $h_cdna{$tr} = $cdnaseq;
+		$h_cdna{$tr} = $cdnaseq;
 
 
-		if ($countseqok == $nbtx){
+		if (defined $nbtx && $countseqok == $nbtx){
 			print STDERR "\tMax ORF/cDNAs sequences '$nbtx' reached..ending!\n";
 			last;
 		}
@@ -495,7 +500,7 @@ sub CreateORFcDNAFromGTF{
 	if (defined $orffile){
 		# Final Check if the number of complete ORF is ok
 		my $sizehorf = keys(%h_orf);
-		die "The number of complete ORF found with computeORF mode is *$sizehorf* transcripts... That's not enough to training the program\n" if ($sizehorf < $minnumtx);
+		die "The number of complete ORF found with computeORF mode is *$sizehorf* transcripts... That's not enough to training the program\n" if (defined $nbtx && $sizehorf < $minnumtx);
 
 		&writefastafile(\%h_orf,  $orffile, $verbosity);
 		&writefastafile(\%h_cdna, $cdnafile, $verbosity);
@@ -691,6 +696,8 @@ sub randomizedGTFtoFASTA{
 			# define a random start/begin position on the random chr (and thus the end)
 			$beg = int(rand($refgenomesize->{$chrrdm}));
 			$end = $beg + int( $refannotsize->{$tx}->{size} * $sizecorrec);
+
+			#VW print "chr: $chrrdm; begin: $beg; end: $end\n";
 
 			# Self - Overlap
 			$overlap = overlapwithH($chrrdm,$beg,$end, $hlightforover, $countTries, $verbosity);
