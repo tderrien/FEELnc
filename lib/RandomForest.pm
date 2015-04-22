@@ -75,18 +75,19 @@ rfPredToGTF: With a .gtf and a result file from a random forest, write 2 .gtf fi
 
 
 # Run minidsk on training set and generate output model (logRatio values for each kmer)
-#	$codFile = fasta file with the ORF of coding genes
-#	$nonFile = fasta file with sequence of non coding genes
-#	$outFile = file where the logRatio of kmer frequency need to be written
-#	$kmerSize = size of the kmer
-#	$codStep = step for the counting of kmer for the ORF coding genes
-#	$nonStep = step for the counting of kmer for the non coding genes
-#	$proc = number of proc to be use for minidsk
+#	$codFile   = fasta file with the ORF of coding genes
+#	$nonFile   = fasta file with sequence of non coding genes
+#	$outFile   = file where the logRatio of kmer frequency need to be written
+#	$kmerSize  = size of the kmer
+#	$codStep   = step for the counting of kmer for the ORF coding genes
+#	$nonStep   = step for the counting of kmer for the non coding genes
+#	$proc      = number of proc to be use for minidsk
+#	$verbosity = value to define the verbosity
 #	Return value:
 #		Return the array of the log ratio value
 sub getKmerRatio
 {
-    my($codFile, $nonFile, $outFile, $kmerSize, $codStep, $nonStep, $proc) = @_;
+    my($codFile, $nonFile, $outFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity) = @_;
     $codFile ||= undef;
     $nonFile ||= undef;
     $outFile ||= undef;
@@ -111,12 +112,12 @@ sub getKmerRatio
     my $nonOut = "/tmp/non_".int(rand(1000)).".tmp";
 
     # Run minidsk on ORF for coding genes
-    print "Running minidsk on $codFile:\n";
+    print "Running minidsk on $codFile:\n" if($verbosity >= 5);
     $cmd = "$minidskPath -file $codFile -nb-cores $proc -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
     system($cmd);
 
     # Run minidsk on non coding genes
-    print "Running minidsk on $nonFile:\n";
+    print "Running minidsk on $nonFile:\n" if($verbosity >= 5);
     $cmd = "$minidskPath -file $nonFile -nb-cores $proc -kmer-size $kmerSize -out $nonOut -dont-reverse -step $nonStep 1>/dev/null 2>/dev/null";
     system($cmd);
 
@@ -129,7 +130,7 @@ sub getKmerRatio
     my $i;
 
     # Read the kmer counting for ORF on coding genes
-    print "Read kmer counting for coding genes of size $kmerSize in $codOut\n";
+    print "Read kmer counting for coding genes of size $kmerSize in $codOut\n" if($verbosity >= 5);
     # Open file
     open FILE, "$codOut" or die "Error! Cannot open kmerFile ". $codOut . ": ".$!;
     $i = 0;
@@ -147,7 +148,7 @@ sub getKmerRatio
     close FILE;
 
     # Read the kmer counting for non coding genes
-    print "Read kmer counting for non coding genes of size $kmerSize in $nonOut\n";
+    print "Read kmer counting for non coding genes of size $kmerSize in $nonOut\n" if($verbosity >= 5);
     # Open file
     open FILE, "$nonOut" or die "Error! Cannot open kmerFile ". $nonOut . ": ".$!;
     $i = 0;
@@ -167,7 +168,7 @@ sub getKmerRatio
 
 
     # Write the output file with the log ratio directly
-    print "Write the log ratio of kmer bewteen coding and non coding genes frequency for a size of kmer of $kmerSize\n";
+    print "Write the log ratio of kmer bewteen coding and non coding genes frequency for a size of kmer of $kmerSize\n" if($verbosity >= 5);
     open FILE, "> $outFile" or die "Error! Cannot access output file ". $outFile . ": ".$!;
     my $nbKmer = @kmerTab;
     my $log    = 0;
@@ -213,15 +214,16 @@ sub getKmerRatio
 
 
 # Temporary function to compute the scoring function of a multifasta file of ORF
-#	$orfFile  = multi fasta file with the ORF of the genes to be scored
-#	$modFile  = file with the log ratio score compute on learning files
-#	$outFile  = file where the logRatio of kmer frequency need to be written
-#	$kmerSize = size of the kmer
-#	$step     = step for the counting of kmer
-#	$proc     = number of proc to be use for minidsk
+#	$orfFile   = multi fasta file with the ORF of the genes to be scored
+#	$modFile   = file with the log ratio score compute on learning files
+#	$outFile   = file where the logRatio of kmer frequency need to be written
+#	$kmerSize  = size of the kmer
+#	$step      = step for the counting of kmer
+#	$proc      = number of proc to be use for minidsk
+#	$verbosity = value to define the verbosity
 sub scoreORF
 {
-    my($orfFile, $modFile, $outFile, $kmerSize, $step, $proc) = @_;
+    my($orfFile, $modFile, $outFile, $kmerSize, $step, $proc, $verbosity) = @_;
     $orfFile  ||= undef;
     $modFile  ||= undef;
     $outFile  ||= undef;
@@ -242,7 +244,7 @@ sub scoreORF
     my $minidskPath = Utils::pathProg("minidsk");
 
     # Parse ORF file and put ORF sequence in an array
-    print "Read ORF file $orfFile\n";
+    print "Read ORF file $orfFile\n" if($verbosity >=5);
     my $multiFasta = new Bio::SeqIO(-file  => $orfFile);
     my @seqTab;
     my $seq;
@@ -254,7 +256,7 @@ sub scoreORF
 
 
     # Read the model file
-    print "Read the log ratio file $modFile\n";
+    print "Read the log ratio file $modFile\n" if($verbosity >= 5);
     my @kmerTab;
     my @logTab;
     my $flag = 0;
@@ -572,13 +574,12 @@ sub getRunModel
 #	$outFile         = file to write the result of the random forest
 #	$kmerListString  = list of size of kmer as '2,3,4,5,6' (default value) as string
 #	$thres           = the threshold for the random forest, if it is not defined then it is set using a 10-fold cross-validation on learning data
+#	$verb            = value for level of verbosity
 sub runRF
 {
-    my ($codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres) = @_;
+    my ($codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $verbosity) = @_;
     $kmerListString ||= "2,3,4,5,6";
-
-
-    #print "$codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres\n";
+    $verbosity      ||= 0;
 
 
     # 1. Compute the size of each sequence and ORF
@@ -621,7 +622,7 @@ sub runRF
 	$kmerFile = "/tmp/".basename($orfCodLearnFile)."_".int(rand(10000))."_kmerRatio.tmp";
 	push(@kmerRatioFileList, $kmerFile);
 
-	&getKmerRatio($orfCodLearnFile, $nonLearnFile, $kmerFile, $kmerSize, $codStep, $nonStep, $proc);
+	&getKmerRatio($orfCodLearnFile, $nonLearnFile, $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity);
     }
 
     # 3. Compute the kmer score for each kmer size on learning and test ORF and for each type
@@ -633,17 +634,17 @@ sub runRF
 	## Coding
 	$kmerFile = "/tmp/".basename($orfCodLearnFile)."_".int(rand(10000))."_kmerScoreCodLearn.tmp";
 	push(@kmerScoreCodLearnFileList, $kmerFile);
-	scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc);
+	scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
 
 	## Non coding
 	$kmerFile = "/tmp/".basename($orfNonLearnFile)."_".int(rand(10000))."_kmerScoreNonLearn.tmp";
 	push(@kmerScoreNonLearnFileList, $kmerFile);
-	scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc);
+	scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
 
 	# Test
 	$kmerFile = "/tmp/".basename($orfTestFile)."_".int(rand(10000))."_kmerScoreTest.tmp";
 	push(@kmerScoreTestFileList, $kmerFile);
-	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc);
+	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
     }
 
 
@@ -807,6 +808,10 @@ step for the counting of kmer for the non coding genes
 
 number of proc to be use for minidsk
 
+=item $verbosity
+
+define the verbosity of the program
+
 =back
 
 Return value: Return the array of the log ratio value
@@ -842,6 +847,10 @@ step for the counting of kmer
 =item $proc
 
 number of proc to be use for minidsk
+
+=item $verbosity
+
+define the verbosity of the program
 
 =back
 
@@ -962,6 +971,10 @@ list of size of kmer as '2,3,4,5,6' (default value) as a string
 =item $thres
 
 the threshold for the random forest, if it is not defined then it is set using a 10-fold cross-validation on learning data
+
+=item $verbosity
+
+define the verbosity of the program
 
 =back
 

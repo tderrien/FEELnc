@@ -255,7 +255,7 @@ my $rfout = basename($infile)."_RF.out";
 
 
 # VW: Run de façon crade !
-RandomForest::runRF($cdnafile, $orffile, $lncfile, $lncOrfFile, $infile_outfa, $testOrfFile, $rfout, $kmerList, $rfcut);
+RandomForest::runRF($cdnafile, $orffile, $lncfile, $lncOrfFile, $infile_outfa, $testOrfFile, $rfout, $kmerList, $rfcut, $verbosity);
 # Parsing of the random forest output
 RandomForest::rfPredToGTF($infile,$rfout);
 
