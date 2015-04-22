@@ -50,11 +50,9 @@ my $numtx    = 3000;	# number of tx for training
 my $minnumtx = 100;	# Min number of tx for training (a too small value will result in a bad regression)
 
 
+# VW Adding a variable to get the kmer size which are used to calculat the kmer scores
+my $kmerList = '2,3,4,5,6';
 
-# VW: put CPAT in commentary
-# If CPAT cutoff is defined, no need to compute it on TP lncRNA and mRNA
-#my $cpatcut = undef;
-#my $sn_sp   = undef;
 
 # If random forest (rf/RF) cutoff is defined, no need to compute it on TP lncRNA and mRNA
 my $rfcut = undef;
@@ -71,17 +69,17 @@ my $sizecorrec = 1; # a float value between 0 and 1
 ## Parse options and print usage if there is a syntax error,
 ## or if usage was explicitly requested.
 GetOptions(
-	'i|infile=s'     => \$infile,
-	'a|mRNAfile=s'   => \$mRNAfile,
-	'l|lncRNAfile=s' => \$lncRNAfile,
-	'g|genome=s'     => \$genome,
-	"n|numtx=i"      => \$numtx,
-	"b|biotype=s"    => \%biotype,
-#VW	"c|cpatcut=f"    => \$cpatcut,
-	"r|rfcut=f"      => \$rfcut,
-	'v|verbosity=i'  => \$verbosity,
-	'help|?'         => \$help,
-	'man'            => \$man
+    'i|infile=s'     => \$infile,
+    'a|mRNAfile=s'   => \$mRNAfile,
+    'l|lncRNAfile=s' => \$lncRNAfile,
+    'g|genome=s'     => \$genome,
+    'n|numtx=i'      => \$numtx,
+    'b|biotype=s'    => \%biotype,
+    'r|rfcut=f'      => \$rfcut,
+    'k|kmer=s'       => \$kmerList,
+    'v|verbosity=i'  => \$verbosity,
+    'help|?'         => \$help,
+    'man'            => \$man
 # 	"o|outlog=s"     => \$outputlog,
 ) or pod2usage(2);
 
@@ -257,7 +255,7 @@ my $rfout = basename($infile)."_RF.out";
 
 
 # VW: Run de façon crade !
-RandomForest::runRF($cdnafile, $orffile, $lncfile, $lncOrfFile, $infile_outfa, $testOrfFile, $rfout, "2,3,4,5,6", $rfcut);
+RandomForest::runRF($cdnafile, $orffile, $lncfile, $lncOrfFile, $infile_outfa, $testOrfFile, $rfout, $kmerList, $rfcut);
 # Parsing of the random forest output
 RandomForest::rfPredToGTF($infile,$rfout);
 
@@ -695,11 +693,12 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
 
 =head2 Optional arguments
 
-  -g,--genome=genome.fa				genome file or directory with chr files (mandatory if input is .GTF) [ default undef ]
+  -g,--genome=genome.fa			genome file or directory with chr files (mandatory if input is .GTF) [ default undef ]
   -l,--lncRNAfile=file.gtf/.fasta	specify a known set of lncRNA for training .GTF or .FASTA  [ default undef ]
-  -b,--biotype			only consider transcripts having this(these) biotype(s) from the reference annotation (e.g : -b transcript_biotype=protein_coding,pseudogene) [default undef i.e all transcripts]
-  -n,--numtx=2000		Number of transcripts required for the training [default 2000 ]
-  -c,--cpatcut=[0-1]			CPAT coding potential cutoff [default undef i.e will compute best cutoff]
+  -b,--biotype				only consider transcripts having this(these) biotype(s) from the reference annotation (e.g : -b transcript_biotype=protein_coding,pseudogene) [default undef i.e all transcripts]
+  -n,--numtx=2000			Number of transcripts required for the training [ default 2000 ]
+  -r,--rfcut=[0-1]			Random forest voting cutoff [ default undef i.e will compute best cutoff ]
+  -k,--kmer="2,3,4,5,6"			Kmer size list with size separate by ',' as string [ default "2,3,4,5,6" ]
 
 
 =head2 Intergenic lncRNA extraction
