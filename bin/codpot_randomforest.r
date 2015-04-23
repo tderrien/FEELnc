@@ -170,21 +170,32 @@ if(is.null(thres))
 
 ## Make the random forest model
 cat("\tMaking random forest model on '", codFile, "' and '", nonFile ,"' and apply it on '", testFile, "'.\n", sep="")
+
+## RF model
+dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=500)
+
+## Prediction on learning data
+dat.rf.learn <- predict(dat.rf, dat[,dat.featID], cutoff=c(1-thres, thres))
+
+## Prediction on test data
+dat.rf.test <- predict(dat.rf, testMat[,dat.featID], cutoff=c(1-thres, thres))
+
 ## RF on learning for stats
-dat.rf.learn <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]),
-                       xtest=dat[,dat.featID],
-                       ntree=50)
+## dat.rf.learn <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]),
+##                        xtest=dat[,dat.featID],
+##                        ntree=50)
 ## RF on test
-dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]),
-                       xtest=testMat[,dat.featID],
-                       ntree=50)
+## dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]),
+##                        xtest=testMat[,dat.featID],
+##                        ntree=50)
 
 ## Get sensitivity, specificity, accuracy and precision on learning set using the model and the threshold
 cat("\tPrinting stats in '", outStats, "' the sensitivity, specificity, precision and accuracy obtain on learning data.\n", sep="")
-res <- rep(0, length.out=nrow(dat))
-res[dat.rf.learn$test$votes[,2]>=thres] <- 1
+## res <- rep(0, length.out=nrow(dat))
+## res[dat.rf.learn$test$votes[,2]>=thres] <- 1
 
-cont <- table(data=dat[,dat.labelID], prediction=res)
+## cont <- table(data=dat[,dat.labelID], prediction=res)
+cont <- table(data=dat[,dat.labelID], prediction=dat.rf.learn)
 tp   <- cont[2,2]
 fp   <- cont[1,2]
 tn   <- cont[1,1]
@@ -201,12 +212,13 @@ write.table(x="\nMetric values:", file=outStats, append=TRUE, sep="", quote=FALS
 write.table(x=cbind(c("Sensitivity","Specificity","Precision","Accuracy"), c(sen,spe,pre,acc)), file=outStats, append=TRUE, quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
 
 ## Obtain the coding label prediction on test data
-res <- rep(0, length.out=nrow(testMat))
-res[dat.rf$test$votes[,2]>=thres] <- 1
+## res <- rep(0, length.out=nrow(testMat))
+## res[dat.rf$test$votes[,2]>=thres] <- 1
 
 ## Write the output
 cat("\tWrite the coding label for '", testFile, "' in '", outFile, "'.\n", sep="")
-write.table(x=cbind(testMat, label=res), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
+## write.table(x=cbind(testMat, label=res), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
+write.table(x=cbind(testMat, label=dat.rf.test), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
 
 ## Write the plot for variable importance
 cat("\tPlot the variable importance as measured by a random forest in '", outStats, "'.\n", sep="")
