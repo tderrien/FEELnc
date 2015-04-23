@@ -96,7 +96,7 @@ pod2usage ("- Error: \$numtx option (number of transcripts for training) '$numtx
 if (defined $rfcut){
 	pod2usage ("- Error: \$rfcut option '$rfcut' should be a float between 0 and 1 [0-1] \n") unless ($rfcut >= 0 and $rfcut <= 1);
 }
-pod2usage ("- Error: \$sizecorrec option (ratio between mRNAs and intergenic non coding sequences) '$sizecorrec' should be a float between 0 and 1 [0-1] \n") unless ($sizecorrec >= 0 and $sizecorrec <= 1);
+pod2usage ("- Error: \$sizecorrec option (ratio between mRNAs sequence lenghts and intergenic non coding sequence lenghts) '$sizecorrec' should be a float between 0 and 1 [0-1] \n") unless ($sizecorrec >= 0 and $sizecorrec <= 1);
 #############################################################
 
 # test path
@@ -548,6 +548,11 @@ sub randomizedGTFtoFASTA{
 			# define a random start/begin position on the random chr (and thus the end)
 			$beg = int(rand($refgenomesize->{$chrrdm}));
 			$end = $beg + int( $refannotsize->{$tx}->{size} * $sizecorrec);
+			# if the final length is < 200bp (smaller than lncRNA definition), then the size is set to 200
+			if($end - $beg < 200)
+			{
+			    $end = $beg + 200;
+			}
 
 			#VW print "chr: $chrrdm; begin: $beg; end: $end\n";
 
@@ -703,6 +708,7 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
   -r,--rfcut=[0-1]			Random forest voting cutoff [ default undef i.e will compute best cutoff ]
   -k,--kmer="2,3,4,5,6"			Kmer size list with size separate by ',' as string [ default "2,3,4,5,6" ]
   --keeptmp=0				To keep the temporary files, by default don't keep it (0 value). Any other value than 0 will keep the temporary files
+  -s,--sizeinter=0.75			Ratio between mRNA sequence lengths and non coding intergenic region sequence lengths as, by default, ncInter = mRNA * 0.75
 
 =head2 Intergenic lncRNA extraction
 
@@ -722,6 +728,9 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
 =item *
 
 Thomas DERRIEN <tderrien@univ-rennes1.fr>
+
+=item *
+
 Fabrice LEGEAI <fabrice.legeai@inria.fr>
 
 =back
