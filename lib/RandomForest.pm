@@ -114,12 +114,12 @@ sub getKmerRatio
     my $nonOut = "/tmp/non_".int(rand(1000)).".tmp";
 
     # Run minidsk on ORF for coding genes
-    print "Running minidsk on $codFile:\n" if($verbosity >= 5);
+    print "\tRunning minidsk on '$codFile'.\n" if($verbosity >= 5);
     $cmd = "$minidskPath -file $codFile -nb-cores $proc -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
     system($cmd);
 
     # Run minidsk on non coding genes
-    print "Running minidsk on $nonFile:\n" if($verbosity >= 5);
+    print "\tRunning minidsk on '$nonFile'.\n" if($verbosity >= 5);
     $cmd = "$minidskPath -file $nonFile -nb-cores $proc -kmer-size $kmerSize -out $nonOut -dont-reverse -step $nonStep 1>/dev/null 2>/dev/null";
     system($cmd);
 
@@ -132,9 +132,9 @@ sub getKmerRatio
     my $i;
 
     # Read the kmer counting for ORF on coding genes
-    print "Read kmer counting for coding genes of size $kmerSize in $codOut\n" if($verbosity >= 5);
+    print "\tRead kmer counting for coding genes of size '$kmerSize' in '$codOut'.\n" if($verbosity >= 5);
     # Open file
-    open FILE, "$codOut" or die "Error! Cannot open kmerFile ". $codOut . ": ".$!;
+    open FILE, "$codOut" or die "Error! Cannot open kmerFile '". $codOut . "': ".$!;
     $i = 0;
     while(<FILE>)
     {
@@ -150,16 +150,16 @@ sub getKmerRatio
     close FILE;
 
     # Read the kmer counting for non coding genes
-    print "Read kmer counting for non coding genes of size $kmerSize in $nonOut\n" if($verbosity >= 5);
+    print "\tRead kmer counting for non coding genes of size '$kmerSize' in '$nonOut'.\n" if($verbosity >= 5);
     # Open file
-    open FILE, "$nonOut" or die "Error! Cannot open kmerFile ". $nonOut . ": ".$!;
+    open FILE, "$nonOut" or die "Error! Cannot open kmerFile '". $nonOut . "': ".$!;
     $i = 0;
     while(<FILE>)
     {
 	chop;
 	my ($kmer, $val) = split(/\t/);
 
-	die "Error: kmer order is not the same between $codOut and $nonOut.\nExit." if($kmerTab[$i] ne $kmer);
+	die "Error: kmer order is not the same between '$codOut' and '$nonOut'.\nExit." if($kmerTab[$i] ne $kmer);
 
 	#$nonVal[$i] = $val;
 	push(@nonVal, int($val));
@@ -169,8 +169,8 @@ sub getKmerRatio
     close FILE;
 
     # Write the output file with the log ratio directly
-    print "Write the log ratio of kmer bewteen coding and non coding genes frequency for a size of kmer of $kmerSize\n" if($verbosity >= 5);
-    open FILE, "> $outFile" or die "Error! Cannot access output file ". $outFile . ": ".$!;
+    print "\tWrite the log ratio of kmer bewteen coding and non coding genes frequency for a size of kmer of '$kmerSize'.\n" if($verbosity >= 5);
+    open FILE, "> $outFile" or die "Error! Cannot access output file '". $outFile . "': ".$!;
     my $nbKmer = @kmerTab;
     my $log    = 0;
     my @logTab;
@@ -249,7 +249,7 @@ sub scoreORF
     my $minidskPath = Utils::pathProg("minidsk");
 
     # Parse ORF file and put ORF sequence in an array
-    print "Read ORF file $orfFile\n" if($verbosity >=5);
+    print "\tRead ORF file '$orfFile'.\n" if($verbosity >=5);
     my $multiFasta = new Bio::SeqIO(-file  => $orfFile);
     my @seqTab;
     my $seq;
@@ -261,11 +261,11 @@ sub scoreORF
 
 
     # Read the model file
-    print "Read the log ratio file $modFile\n" if($verbosity >= 5);
+    print "\tRead the log ratio file '$modFile'.\n" if($verbosity >= 5);
     my @kmerTab;
     my @logTab;
     my $flag = 0;
-    open FILE, "$modFile" or die "Error! Cannot open the model file ". $modFile . ": ".$!;
+    open FILE, "$modFile" or die "Error! Cannot open the model file '". $modFile . "': ".$!;
     while(<FILE>)
     {
 	if($flag == 0)
@@ -288,7 +288,7 @@ sub scoreORF
     my $logSum     = 0;
     my $totKmer    = 0;
     my $i          = 0;
-    open FILEOUT, "> $outFile" or die "Error! Cannot access output file ". $outFile . ": ".$!;
+    open FILEOUT, "> $outFile" or die "Error! Cannot access output file '". $outFile . "': ".$!;
 
     # Print the header of the output file
     print FILEOUT "name\tkmerScore_".$kmerSize."mer\n";
@@ -315,13 +315,13 @@ sub scoreORF
 	system($cmd);
 
 	# Read the minidsk output (FILEMINI) and write it on the output file (FILEOUT)
-	open FILEMINI, "$tmpFileOut" or die "Error! Cannot access the temporary output minidsk file ". $tmpFileOut . ": ".$!;
+	open FILEMINI, "$tmpFileOut" or die "Error! Cannot access the temporary output minidsk file '". $tmpFileOut . "': ".$!;
 	$i = 0;
 	while(<FILEMINI>)
 	{
 	    chop;
 	    my ($kmer, $nbr) = split(/\t/);
-	    die "Error: kmer order is not the same between $modFile and $tmpFileOut.\nExit." if($kmerTab[$i] ne $kmer);
+	    die "Error: kmer order is not the same between '$modFile' and '$tmpFileOut'.\nExit." if($kmerTab[$i] ne $kmer);
 
 	    $logSum  = $logSum + ( int($nbr)*$logTab[$i] );
 	    $totKmer = $totKmer + int($nbr);
@@ -366,8 +366,8 @@ sub mergeKmerScoreSize
     die "Merging kmer scores and size files: output file for the merging is not defined... exiting\n" if(!defined $outFile);
 
     # empty
-    die "Merging kmer scores and size files: ORF size file is empty... exiting\n"  unless(-s $orfSizeFile);
-    die "Merging kmer scores and size files: mRNA size file is empty... exiting\n" unless(-s $rnaSizeFile);
+    die "Merging kmer scores and size files: ORF size file '$orfSizeFile' is empty... exiting\n"  unless(-s $orfSizeFile);
+    die "Merging kmer scores and size files: mRNA size file '$rnaSizeFile' is empty... exiting\n" unless(-s $rnaSizeFile);
 
 
     # Get a hash to stock score values for each sequences and a tab for the header
@@ -380,7 +380,7 @@ sub mergeKmerScoreSize
     foreach $file (@{$RefKmerFileList})
     {
 	$flag = 0;
-	open FILE, "$file" or die "Error! Cannot access kmer score file ". $file . ": ".$!;
+	open FILE, "$file" or die "Error! Cannot access kmer score file '". $file . "': ".$!;
 	while(<FILE>)
 	{
 	    chop;
@@ -409,7 +409,7 @@ sub mergeKmerScoreSize
 
     # Read ORF size
     $flag = 0;
-    open FILE, "$orfSizeFile" or die "Error! Cannot access ORF size file ". $orfSizeFile . ": ".$!;
+    open FILE, "$orfSizeFile" or die "Error! Cannot access ORF size file '". $orfSizeFile . "': ".$!;
     while(<FILE>)
     {
 	chop;
@@ -419,7 +419,7 @@ sub mergeKmerScoreSize
 	{
 	    if(!exists $seq{$name})
 	    {
-		die "Error at merge ORF size step! $name is not in the kmer score files: ".$!;
+		die "Error at merge ORF size step! '$name' is not in the kmer score files: ".$!;
 	    }
 
 	    push(@{$seq{$name}}, $orfSize);
@@ -435,7 +435,7 @@ sub mergeKmerScoreSize
 
     # Read mRNA size
     $flag = 0;
-    open FILE, "$rnaSizeFile" or die "Error! Cannot access mRNA size file ". $rnaSizeFile . ": ".$!;
+    open FILE, "$rnaSizeFile" or die "Error! Cannot access mRNA size file '". $rnaSizeFile . "': ".$!;
     while(<FILE>)
     {
 	chop;
@@ -462,7 +462,7 @@ sub mergeKmerScoreSize
     unlink $rnaSizeFile unless($keepTmp != 0);
 
     # Write the output file
-    open FILE, "> $outFile" or die "Error! Cannot access to the output file ". $outFile . ": ".$!;
+    open FILE, "> $outFile" or die "Error! Cannot access to the output file '". $outFile . "': ".$!;
     my $seqId;
 
     #print Dumper @head;
@@ -497,7 +497,7 @@ sub getSizeFastaFile
     die "Get size: the ouput file is not defined... exiting\n" if(!defined $outFile);
 
     # empty
-    die "Get size: input file $inFile is empty... exiting\n" unless(-s $inFile);
+    die "Get size: input file '$inFile' is empty... exiting\n" unless(-s $inFile);
 
     # Put all input sequence in array
     my $multiFasta = new Bio::SeqIO(-file  => $inFile);
@@ -509,7 +509,7 @@ sub getSizeFastaFile
     }
 
     # Get length for each sequence and print it
-    open FILE, "> $outFile" or die "Error! Cannot access to the output file ". $outFile . ": ".$!;
+    open FILE, "> $outFile" or die "Error! Cannot access to the output file '". $outFile . "': ".$!;
     my $length;
     my $id;
 
@@ -551,7 +551,7 @@ sub getRunModel
 
 
     # Get the path to RSCRIPT_RF.R to run the learning and assignment of the sequences
-    print "Running codpot_randomforest.r\n";
+    print "\tRunning codpot_randomforest.r.\n";
     my $rprogpath = $ENV{'FEELNCPATH'}."/bin/codpot_randomforest.r";
     my $cmd       = "";
 
@@ -559,13 +559,13 @@ sub getRunModel
     if(!defined $thres)
     {
 	# If no threshold given, run codpot_randomforest.r without threshold (4 arguments)
-	print "The threshold for the voting in random forest is not defined. Use 10-fold cross-validation to determine the best threshold.\n";
+	print "\tThe threshold for the voting in random forest is not defined. Use 10-fold cross-validation to determine the best threshold.\n";
 	$cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile";
     }
     else
     {
 	# If a threshold is given, run codpot_randomforest.r with this threshold (5 arguments)
-	print "The threshold for the voting in random forest is $thres.\n";
+	print "\tThe threshold for the voting in random forest is '$thres'.\n";
 	$cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile $thres";
     }
     system($cmd);
@@ -734,7 +734,7 @@ sub rfPredToGTF
 
 
     # Start by reading the result file from the random forest
-    open FILE, "$rfFile" or die "Error! Cannot access to the random forest output file ". $rfFile . ": ".$!;
+    open FILE, "$rfFile" or die "Error! Cannot access to the random forest output file '". $rfFile . "': ".$!;
     # Put transcript names on 2 tab, one for coding genes and the other for non coding genes
     my %nonHas;
     my %codHas;
@@ -764,7 +764,7 @@ sub rfPredToGTF
 	}
 	else
 	{
-	    die "Not a valid value for coding label for the transcript $info[0].Exit.\n";
+	    die "Not a valid value for coding label for the transcript '$info[0]'. Exit.\n";
 	}
     }
     close FILE;
@@ -775,11 +775,11 @@ sub rfPredToGTF
     my $line   = "";
     my $name   = "";
 
-    print "Writing the two GTF output files: $outNon and $outCod\n";
+    print "Writing the two GTF output files: '$outNon' and '$outCod'\n";
 
-    open FILE,  "$testGTF" or die "Error! Cannot access to the gtf file for new transcripts ". $testGTF . ": ".$!;
-    open LNC, "> $outNon"  or die "Error! Cannot access to the lncRNA gtf output file ". $outNon . ": ".$!;
-    open RNA, "> $outCod"  or die "Error! Cannot access to the mRNA gtf output file ". $outCod . ": ".$!;
+    open FILE,  "$testGTF" or die "Error! Cannot access to the gtf file for new transcripts '". $testGTF . "': ".$!;
+    open LNC, "> $outNon"  or die "Error! Cannot access to the lncRNA gtf output file '". $outNon . "': ".$!;
+    open RNA, "> $outCod"  or die "Error! Cannot access to the mRNA gtf output file '". $outCod . "': ".$!;
 
     while(<FILE>)
     {

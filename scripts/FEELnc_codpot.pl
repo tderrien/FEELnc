@@ -164,7 +164,7 @@ if ($mRNAfileformat eq "gtf"){
 	my $sizeh = keys(%{$refmrna});
 
 
-	die "Your input mRNA file '", basename($mRNAfile),"' contains only *$sizeh* transcripts.\nNot enough to training the program with the --numtx|n '$numtx' option (default option == 3000)\n" if ($sizeh < $numtx);
+	die "Your input mRNA file '", basename($mRNAfile),"' contains only *$sizeh* transcripts.\nNot enough to train the program with the '--numtx|n $numtx' option (default option == 3000)\n" if ($sizeh < $numtx);
 	print STDERR "\tYour input mRNA training file '", basename($mRNAfile),"' contains *$sizeh* transcripts\n" if ($verbosity > 0 );
 
 	# Create cDNA and ORF 2 files for training and testing CPAT
@@ -197,7 +197,7 @@ if (defined $lncRNAfile){
 		my $reflnc = Parser::parseGTF($lncRNAfile, 'exon' , undef, undef, $verbosity);
 		my $sizeh  = scalar keys(%{$reflnc});
 
-		die "Your input lncRNA training file '", basename($lncRNAfile),"' contains only *$sizeh* transcripts.\nNot enough to training the program with the --numtx|n '$numtx' option (default option == 3000)\n" if ($sizeh < $numtx);
+		die "Your input lncRNA training file '", basename($lncRNAfile),"' contains only *$sizeh* transcripts.\nNot enough to train the program with the '--numtx|n $numtx' option (default option == 3000)\n" if ($sizeh < $numtx);
 		print STDERR "\tYour lncRNA training file '", basename($lncRNAfile),"' contains *$sizeh* transcripts\n" if ($verbosity > 0 );
 
 		# Create cDNA and ORF 2 files for training and testing CPAT
@@ -352,7 +352,7 @@ sub CreateORFcDNAFromGTF{
 	if (defined $orffile){
 		# Final Check if the number of complete ORF is ok
 		my $sizehorf = keys(%h_orf);
-		die "The number of complete ORF found with computeORF mode is *$sizehorf* transcripts... That's not enough to training the program\n" if (defined $nbtx && $sizehorf < $minnumtx);
+		die "The number of complete ORF found with computeORF mode is *$sizehorf* transcripts... That's not enough to train the program\n" if (defined $nbtx && $sizehorf < $minnumtx);
 
 		&writefastafile(\%h_orf,  $orffile, $verbosity);
 		&writefastafile(\%h_cdna, $cdnafile, $verbosity);
@@ -363,7 +363,7 @@ sub CreateORFcDNAFromGTF{
 	} else {
 
 		my $sizeh = keys(%h_cdna);
-		die "The number of cDNA sequences is *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $minnumtx);
+		die "The number of cDNA sequences is *$sizeh* transcripts... That's not enough to train the program\n" if ($sizeh < $minnumtx);
 		&writefastafile(\%h_cdna, $cdnafile, $verbosity);
 	}
 
@@ -395,7 +395,7 @@ sub CreateORFcDNAFromFASTA{
 	# count the nb of sequences
 	my $nbseq = 0;
 	$nbseq++ while( my $seq = $seqin->next_seq());
-	die "Your input FASTA '$fastafile' contains only *$nbseq* sequences.\nNot enough to training the program (default option --ntx|-n)\n" if ($nbseq < $minnumtx);
+	die "Your input FASTA '$fastafile' contains only *$nbseq* sequences.\nNot enough to train the program (default option --ntx|-n)\n" if ($nbseq < $minnumtx);
 
 	# weird have to recreate a seqio object
 	$seqin = Bio::SeqIO->new(-file => $fastafile, -format => "fasta");
@@ -442,7 +442,7 @@ sub CreateORFcDNAFromFASTA{
 
 		# Final Check if the number of complete ORF is ok
 		my $sizehorf = keys(%h_orf);
-		die "The number of complete ORF found with computeORF mode is *$sizehorf* ... That's not enough to training the program\n" if ($sizehorf < $minnumtx);
+		die "The number of complete ORF found with computeORF mode is *$sizehorf* ... That's not enough to train the program\n" if ($sizehorf < $minnumtx);
 
 		&writefastafile(\%h_orf,  $orffile, $verbosity);
 		&writefastafile(\%h_cdna, $cdnafile, $verbosity);
@@ -452,7 +452,7 @@ sub CreateORFcDNAFromFASTA{
 	} else {
 
 		my $sizeh = keys(%h_cdna);
-		die "The number of cDNA sequences is *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $minnumtx);
+		die "The number of cDNA sequences is *$sizeh* transcripts... That's not enough to train the program\n" if ($sizeh < $minnumtx);
 		&writefastafile(\%h_cdna, $cdnafile, $verbosity);
 	}
 }
@@ -583,7 +583,7 @@ sub randomizedGTFtoFASTA{
 	}
 
 	my $sizeh = keys(%h_cdna_rdm);
-	die "The number of RANDOMLY relocated cDNA sequences =  *$sizeh* transcripts... That's not enough to training the program\n" if ($sizeh < $minnumtx);
+	die "The number of RANDOMLY relocated cDNA sequences =  *$sizeh* transcripts... That's not enough to train the program\n" if ($sizeh < $minnumtx);
 	&writefastafile(\%h_cdna_rdm, $cdnafile, $verbosity);
 
 }

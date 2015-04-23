@@ -50,7 +50,7 @@ if(length(new.packages) != 0)
 ## Loading library
 for(pack in list.of.packages)
     {
-        library(pack, quietly=TRUE, verbose=FALSE, character.only=TRUE)
+        suppressMessages(library(pack, quietly=TRUE, verbose=FALSE, character.only=TRUE))
     }
 
 ###########################
@@ -83,7 +83,7 @@ dat.labelID <- ncol(dat)
 
 if(is.null(thres))
     {
-        cat("No threshold: running 10-fold cross-validation on learning set to set a threshold.\n")
+        cat("\tNo threshold: running 10-fold cross-validation on learning set to set a threshold.\n")
 
         ## variables counting
         number_row   <- nrow(dat)
@@ -93,7 +93,7 @@ if(is.null(thres))
         nb_cross_val <- 10
 
         ## Progress bar
-        cat("10-fold cross-validation progress:\n")
+        cat("\t10-fold cross-validation progress:\n")
         progress <- txtProgressBar(1, nb_cross_val, style=3)
         setTxtProgressBar(progress, 0)
 
@@ -133,8 +133,6 @@ if(is.null(thres))
 ######################################
 ##### BEGIN THE PLOT OF THE ROCR #####
 ######################################
-        cat("Begin the plot of the ROCR curve in ", outROC, ".\n", sep="")
-
         ## plot curve
         png(outROC, h=800, w=800)
         par(cex.axis=1.2, cex.lab=1.2)
@@ -157,19 +155,21 @@ if(is.null(thres))
         ## Legend
         legend("right",col=c("blue","red"),lwd=2,legend=c("Sensitivity","Specificity"))
 
-        tt=dev.off()
+        tt <- dev.off()
+        cat("\tROCR curve plot in '", outROC, "'.\n", sep="")
+
 ####################################
 ##### END THE PLOT OF THE ROCR #####
 ####################################
         thres <- mean_cutoff
 
-        cat("10-fold cross-validation step is finish. Best threshold found: ", thres, ".\n", sep="")
+        cat("\t10-fold cross-validation step is finish. Best threshold found: '", thres, "'.\n", sep="")
     }
 ## END of: if(thres==NULL)
 
 
 ## Make the random forest model
-cat("Making random forest model on ", codFile, " and ", nonFile ," and apply it on ", testFile, ".\n", sep="")
+cat("\tMaking random forest model on '", codFile, "' and '", nonFile ,"' and apply it on '", testFile, "'.\n", sep="")
 ## RF on learning for stats
 dat.rf.learn <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]),
                        xtest=dat[,dat.featID],
@@ -180,7 +180,7 @@ dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]),
                        ntree=50)
 
 ## Get sensitivity, specificity, accuracy and precision on learning set using the model and the threshold
-cat("Printing in ", outStats, " the sensitivity, specificity, precision and accuracy obtain on learning data.\n", sep="")
+cat("\tPrinting stats in '", outStats, "' the sensitivity, specificity, precision and accuracy obtain on learning data.\n", sep="")
 res <- rep(0, length.out=nrow(dat))
 res[dat.rf.learn$test$votes[,2]>=thres] <- 1
 
@@ -194,12 +194,9 @@ spe  <- tn / (fp+tn)
 pre  <- tp / (tp+fp)
 acc  <- (tp+tn) / sum(cont)
 
-cont           <- as.data.frame(cont)
-temp           <- c("true negative","false negative","false positive","true positive")
-cont           <- cbind(type=temp, cont)
-colnames(cont) <- c("type","data","prediction","num")
-write.table(x="Contingency matrix:", file=outStats, quote=FALSE, sep="", col.names=FALSE, row.names=FALSE)
-write.table(x=cont, file=outStats, append=TRUE, quote=FALSE, sep="\t", row.names=FALSE)
+cont           <- cbind(c("true negative","false negative","false positive","true positive"), as.data.frame(cont)[,3])
+write.table(x="Number of true/false positives/negatives:", file=outStats, quote=FALSE, sep="", col.names=FALSE, row.names=FALSE)
+write.table(x=cont, file=outStats, append=TRUE, quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE)
 write.table(x="\nMetric values:", file=outStats, append=TRUE, sep="", quote=FALSE, col.names=FALSE, row.names=FALSE)
 write.table(x=cbind(c("Sensitivity","Specificity","Precision","Accuracy"), c(sen,spe,pre,acc)), file=outStats, append=TRUE, quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
 
@@ -208,11 +205,11 @@ res <- rep(0, length.out=nrow(testMat))
 res[dat.rf$test$votes[,2]>=thres] <- 1
 
 ## Write the output
-cat("Write the coding label for ", testFile, " in ", outFile, ".\n", sep="")
+cat("\tWrite the coding label for '", testFile, "' in '", outFile, "'.\n", sep="")
 write.table(x=cbind(testMat, label=res), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
 
 ## Write the plot for variable importance
-cat("Plot the variable importance as measured by a random forest in ", outStats, ".\n", sep="")
+cat("\tPlot the variable importance as measured by a random forest in '", outStats, "'.\n", sep="")
 png(outVar, h=800, w=800)
 varImpPlot(dat.rf)
-dev.off()
+tt <- dev.off()
