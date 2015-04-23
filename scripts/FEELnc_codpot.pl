@@ -28,7 +28,6 @@ use ExtractFromFeature;
 use Intersect;
 use Utils;
 use Orf;
-#VW use Cpat;
 use RandomForest;
 
 # my $pathRcrossvalidation = "~tderrien/bin/perl/script/FEELnc/bin/crossValidation_cutoff.r";
@@ -66,7 +65,6 @@ my $sn_sp = undef;
 my $maxTries   = 10;
 my $maxN       = 5;
 my $sizecorrec = 1; # a float value between 0 and 1
-#my $sizecorrec = 0.1; # VW
 
 ## Parse options and print usage if there is a syntax error,
 ## or if usage was explicitly requested.
@@ -79,6 +77,7 @@ GetOptions(
     'b|biotype=s'    => \%biotype,
     'r|rfcut=f'      => \$rfcut,
     'k|kmer=s'       => \$kmerList,
+    's|sizeinter=f'  => \$sizecorrec,
     'keeptmp'        => \$keepTmp,
     'v|verbosity=i'  => \$verbosity,
     'help|?'         => \$help,
@@ -97,6 +96,7 @@ pod2usage ("- Error: \$numtx option (number of transcripts for training) '$numtx
 if (defined $rfcut){
 	pod2usage ("- Error: \$rfcut option '$rfcut' should be a float between 0 and 1 [0-1] \n") unless ($rfcut >= 0 and $rfcut <= 1);
 }
+pod2usage ("- Error: \$sizecorrec option (ratio between mRNAs and intergenic non coding sequences) '$sizecorrec' should be a float between 0 and 1 [0-1] \n") unless ($sizecorrec >= 0 and $sizecorrec <= 1);
 #############################################################
 
 # test path
