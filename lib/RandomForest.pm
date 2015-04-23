@@ -34,8 +34,6 @@ use Orf;
 my $randVal = int(rand(1000));
 
 
-
-
 =encoding UTF-8
 
 =head1 RandomForest.pm
@@ -86,11 +84,12 @@ rfPredToGTF: With a .gtf and a result file from a random forest, write 2 .gtf fi
 #	$proc      = number of proc to be use for minidsk
 #	$verbosity = value to define the verbosity
 #	$keepTmp   = keeping or not the temporary files
+#	$outTmp    = temporary file output directory
 #	Return value:
 #		Return the array of the log ratio value
 sub getKmerRatio
 {
-    my($codFile, $nonFile, $outFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp) = @_;
+    my($codFile, $nonFile, $outFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp) = @_;
     $codFile ||= undef;
     $nonFile ||= undef;
     $outFile ||= undef;
@@ -112,8 +111,8 @@ sub getKmerRatio
     my $minidskPath = Utils::pathProg("minidsk");
     my $cmd = "";
     # Temporary files to put kmer counting for ORF coding genes and non coding genes
-    my $codOut = "/tmp/cod_".$randVal.".tmp";
-    my $nonOut = "/tmp/non_".$randVal.".tmp";
+    my $codOut = $outTmp."cod_".$randVal.".tmp";
+    my $nonOut = $outTmp."non_".$randVal.".tmp";
 
     # Run minidsk on ORF for coding genes
     print "\tRunning minidsk on '$codFile'.\n" if($verbosity >= 5);
@@ -227,9 +226,10 @@ sub getKmerRatio
 #	$proc      = number of proc to be use for minidsk
 #	$verbosity = value to define the verbosity
 #	$keepTmp   = keep or not the temporary files
+#	$outTmp    = temporary file output directory
 sub scoreORF
 {
-    my($orfFile, $modFile, $outFile, $kmerSize, $step, $proc, $verbosity, $keepTmp) = @_;
+    my($orfFile, $modFile, $outFile, $kmerSize, $step, $proc, $verbosity, $keepTmp, $outTmp) = @_;
     $orfFile  ||= undef;
     $modFile  ||= undef;
     $outFile  ||= undef;
@@ -282,8 +282,8 @@ sub scoreORF
     }
     close FILE;
 
-    my $tmpFile    = "/tmp/orf_".$randVal.".tmp";
-    my $tmpFileOut = "/tmp/out_".$randVal.".tmp";
+    my $tmpFile    = $outTmp."orf_".$randVal.".tmp";
+    my $tmpFileOut = $outTmp."out_".$randVal.".tmp";
     my $id         = "";
     my $length     = 0;
     my $logSum     = 0;
@@ -588,19 +588,26 @@ sub getRunModel
 #	$keepTmp         = keep or not the temporary files
 sub runRF
 {
-    my ($codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $verbosity, $keepTmp) = @_;
+    my ($codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $outDir, $verbosity, $keepTmp) = @_;
     $kmerListString ||= "2,3,4,5,6";
     $verbosity      ||= 0;
 
+    # Make a variable to keep temporay file in the outdir if --keeptmp is specify
+    my $outTmp = "/tmp/";
+    if($keepTmp!=0)
+    {
+	$outTmp = $outDir."tmp/";
+	mkdir $outTmp;
+    }
 
     # 1. Compute the size of each sequence and ORF
     print "1. Compute the size of each sequence and ORF\n";
-    my $sizeCodLearnFile    = "/tmp/".basename($codLearnFile)."_mRNASize".$randVal.".tmp";
-    my $sizeOrfCodLearnFile = "/tmp/".basename($orfCodLearnFile)."_ORFSize".$randVal.".tmp";
-    my $sizeNonLearnFile    = "/tmp/".basename($nonLearnFile)."_mRNASize".$randVal.".tmp";
-    my $sizeOrfNonLearnFile = "/tmp/".basename($orfNonLearnFile)."_ORFSize".$randVal.".tmp";
-    my $sizeTestFile        = "/tmp/".basename($testFile)."_mRNASize".$randVal.".tmp";
-    my $sizeOrfTestFile     = "/tmp/".basename($orfTestFile)."_ORFSize".$randVal.".tmp";
+    my $sizeCodLearnFile    = $outTmp.basename($codLearnFile)."_mRNASize".$randVal.".tmp";
+    my $sizeOrfCodLearnFile = $outTmp.basename($orfCodLearnFile)."_ORFSize".$randVal.".tmp";
+    my $sizeNonLearnFile    = $outTmp.basename($nonLearnFile)."_mRNASize".$randVal.".tmp";
+    my $sizeOrfNonLearnFile = $outTmp.basename($orfNonLearnFile)."_ORFSize".$randVal.".tmp";
+    my $sizeTestFile        = $outTmp.basename($testFile)."_mRNASize".$randVal.".tmp";
+    my $sizeOrfTestFile     = $outTmp.basename($orfTestFile)."_ORFSize".$randVal.".tmp";
 
     # Learning
     ## Coding
@@ -630,10 +637,10 @@ sub runRF
 
     foreach $kmerSize ( @kmerList )
     {
-	$kmerFile = "/tmp/".basename($orfCodLearnFile)."_".$randVal."_kmerRatio.tmp";
+	$kmerFile = $outTmp.basename($orfCodLearnFile)."_".$randVal."_kmerRatio.tmp";
 	push(@kmerRatioFileList, $kmerFile);
 
-	&getKmerRatio($orfCodLearnFile, $nonLearnFile, $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp);
+	&getKmerRatio($orfCodLearnFile, $nonLearnFile, $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp);
     }
 
     # 3. Compute the kmer score for each kmer size on learning and test ORF and for each type
@@ -643,27 +650,27 @@ sub runRF
     {
 	# Learning
 	## Coding
-	$kmerFile = "/tmp/".basename($orfCodLearnFile)."_".$randVal."_kmerScoreCodLearn.tmp";
+	$kmerFile = $outTmp.basename($orfCodLearnFile)."_".$randVal."_kmerScoreCodLearn.tmp";
 	push(@kmerScoreCodLearnFileList, $kmerFile);
-	scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp);
+	scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp, $outTmp);
 
 	## Non coding
-	$kmerFile = "/tmp/".basename($orfNonLearnFile)."_".$randVal."_kmerScoreNonLearn.tmp";
+	$kmerFile = $outTmp.basename($orfNonLearnFile)."_".$randVal."_kmerScoreNonLearn.tmp";
 	push(@kmerScoreNonLearnFileList, $kmerFile);
-	scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp);
+	scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp, $outTmp);
 
 	# Test
-	$kmerFile = "/tmp/".basename($orfTestFile)."_".$randVal."_kmerScoreTest.tmp";
+	$kmerFile = $outTmp.basename($orfTestFile)."_".$randVal."_kmerScoreTest.tmp";
 	push(@kmerScoreTestFileList, $kmerFile);
-	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp);
+	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp, $outTmp);
     }
 
 
     # 4. Merge the score and size files into one file for each type (learning coding and non coding and test)
     print "4. Merge the score and size files into one file for each type\n";
-    my $outModCodLearn = basename("$outFile").".modelCoding.out";
-    my $outModNonLearn = basename("$outFile").".modelNonCoding.out";
-    my $outModTest     = basename("$outFile").".modelTest.out";
+    my $outModCodLearn = $outTmp.basename("$outFile").".modelCoding.out";
+    my $outModNonLearn = $outTmp.basename("$outFile").".modelNonCoding.out";
+    my $outModTest     = $outTmp.basename("$outFile").".modelTest.out";
 
     # Learning
     ## Coding
@@ -720,9 +727,10 @@ sub runRF
 #	$reFile  = the output file from the random forest giving ranscripts class (0: non coding; 1: coding)
 sub rfPredToGTF
 {
-    my($testGTF, $rfFile) = @_;
+    my($testGTF, $rfFile, $outDir) = @_;
     $testGTF ||= undef;
     $rfFile  ||= undef;
+    $outDir  ||= undef;
 
 
     # Check if mendatory arguments have been given
@@ -771,8 +779,8 @@ sub rfPredToGTF
     close FILE;
 
     # Read the GTF file and put the line in the right file depending on which tab the transcript is
-    my $outNon = basename($testGTF).".lncRNA.gtf";
-    my $outCod = basename($testGTF).".mRNA.gtf";
+    my $outNon = $outDir.basename($testGTF).".lncRNA.gtf";
+    my $outCod = $outDir.basename($testGTF).".mRNA.gtf";
     my $line   = "";
     my $name   = "";
 
@@ -857,6 +865,10 @@ define the verbosity of the program
 
 if the temporary files need to be kept (0: delete; !0: keep)
 
+=item $outTmp
+
+temporary file output directory
+
 =back
 
 Return value: Return the array of the log ratio value
@@ -900,6 +912,10 @@ define the verbosity of the program
 =item $keepTmp
 
 if the temporary files need to be kept (0: delete; !0: keep)
+
+=item $outTmp
+
+temporary file output directory
 
 =back
 
@@ -1025,6 +1041,10 @@ list of size of kmer as '2,3,4,5,6' (default value) as a string
 
 the threshold for the random forest, if it is not defined then it is set using a 10-fold cross-validation on learning data
 
+=item $outDir
+
+output directory
+
 =item $verbosity
 
 define the verbosity of the program
@@ -1050,6 +1070,10 @@ the GTF file of the unknown transcripts
 =item $reFile
 
 the output file from the random forest giving ranscripts class (0: non coding; 1: coding)
+
+=item $outDir
+
+output directory
 
 =back
 

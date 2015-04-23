@@ -49,19 +49,21 @@ my $numtx    = 3000;	# number of tx for training
 my $minnumtx = 100;	# Min number of tx for training (a too small value will result in a bad regression)
 
 
-# VW Adding a variable to get the kmer size which are used to calculat the kmer scores
+# VW Add a variable to get the kmer size which are used to calculat the kmer scores
 my $kmerList = '2,3,4,5,6';
 
-# VW Adding a variable to keep tmp file, default don't keep
+# VW Add a variable to keep tmp file, default don't keep
 my $keepTmp = 0;
 
 # VW If random forest (rf/RF) cutoff is defined, no need to compute it on TP lncRNA and mRNA
 my $rfcut = undef;
 
-# VW Adding option to select the calculate orf for learning and test data sets
+# VW Add option to select the calculate orf for learning and test data sets
 my $orfTypeLearn = 0;
 my $orfTypeTest  = 3;
 
+# VW Add an option to specify the output directory, default current directory
+my $outDir = "./";
 
 # Intergenic extraction:
 my $maxTries   = 10;
@@ -82,6 +84,7 @@ GetOptions(
     's|sizeinter=f'  => \$sizecorrec,
     'learnorftype=i' => \$orfTypeLearn,
     'testorftype=i'  => \$orfTypeTest,
+    'o|outdir=s'      => \$outDir,
     'keeptmp'        => \$keepTmp,
     'v|verbosity=i'  => \$verbosity,
     'help|?'         => \$help,
@@ -102,8 +105,11 @@ if (defined $rfcut){
 }
 pod2usage ("- Error: \$sizecorrec option (ratio between mRNAs sequence lenghts and intergenic non coding sequence lenghts) '$sizecorrec' should be a float between 0 and 1 [0-1] \n") unless ($sizecorrec >= 0 and $sizecorrec <= 1);
 pod2usage ("- Error: \$orfTypeLearn option '$orfTypeLearn' should be equal to 0, 1, 2, 3 or 4 (see 'FEELnc_codpot.pl --help' for more information) \n") unless ($orfTypeLearn==0 || $orfTypeLearn==1 || $orfTypeLearn==2 || $orfTypeLearn==3 || $orfTypeLearn==4);
-
 pod2usage ("- Error: \$orfTypeTest option '$orfTypeTest' should be equal to 0, 1, 2, 3 or 4 (see 'FEELnc_codpot.pl --help' for more information) \n") unless ($orfTypeTest==0 || $orfTypeTest==1 || $orfTypeTest==2 || $orfTypeTest==3 || $orfTypeTest==4);
+pod2usage ("- Error: \$outDir option '$outDir' is not a directory or it does not exist \n") unless (-d $outDir);
+
+# For $outDiradd a '/' at the end of the path
+$outDir = $outDir."/";
 
 #############################################################
 
@@ -147,13 +153,13 @@ warn "> Preparing files for random forest...\n";
 # mRNA file
 #######
 # Training file
-my $cdnafile = Utils::renamefile($mRNAfile, ".cdnatrain.fa");
-my $orffile  = Utils::renamefile($mRNAfile, ".orftrain.fa");
+my $cdnafile = $outDir.Utils::renamefile($mRNAfile, ".cdnatrain.fa");
+my $orffile  = $outDir.Utils::renamefile($mRNAfile, ".orftrain.fa");
 my $lncfile;
 if (defined $lncRNAfile){
-    $lncfile = Utils::renamefile($lncRNAfile, ".lnctrain.fa");
+    $lncfile = $outDir.Utils::renamefile($lncRNAfile, ".lnctrain.fa");
 } else {
-    $lncfile = Utils::renamefile($mRNAfile, ".mRNAlinctrain.fa");
+    $lncfile = $outDir.Utils::renamefile($mRNAfile, ".mRNAlinctrain.fa");
 }
 
 
@@ -251,8 +257,8 @@ if (Utils::guess_format($infile) eq "gtf"){
 
 # VW modif crade !
 # besoin des ORF pour lnc et test
-my $lncOrfFile  = "./lncRNA_ORF.fa";
-my $testOrfFile = "./test_ORF.fa";
+my $lncOrfFile  = $outDir."lncRNA_ORF.fa";
+my $testOrfFile = $outDir."test_ORF.fa";
 
 # VW : Récupère les ORF du jeu lncRNA et test, crade !!!!
 &CreateORFcDNAFromFASTA($lncfile, "/tmp/poubelle1", $lncOrfFile, $numtx, $orfTypeLearn, $verbosity);
@@ -260,13 +266,13 @@ my $testOrfFile = "./test_ORF.fa";
 &CreateORFcDNAFromGTF($refin, "/tmp/poubelle2",  $testOrfFile, undef, $genome, $orfTypeTest, $verbosity);
 
 print STDERR "> Run random Forest on '$infile_outfa':\n";
-my $rfout = basename($infile)."_RF.out";
+my $rfout = $outDir.basename($infile)."_RF.out";
 
 
 # VW: Run de façon crade !
-RandomForest::runRF($cdnafile, $orffile, $lncfile, $lncOrfFile, $infile_outfa, $testOrfFile, $rfout, $kmerList, $rfcut, $verbosity, $keepTmp);
+RandomForest::runRF($cdnafile, $orffile, $lncfile, $lncOrfFile, $infile_outfa, $testOrfFile, $rfout, $kmerList, $rfcut, $outDir, $verbosity, $keepTmp);
 # Parsing of the random forest output
-RandomForest::rfPredToGTF($infile,$rfout);
+RandomForest::rfPredToGTF($infile, $rfout, $outDir);
 
 ################################
 ##### END OF THE MAIN CODE #####
@@ -763,7 +769,7 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
   -n,--numtx=2000			Number of transcripts required for the training [ default 2000 ]
   -r,--rfcut=[0-1]			Random forest voting cutoff [ default undef i.e will compute best cutoff ]
   -k,--kmer="2,3,4,5,6"			Kmer size list with size separate by ',' as string [ default "2,3,4,5,6" ]
-  --keeptmp=0				To keep the temporary files, by default don't keep it (0 value). Any other value than 0 will keep the temporary files
+  -o,--outdir="./"			Output directory [ default current directory ]
   -s,--sizeinter=0.75			Ratio between mRNA sequence lengths and non coding intergenic region sequence lengths as, by default, ncInter = mRNA * 0.75
   --learnorftype=0			Integer [0,1,2,3,4] to specify the type of longest ORF calculate (default: 0) for learning data set.
 					If the CDS is annotated in the .GTF, then the CDS is considered as the longest ORF, whatever the --orftype value.
@@ -773,6 +779,7 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
 						'3': same as '0' and if no ORF found, take the longest between ORF with start or stop codon (see '1' and '2');
 						'4': same as '3' but if no ORF is found, take the input sequence as ORF.
   --testorftype=3			Integer [0,1,2,3,4] to specify the type of longest ORF calculate (default: 3) for test data set. See --learnortype description for more informations.
+  --keeptmp=0				To keep the temporary files in a 'tmp' directory the outdir, by default don't keep it (0 value). Any other value than 0 will keep the temporary files
 
 
 =head2 Intergenic lncRNA extraction
