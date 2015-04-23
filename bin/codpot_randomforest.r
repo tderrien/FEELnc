@@ -45,7 +45,9 @@ if(length(args) == 4)
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages) != 0)
     {
-        install.packages(new.packages, repos="http:#cran.r-project.org/",  dependencies = TRUE)
+        cat("Please wait during the installation of the R packages (only done once): ", new.packages, ".\n", sep="")
+        install.packages(new.packages, repos="http://cran.r-project.org/",  dependencies = TRUE)
+        cat("R packages: ", new.packages, " installed.\n", sep="")
         }
 ## Loading library
 for(pack in list.of.packages)
@@ -106,7 +108,7 @@ if(is.null(thres))
                 ## Train the random forest model with (nb_cross_val-1) chunks and predict the value for the test dat set
                 models[[n]] <- randomForest(    x=dat[-chunk[[n]], dat.featID],    y=as.factor(dat[-chunk[[n]], dat.labelID]),
                                             xtest=dat[chunk[[n]], dat.featID], ytest=as.factor(dat[chunk[[n]], dat.labelID]),
-                                            ntree=50)
+                                            ntree=500)
 
                 ## Output results in list output
                 output[[n]] <- as.data.frame(cbind(dat[chunk[[n]], dat.featID], "Label"=dat[chunk[[n]], dat.labelID], "Prob"=models[[n]]$test$votes[,2], "Pred"=models[[n]]$test$predicted))
@@ -205,7 +207,7 @@ spe  <- tn / (fp+tn)
 pre  <- tp / (tp+fp)
 acc  <- (tp+tn) / sum(cont)
 
-cont           <- cbind(c("true negative","false negative","false positive","true positive"), as.data.frame(cont)[,3])
+cont <- cbind(c("true negative","false negative","false positive","true positive"), as.data.frame(cont)[,3])
 write.table(x="Number of true/false positives/negatives:", file=outStats, quote=FALSE, sep="", col.names=FALSE, row.names=FALSE)
 write.table(x=cont, file=outStats, append=TRUE, quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE)
 write.table(x="\nMetric values:", file=outStats, append=TRUE, sep="", quote=FALSE, col.names=FALSE, row.names=FALSE)
