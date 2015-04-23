@@ -7,7 +7,6 @@ use warnings;
 use Data::Dumper;
 use Pod::Usage;
 use File::Basename;
-
 use Utils;
 use ExtractFromFeature; # getKeyFromFeature line 932
 use Bio::DB::Fasta;
@@ -23,8 +22,6 @@ use Bio::SeqIO;
 use Bio::DB::Fasta;
 use Data::Dumper;
 
-
-
 # lib directory : ~tderrien/bin/perl/lib/
 use Parser;
 use ExtractFromHash;
@@ -32,6 +29,11 @@ use ExtractFromFeature;
 use Intersect;
 use Utils;
 use Orf;
+
+# Define a random value for the tmp file
+my $randVal = int(rand(1000));
+
+
 
 
 =encoding UTF-8
@@ -110,8 +112,8 @@ sub getKmerRatio
     my $minidskPath = Utils::pathProg("minidsk");
     my $cmd = "";
     # Temporary files to put kmer counting for ORF coding genes and non coding genes
-    my $codOut = "/tmp/cod_".int(rand(1000)).".tmp";
-    my $nonOut = "/tmp/non_".int(rand(1000)).".tmp";
+    my $codOut = "/tmp/cod_".$randVal.".tmp";
+    my $nonOut = "/tmp/non_".$randVal.".tmp";
 
     # Run minidsk on ORF for coding genes
     print "\tRunning minidsk on '$codFile'.\n" if($verbosity >= 5);
@@ -280,8 +282,8 @@ sub scoreORF
     }
     close FILE;
 
-    my $tmpFile    = "/tmp/orf_".int(rand(1000)).".tmp";
-    my $tmpFileOut = "/tmp/out_".int(rand(1000)).".tmp";
+    my $tmpFile    = "/tmp/orf_".$randVal.".tmp";
+    my $tmpFileOut = "/tmp/out_".$randVal.".tmp";
     my $id         = "";
     my $length     = 0;
     my $logSum     = 0;
@@ -593,12 +595,12 @@ sub runRF
 
     # 1. Compute the size of each sequence and ORF
     print "1. Compute the size of each sequence and ORF\n";
-    my $sizeCodLearnFile    = "/tmp/".basename($codLearnFile)."_mRNASize".int(rand(1000)).".tmp";
-    my $sizeOrfCodLearnFile = "/tmp/".basename($orfCodLearnFile)."_ORFSize".int(rand(1000)).".tmp";
-    my $sizeNonLearnFile    = "/tmp/".basename($nonLearnFile)."_mRNASize".int(rand(1000)).".tmp";
-    my $sizeOrfNonLearnFile = "/tmp/".basename($orfNonLearnFile)."_ORFSize".int(rand(1000)).".tmp";
-    my $sizeTestFile        = "/tmp/".basename($testFile)."_mRNASize".int(rand(1000)).".tmp";
-    my $sizeOrfTestFile     = "/tmp/".basename($orfTestFile)."_ORFSize".int(rand(1000)).".tmp";
+    my $sizeCodLearnFile    = "/tmp/".basename($codLearnFile)."_mRNASize".$randVal.".tmp";
+    my $sizeOrfCodLearnFile = "/tmp/".basename($orfCodLearnFile)."_ORFSize".$randVal.".tmp";
+    my $sizeNonLearnFile    = "/tmp/".basename($nonLearnFile)."_mRNASize".$randVal.".tmp";
+    my $sizeOrfNonLearnFile = "/tmp/".basename($orfNonLearnFile)."_ORFSize".$randVal.".tmp";
+    my $sizeTestFile        = "/tmp/".basename($testFile)."_mRNASize".$randVal.".tmp";
+    my $sizeOrfTestFile     = "/tmp/".basename($orfTestFile)."_ORFSize".$randVal.".tmp";
 
     # Learning
     ## Coding
@@ -628,7 +630,7 @@ sub runRF
 
     foreach $kmerSize ( @kmerList )
     {
-	$kmerFile = "/tmp/".basename($orfCodLearnFile)."_".int(rand(10000))."_kmerRatio.tmp";
+	$kmerFile = "/tmp/".basename($orfCodLearnFile)."_".$randVal."_kmerRatio.tmp";
 	push(@kmerRatioFileList, $kmerFile);
 
 	&getKmerRatio($orfCodLearnFile, $nonLearnFile, $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp);
@@ -641,17 +643,17 @@ sub runRF
     {
 	# Learning
 	## Coding
-	$kmerFile = "/tmp/".basename($orfCodLearnFile)."_".int(rand(10000))."_kmerScoreCodLearn.tmp";
+	$kmerFile = "/tmp/".basename($orfCodLearnFile)."_".$randVal."_kmerScoreCodLearn.tmp";
 	push(@kmerScoreCodLearnFileList, $kmerFile);
 	scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp);
 
 	## Non coding
-	$kmerFile = "/tmp/".basename($orfNonLearnFile)."_".int(rand(10000))."_kmerScoreNonLearn.tmp";
+	$kmerFile = "/tmp/".basename($orfNonLearnFile)."_".$randVal."_kmerScoreNonLearn.tmp";
 	push(@kmerScoreNonLearnFileList, $kmerFile);
 	scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp);
 
 	# Test
-	$kmerFile = "/tmp/".basename($orfTestFile)."_".int(rand(10000))."_kmerScoreTest.tmp";
+	$kmerFile = "/tmp/".basename($orfTestFile)."_".$randVal."_kmerScoreTest.tmp";
 	push(@kmerScoreTestFileList, $kmerFile);
 	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp);
     }
