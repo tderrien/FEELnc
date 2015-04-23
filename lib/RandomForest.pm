@@ -173,7 +173,6 @@ sub getKmerRatio
     open FILE, "> $outFile" or die "Error! Cannot access output file '". $outFile . "': ".$!;
     my $nbKmer = @kmerTab;
     my $log    = 0;
-    my @logTab;
 
     # Print the file header
     print FILE "kmer\tkmerSize_logRatio\n";
@@ -200,7 +199,7 @@ sub getKmerRatio
 	    $log = log( ($codVal[$i]/$codTot) / ($nonVal[$i]/$nonTot) );
 	}
 
-	$logTab[$i] = $log;
+	#$logTab[$i] = $log;
 	print FILE "$kmerTab[$i]\t$log\n";
     }
     close FILE;
@@ -212,7 +211,7 @@ sub getKmerRatio
 	unlink $nonOut;
     }
 
-    return(@logTab);
+    return(1);
 }
 
 
