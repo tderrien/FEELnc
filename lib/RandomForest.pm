@@ -170,7 +170,7 @@ sub getKmerRatio
     close FILE;
 
     # Write the output file with the log ratio directly
-    print "\tWrite the log ratio of kmer bewteen coding and non coding genes frequency for a size of kmer of '$kmerSize'.\n" if($verbosity >= 5);
+    print "\tWrite the log ratio of kmer between coding and non coding genes frequency for a size of kmer of '$kmerSize' in '$outFile'.\n" if($verbosity >= 5);
     open FILE, "> $outFile" or die "Error! Cannot access output file '". $outFile . "': ".$!;
     my $nbKmer = @kmerTab;
     my $log    = 0;
