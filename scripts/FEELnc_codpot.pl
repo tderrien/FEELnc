@@ -239,7 +239,7 @@ if(Utils::guess_format($infile) eq "gtf")      # -- if GTF
 }
 elsif(Utils::guess_format($infile) eq "fasta") # -- if FASTA
 {
-    ExtractCdnaOrf::CreateORFcDNAFromFASTA($infile, $testFile, $testOrfFile, $numtx, $minnumtx, $orfTypeTest, $verbosity);
+    ExtractCdnaOrf::CreateORFcDNAFromFASTA($infile, $testFile, $testOrfFile, undef, $minnumtx, $orfTypeTest, $verbosity);
 }
 else
 {
