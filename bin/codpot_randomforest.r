@@ -72,7 +72,7 @@ nonMat <- cbind(nonMat, label=rep(x=0, length.out=nrow(nonMat)))
 ## and write the full matrix with label
 ## Write step
 dat    <- rbind(codMat, nonMat)
-outDat <- paste(file_path_sans_ext(outFile), "_learningData.out", sep="")
+outDat <- paste(file_path_sans_ext(outFile), "_learningData.txt", sep="")
 write.table(x=dat, file=outDat, sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
 
 ## Random step

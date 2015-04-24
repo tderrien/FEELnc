@@ -8,7 +8,6 @@
 #
 
 
-
 # Perl libs
 use warnings;
 use strict;
@@ -29,6 +28,10 @@ use Intersect;
 use Utils;
 use Orf;
 use RandomForest;
+
+
+
+
 
 # my $pathRcrossvalidation = "~tderrien/bin/perl/script/FEELnc/bin/crossValidation_cutoff.r";
 my $rprog    = "10crossValidation_cutoff.r";
@@ -84,7 +87,7 @@ GetOptions(
     's|sizeinter=f'  => \$sizecorrec,
     'learnorftype=i' => \$orfTypeLearn,
     'testorftype=i'  => \$orfTypeTest,
-    'o|outdir=s'      => \$outDir,
+    'o|outdir=s'     => \$outDir,
     'keeptmp'        => \$keepTmp,
     'v|verbosity=i'  => \$verbosity,
     'help|?'         => \$help,
@@ -108,8 +111,19 @@ pod2usage ("- Error: \$orfTypeLearn option '$orfTypeLearn' should be equal to 0,
 pod2usage ("- Error: \$orfTypeTest option '$orfTypeTest' should be equal to 0, 1, 2, 3 or 4 (see 'FEELnc_codpot.pl --help' for more information) \n") unless ($orfTypeTest==0 || $orfTypeTest==1 || $orfTypeTest==2 || $orfTypeTest==3 || $orfTypeTest==4);
 pod2usage ("- Error: \$outDir option '$outDir' is not a directory or it does not exist \n") unless (-d $outDir);
 
+
 # For $outDiradd a '/' at the end of the path
 $outDir = $outDir."/";
+
+# Create the directory for temporary files
+my $outTmp = "/tmp/";
+if($keepTmp!=0)
+{
+    $outTmp = $outDir."tmp/";
+    mkdir $outTmp;
+}
+
+
 
 #############################################################
 
@@ -153,13 +167,13 @@ warn "> Preparing files for random forest...\n";
 # mRNA file
 #######
 # Training file
-my $cdnafile = $outDir.Utils::renamefile($mRNAfile, ".cdnatrain.fa");
-my $orffile  = $outDir.Utils::renamefile($mRNAfile, ".orftrain.fa");
+my $cdnafile = $outTmp.Utils::renamefile($mRNAfile, ".cdnatrain.fa");
+my $orffile  = $outTmp.Utils::renamefile($mRNAfile, ".orftrain.fa");
 my $lncfile;
 if (defined $lncRNAfile){
-    $lncfile = $outDir.Utils::renamefile($lncRNAfile, ".lnctrain.fa");
+    $lncfile = $outTmp.Utils::renamefile($lncRNAfile, ".lnctrain.fa");
 } else {
-    $lncfile = $outDir.Utils::renamefile($mRNAfile, ".mRNAlinctrain.fa");
+    $lncfile = $outTmp.Utils::renamefile($mRNAfile, ".mRNAlinctrain.fa");
 }
 
 
@@ -257,8 +271,8 @@ if (Utils::guess_format($infile) eq "gtf"){
 
 # VW modif crade !
 # besoin des ORF pour lnc et test
-my $lncOrfFile  = $outDir."lncRNA_ORF.fa";
-my $testOrfFile = $outDir."test_ORF.fa";
+my $lncOrfFile  = $outTmp."lncRNA_ORF.fa";
+my $testOrfFile = $outTmp."test_ORF.fa";
 
 
 # VW : Récupère les ORF du jeu lncRNA et test, crade !!!!
@@ -285,13 +299,24 @@ elsif (Utils::guess_format($infile) eq "fasta")
 
 
 print STDERR "> Run random Forest on '$infile_outfa':\n";
-my $rfout = $outDir.basename($infile)."_RF.out";
+my $rfout = $outDir.basename($infile)."_RF.txt";
 
 
 # VW: Run de façon crade !
 RandomForest::runRF($cdnafile, $orffile, $lncfile, $lncOrfFile, $infile_outfa, $testOrfFile, $rfout, $kmerList, $rfcut, $outDir, $verbosity, $keepTmp);
 # Parsing of the random forest output
 RandomForest::rfPredToOut($infile, $rfout, $outDir);
+
+
+# Cleaning temporary files
+if($keepTmp==0)
+{
+    unlink $cdnafile;
+    unlink $orffile;
+    unlink $lncfile;
+    unlink $lncOrfFile;
+    unlink $testOrfFile;
+}
 
 ################################
 ##### END OF THE MAIN CODE #####
