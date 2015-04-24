@@ -67,7 +67,7 @@ runRF: Run all the process using ORF from coding sequences, fasta from coding an
 
 =item .
 
-rfPredToGTF: With a .gtf and a result file from a random forest, write 2 .gtf file, each one respectively for coding and non coding genes
+rfPredToOut: With a .gtf and a result file from a random forest, write 2 .gtf file, each one respectively for coding and non coding genes
 
 =back
 
@@ -648,6 +648,7 @@ sub runRF
     $kmerFile = "";
     for($i=0; $i<$lenKmerList; $i++)
     {
+	print "\t- kmer size: $kmerList[$i]\n";
 	# Learning
 	## Coding
 	$kmerFile = $outTmp.basename($orfCodLearnFile)."_".$kmerList[$i]."_".$randVal."_kmerScoreCodLearn.tmp";
@@ -725,21 +726,21 @@ sub runRF
 # With a .gtf and a result file from a random forest, write 2 .gtf file, each one respectively for coding and non coding genes
 #	$testGTF = the GTF file of the unknown transcripts
 #	$reFile  = the output file from the random forest giving ranscripts class (0: non coding; 1: coding)
-sub rfPredToGTF
+#	$outDir  = ouptu directory
+sub rfPredToOut
 {
-    my($testGTF, $rfFile, $outDir) = @_;
-    $testGTF ||= undef;
-    $rfFile  ||= undef;
-    $outDir  ||= undef;
-
+    my($testFile, $rfFile, $outDir) = @_;
+    $testFile ||= undef;
+    $rfFile   ||= undef;
+    $outDir   ||= undef;
 
     # Check if mendatory arguments have been given
-    die "Parsing random forest output: GTF file with the new transcripts is not defined... exiting\n" if(!defined $testGTF);
+    die "Parsing random forest output: GTF file with the new transcripts is not defined... exiting\n" if(!defined $testFile);
     die "Parsing random forest output: random forest output file is not defined... exiting\n"         if(!defined $rfFile);
 
     # emtpy
-    die "Parsing random forest output: GTF file with the new transcripts '$testGTF' is empty... exiting\n" unless (-s $testGTF);
-    die "Parsing random forest output: random forest output file '$rfFile' is empty... exiting\n"          unless (-s $rfFile);
+    die "Parsing random forest output: GTF file with the new transcripts '$testFile' is empty... exiting\n" unless (-s $testFile);
+    die "Parsing random forest output: random forest output file '$rfFile' is empty... exiting\n"           unless (-s $rfFile);
 
 
     # Start by reading the result file from the random forest
@@ -778,42 +779,76 @@ sub rfPredToGTF
     }
     close FILE;
 
-    # Read the GTF file and put the line in the right file depending on which tab the transcript is
-    my $outNon = $outDir.basename($testGTF).".lncRNA.gtf";
-    my $outCod = $outDir.basename($testGTF).".mRNA.gtf";
-    my $line   = "";
-    my $name   = "";
 
-    print "Writing the two GTF output files: '$outNon' and '$outCod'\n";
-
-    open FILE,  "$testGTF" or die "Error! Cannot access to the gtf file for new transcripts '". $testGTF . "': ".$!;
-    open LNC, "> $outNon"  or die "Error! Cannot access to the lncRNA gtf output file '". $outNon . "': ".$!;
-    open RNA, "> $outCod"  or die "Error! Cannot access to the mRNA gtf output file '". $outCod . "': ".$!;
-
-    while(<FILE>)
+    if(Utils::guess_format($testFile) eq "gtf")
     {
-	$line = $_;
-	$name = ($line =~/.*transcript_id "([^ ]*)";/);
-	$name = $1;
+	# Read the GTF file and put the line in the right file depending on which tab the transcript is
+	my $outNon = $outDir.basename($testFile).".lncRNA.gtf";
+	my $outCod = $outDir.basename($testFile).".mRNA.gtf";
+	my $line   = "";
+	my $name   = "";
 
-	# Check if the name is in the non coding or coding array
-	if(exists $nonHas{$name})
+	print "Writing the two GTF output files: '$outNon' and '$outCod'\n";
+	open FILE,  "$testFile" or die "Error! Cannot access to the GTF input for new transcripts '". $testFile . "': ".$!;
+	open LNC, "> $outNon"   or die "Error! Cannot access to the lncRNA GTF output file '". $outNon . "': ".$!;
+	open RNA, "> $outCod"   or die "Error! Cannot access to the mRNA GTF output file '". $outCod . "': ".$!;
+
+	while(<FILE>)
 	{
-	    print LNC $line;
+	    $line = $_;
+	    $name = ($line =~/.*transcript_id "([^ ]*)";/);
+	    $name = $1;
+
+	    # Check if the name is in the non coding or coding array
+	    if(exists $nonHas{$name})
+	    {
+		print LNC $line;
+	    }
+	    elsif(exists $codHas{$name})
+	    {
+		print RNA $line;
+	    }
+	    else
+	    {
+		warn "Warning: $name is not in the random forest output file...\n";
+	    }
 	}
-	elsif(exists $codHas{$name})
+	close FILE;
+	close LNC;
+	close RNA;
+    }
+    else # if FASTA format
+    {
+	# Read the FASTA file and put the line in the right file depending on which tab the transcript is
+	my $outNon = $outDir.basename($testFile).".lncRNA.fa";
+	my $outCod = $outDir.basename($testFile).".mRNA.fa";
+
+	print "Writing the two FASTA output files: '$outNon' and '$outCod'\n";
+	my $multiFasta = new Bio::SeqIO(-file  => "$testFile", '-format' => 'Fasta');
+	my $lnc        = new Bio::SeqIO(-file => "> $outNon" , '-format' => 'Fasta');
+	my $rna        = new Bio::SeqIO(-file => "> $outCod" , '-format' => 'Fasta');
+
+	my @seqTab;
+	my $seq;
+	while( $seq = $multiFasta->next_seq() )
 	{
-	    print RNA $line;
-	}
-	else
-	{
-	    warn "Warning: $name is not in the random forest output file...\n";
+	    # Check if the name is in the non coding or coding array
+	    if(exists $nonHas{$seq->id()})
+	    {
+		$lnc->write_seq($seq);
+	    }
+	    elsif(exists $codHas{$seq->id()})
+	    {
+		$rna->write_seq($seq);
+	    }
+	    else
+	    {
+		warn "Warning: $seq->id() is not in the random forest output file...\n";
+	    }
 	}
     }
-    close FILE;
-    close LNC;
-    close RNA;
 }
+
 
 1;
 
@@ -1057,7 +1092,7 @@ if the temporary files need to be kept (0: delete; !0: keep)
 
 ##############################################################################
 
-=head2 rfPredToGTF
+=head2 rfPredToOut
 
 With a .gtf and a result file from a random forest, write 2 .gtf file, each one respectively for coding and non coding genes
 

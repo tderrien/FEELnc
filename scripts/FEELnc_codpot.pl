@@ -260,10 +260,29 @@ if (Utils::guess_format($infile) eq "gtf"){
 my $lncOrfFile  = $outDir."lncRNA_ORF.fa";
 my $testOrfFile = $outDir."test_ORF.fa";
 
+
 # VW : Récupère les ORF du jeu lncRNA et test, crade !!!!
-&CreateORFcDNAFromFASTA($lncfile, "/tmp/poubelle1", $lncOrfFile, $numtx, $orfTypeLearn, $verbosity);
+if (Utils::guess_format($lncfile) eq "gtf")
+{
+    &CreateORFcDNAFromGTF($lncfile, "/tmp/poubelle1", $lncOrfFile, $numtx, $genome, $orfTypeLearn, $verbosity);
+
+}
+else
+{
+    &CreateORFcDNAFromFASTA($lncfile, "/tmp/poubelle1", $lncOrfFile, $numtx, $orfTypeLearn, $verbosity);
+}
+
 # VW : utilise undef pour avoir l'ensemble des ORF
-&CreateORFcDNAFromGTF($refin, "/tmp/poubelle2",  $testOrfFile, undef, $genome, $orfTypeTest, $verbosity);
+if (Utils::guess_format($infile) eq "gtf")
+{
+    &CreateORFcDNAFromGTF($refin, "/tmp/poubelle2",  $testOrfFile, undef, $genome, $orfTypeTest, $verbosity);
+}
+elsif (Utils::guess_format($infile) eq "fasta")
+{
+    &CreateORFcDNAFromFASTA($infile, "/tmp/poubelle2",  $testOrfFile, undef, $orfTypeTest, $verbosity);
+}
+
+
 
 print STDERR "> Run random Forest on '$infile_outfa':\n";
 my $rfout = $outDir.basename($infile)."_RF.out";
@@ -272,7 +291,7 @@ my $rfout = $outDir.basename($infile)."_RF.out";
 # VW: Run de façon crade !
 RandomForest::runRF($cdnafile, $orffile, $lncfile, $lncOrfFile, $infile_outfa, $testOrfFile, $rfout, $kmerList, $rfcut, $outDir, $verbosity, $keepTmp);
 # Parsing of the random forest output
-RandomForest::rfPredToGTF($infile, $rfout, $outDir);
+RandomForest::rfPredToOut($infile, $rfout, $outDir);
 
 ################################
 ##### END OF THE MAIN CODE #####
@@ -289,6 +308,8 @@ sub getTypeOrf
     my ($name, $seq, $str, $refOrf, $type) = @_;
     my $orfob;
     my $orfob2;
+
+    return(-1) if($seq eq "");                              # -- if the sequence is empty, return -1
 
     # Type 0
     $orfob = Orf::longestORF2($seq,$str, 0, 0, undef, 1);
@@ -475,15 +496,11 @@ sub CreateORFcDNAFromFASTA{
 
 	my $tr = $seq->id();
 
-	# if not orf
-	if (!defined $orffile){
-	    # store cDNA sequence
-	    # my $new_seq = Bio::Seq->new(-id => $tr, -seq => $seq->seq(), -alphabet => 'dna');
-	    $h_cdna{$tr} = $seq->seq();
-	    print STDERR "\tExtracting cDNAs from FASTA ", $countseqok++,"/$nbtx complete cDNA(s)...\r";
 
-	} else {# get also ORF
-	    $orfFlag = &getTypeOrf($tr, $seq->seq(), $strand, \%h_orf, $orfType);
+	# if not orf
+	if (defined $orffile){ # get also ORF
+	    $h_cdna{$tr} = $seq->seq();
+	    $orfFlag     = &getTypeOrf($tr, $seq->seq(), $strand, \%h_orf, $orfType);
 
 	    # Print according to getTypeOrf result
 	    if ($orfFlag != -1){
@@ -494,12 +511,17 @@ sub CreateORFcDNAFromFASTA{
 		next; # next if ORF is not OK
 	    }
 	}
+	else
+	{
+	    $h_cdna{$tr} = $seq->seq();
+	    print STDERR "\tExtracting cDNAs from FASTA ", $countseqok++,"/$nbtx complete cDNA(s)...\r";
+	}
+
 	# Check if numtx is reached
 	if (defined $nbtx && $countseqok == $nbtx){
 	    print STDERR "\tMax cDNAs/ORF sequences '$nbtx' reached..ending!\n";
 	    last;
 	}
-
     }
     # if dedfined ORFfile, we write ORF and cDNA file
     if (defined $orffile){
@@ -510,7 +532,6 @@ sub CreateORFcDNAFromFASTA{
 
 	&writefastafile(\%h_orf,  $orffile, $verbosity);
 	&writefastafile(\%h_cdna, $cdnafile, $verbosity);
-
 
 	# we write only  cDNA file
     } else {
@@ -572,6 +593,8 @@ sub randomizedGTFtoFASTA{
 
     my %h_cdna_rdm; # to store correclty relocated sequences
 
+    srand(1234); # the seed is initiated to have reproducibility
+
   TX:
     foreach my $tx (sort keys %{$refannotsize}){ # sort for reproducibility
 
@@ -580,7 +603,7 @@ sub randomizedGTFtoFASTA{
 
 	my $overlap    = 1; # Initialize variable for iterative search for selfoverlap
 	my $includeN   = 1; # Initialize variable for iterative search for N
-	my $countTries = 0; # Number of tries
+	my $countTries = -1; # Number of tries
 
 	# data for new sequence
 	my ($chrrdm, $beg, $end, $seq);
@@ -601,9 +624,9 @@ sub randomizedGTFtoFASTA{
 		next TX;
 	    }
 
-	    my $seed = $i+$countTries; # the seed is initiated accroding to the $i (tx) and the nb of try... if only $i, the same chr:pos will be returned...
-	    # Initialize srand foreach tx
-	    srand($seed);
+	    # my $seed = $i+$countTries; # the seed is initiated accroding to the $i (tx) and the nb of try... if only $i, the same chr:pos will be returned...
+	    # # Initialize srand foreach tx
+	    # srand($seed);
 	    # define a rand indice for all chr hash
 	    my $randindex = int( rand(scalar keys %{$refgenomesize}) );
 	    my @chrrdm    = sort keys(%{$refgenomesize}); # sort hash for reproducibility
