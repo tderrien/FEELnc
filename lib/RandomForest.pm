@@ -289,6 +289,7 @@ sub scoreORF
     my $logSum     = 0;
     my $totKmer    = 0;
     my $i          = 0;
+    my $res        = 0;
     open FILEOUT, "> $outFile" or die "Error! Cannot access output file '". $outFile . "': ".$!;
 
     # Print the header of the output file
@@ -317,7 +318,9 @@ sub scoreORF
 
 	# Read the minidsk output (FILEMINI) and write it on the output file (FILEOUT)
 	open FILEMINI, "$tmpFileOut" or die "Error! Cannot access the temporary output minidsk file '". $tmpFileOut . "': ".$!;
-	$i = 0;
+	$i       = 0;
+	$totKmer = 0;
+	$logSum  = 0;
 	while(<FILEMINI>)
 	{
 	    chop;
@@ -330,7 +333,8 @@ sub scoreORF
 	}
 	close FILEMINI;
 
-	print FILEOUT "$id\t$logSum\n";
+	$res = $logSum/$totKmer;
+	print FILEOUT "$id\t$res\n";
     }
     close FILEOUT;
 
