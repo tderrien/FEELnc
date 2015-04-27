@@ -17,6 +17,7 @@ use File::Basename;
 use Bio::SeqIO;
 use Bio::DB::Fasta;
 use Data::Dumper;
+use List::Util qw( min max );
 
 # lib directory: {FEELnc github directory}/lib/
 use Parser;
@@ -46,7 +47,7 @@ my $minnumtx = 100;	# Min number of tx for training (a too small value will resu
 
 
 # VW Add a variable to get the kmer size which are used to calculat the kmer scores
-my $kmerList = '2,3,4,5,6';
+my $kmerList = '1,2,3,4,5,6';
 
 # VW Add a variable to keep tmp file, default don't keep
 my $keepTmp = 0;
@@ -105,6 +106,13 @@ pod2usage ("- Error: \$orfTypeTest option '$orfTypeTest' should be equal to 0, 1
 pod2usage ("- Error: \$outDir option '$outDir' is not a directory or it does not exist \n") unless (-d $outDir);
 
 
+# Check the max kmersize
+my @kmerTable = split(/,/,$kmerList);
+my $kmerMax   = max @kmerTable;
+pod2usage ("- Error: \$kmerList option '$kmerList' is not valid. One of the size is stricly greater than '15' (see --help for more details). \n") unless ($kmerMax <= 15);
+
+
+
 # For $outDiradd a '/' at the end of the path
 $outDir = $outDir."/";
 
@@ -115,6 +123,7 @@ if($keepTmp!=0)
     $outTmp = $outDir."tmp/";
     mkdir $outTmp;
 }
+
 
 
 
@@ -185,11 +194,11 @@ my $ref_cDNA_passed;
 # Get cDNA and ORF for coding training file
 if($mRNAfileformat eq "gtf")      # -- if GTF
 {
-    $ref_cDNA_passed = ExtractCdnaOrf::CreateORFcDNAFromGTF($mRNAfile, $codFile, $codOrfFile, $numtx, $minnumtx, $genome, 'exon,CDS,stop_codon,start_codon', \%biotype, $orfTypeLearn, $verbosity);
+    $ref_cDNA_passed = ExtractCdnaOrf::CreateORFcDNAFromGTF($mRNAfile, $codFile, $codOrfFile, $numtx, $minnumtx, $genome, 'exon,CDS,stop_codon,start_codon', \%biotype, $orfTypeLearn, $verbosity, $kmerMax);
 }
 elsif($mRNAfileformat eq "fasta") # -- if FASTA
 {
-    ExtractCdnaOrf::CreateORFcDNAFromFASTA($mRNAfile, $codFile, $codOrfFile, $numtx, $minnumtx, $orfTypeLearn, $verbosity);
+    ExtractCdnaOrf::CreateORFcDNAFromFASTA($mRNAfile, $codFile, $codOrfFile, $numtx, $minnumtx, $orfTypeLearn, $verbosity, $kmerMax);
 }
 else
 {
@@ -207,11 +216,11 @@ if(defined $lncRNAfile) # -- if file is defined, it means that we do not have to
 
     if ($lncRNAfileformat eq "gtf") # -- if GTF
     {
-	$ref_cDNA_passed = ExtractCdnaOrf::CreateORFcDNAFromGTF($lncRNAfile, $nonFile, $nonOrfFile, $numtx, $minnumtx, $genome, 'exon', undef, $orfTypeLearn, $verbosity);
+	$ref_cDNA_passed = ExtractCdnaOrf::CreateORFcDNAFromGTF($lncRNAfile, $nonFile, $nonOrfFile, $numtx, $minnumtx, $genome, 'exon', undef, $orfTypeLearn, $verbosity, $kmerMax);
     }
     elsif($lncRNAfileformat eq "fasta")
     {
-	ExtractCdnaOrf::CreateORFcDNAFromFASTA($lncRNAfile, $nonFile, $nonOrfFile, $numtx, $minnumtx, $orfTypeLearn, $verbosity);
+	ExtractCdnaOrf::CreateORFcDNAFromFASTA($lncRNAfile, $nonFile, $nonOrfFile, $numtx, $minnumtx, $orfTypeLearn, $verbosity, $kmerMax);
     }
     else
     {
@@ -224,7 +233,7 @@ else                    # -- if lncRNA training file not defined
     my $refmrna = Parser::parseGTF($mRNAfile, 'exon,CDS,stop_codon,start_codon', undef , \%biotype , $verbosity);
     # Relocated mRNA sequence in intergenic regions to be used as a training lncRNA file
     print STDERR "> The lncRNA training file is not set...will extract intergenic region for training (can take a while...)\n";
-    ExtractCdnaOrf::randomizedGTFtoFASTA($refmrna, $ref_cDNA_passed, $nonFile, $nonOrfFile, $genome, $numtx, $minnumtx, $sizecorrec, $orfTypeLearn, $maxTries, $maxN, $verbosity);
+    ExtractCdnaOrf::randomizedGTFtoFASTA($refmrna, $ref_cDNA_passed, $nonFile, $nonOrfFile, $genome, $numtx, $minnumtx, $sizecorrec, $orfTypeLearn, $maxTries, $maxN, $verbosity, $kmerMax);
 }
 
 
@@ -235,11 +244,11 @@ else                    # -- if lncRNA training file not defined
 if(Utils::guess_format($infile) eq "gtf")      # -- if GTF
 {
     # Use undef for $nbtx to get all sequences and ORFs
-    ExtractCdnaOrf::CreateORFcDNAFromGTF($infile, $testFile, $testOrfFile, undef, $minnumtx, $genome, 'exon', undef, $orfTypeTest, $verbosity);
+    ExtractCdnaOrf::CreateORFcDNAFromGTF($infile, $testFile, $testOrfFile, undef, $minnumtx, $genome, 'exon', undef, $orfTypeTest, $verbosity, $kmerMax);
 }
 elsif(Utils::guess_format($infile) eq "fasta") # -- if FASTA
 {
-    ExtractCdnaOrf::CreateORFcDNAFromFASTA($infile, $testFile, $testOrfFile, undef, $minnumtx, $orfTypeTest, $verbosity);
+    ExtractCdnaOrf::CreateORFcDNAFromFASTA($infile, $testFile, $testOrfFile, undef, $minnumtx, $orfTypeTest, $verbosity, $kmerMax);
 }
 else
 {
@@ -349,7 +358,7 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
   -b,--biotype				Only consider transcripts having this(these) biotype(s) from the reference annotation (e.g : -b transcript_biotype=protein_coding,pseudogene) [default undef i.e all transcripts]
   -n,--numtx=2000			Number of transcripts required for the training [ default 2000 ]
   -r,--rfcut=[0-1]			Random forest voting cutoff [ default undef i.e will compute best cutoff ]
-  -k,--kmer="2,3,4,5,6"			Kmer size list with size separate by ',' as string [ default "2,3,4,5,6" ]
+  -k,--kmer="2,3,4,5,6"			Kmer size list with size separate by ',' as string [ default "2,3,4,5,6" ], the maximum value for the size is '15'
   -o,--outdir="./"			Output directory [ default current directory ]
   -s,--sizeinter=0.75			Ratio between mRNA sequence lengths and non coding intergenic region sequence lengths as, by default, ncInter = mRNA * 0.75
   --learnorftype=0			Integer [0,1,2,3,4] to specify the type of longest ORF calculate (default: 0) for learning data set.

@@ -24,69 +24,79 @@ use Orf;
 # Return $typeOrf if there is an ORF extracted, -1 if no ORF found (regarding the parameters)
 sub getTypeOrf
 {
-    my ($name, $seq, $str, $refOrf, $type) = @_;
+    my ($name, $seq, $str, $refOrf, $type, $kmerMax) = @_;
     my $orfob;
     my $orfob2;
 
-    return(-1) if($seq eq "");                              # -- if the sequence is empty, return -1
+    return(-1) if($seq eq "");
+    # -- if the sequence is empty, return -1
 
     # Type 0
     $orfob = Orf::longestORF2($seq,$str, 0, 0, undef, 1);
 
-    if($orfob->{'check_start'} && $orfob->{'check_stop'}) # -- if an ORF is found with a start and a stop codon
+    if($orfob->{'check_start'} && $orfob->{'check_stop'} && length($orfob->{'cds_seq'}) >= (2*$kmerMax))
+	# -- if an ORF is found with a start and a stop codon
     {
 	$refOrf->{$name} = $orfob->{'cds_seq'};
 	return(0);
     }
     # Type 1
-    if($type==1 || $type==3 || $type==4)                  # -- if type 1, 3 or 4, check for an ORF with a start codon
+    if($type==1 || $type==3 || $type==4)
+	# -- if type 1, 3 or 4, check for an ORF with a start codon
     {
-	$orfob = Orf::longestORF2($seq,$str, 1, 0, undef, 1);
-	if($type==1 && $orfob->{'check_start'})           # -- if type 1 and a start codon is found, get this ORF
+	$orfob = Orf::longestORF2($seq,$str, 0, 1, undef, 1);
+	if($type==1 && $orfob->{'check_start'} && length($orfob->{'cds_seq'}) >= (2*$kmerMax))
+	    # -- if type 1 and a start codon is found, get this ORF
 	{
 	    $refOrf->{$name} = $orfob->{'cds_seq'};
 	    return(1);
 	}
     }
     # Type 2
-    if($type==2 || $type==3 || $type==4)                  # -- if type 2, 3 or 4, check for an ORF with a stop codon
+    if($type==2 || $type==3 || $type==4)
+	# -- if type 2, 3 or 4, check for an ORF with a stop codon
     {
-	$orfob2 = Orf::longestORF2($seq,$str, 0, 1, undef, 1);
-	if($type==2 && $orfob2->{'check_start'})          # -- if type 2 and a stop codon is found, get this ORF
+	$orfob2 = Orf::longestORF2($seq,$str, 1, 0, undef, 1);
+	if($type==2 && $orfob2->{'check_stop'} && length($orfob2->{'cds_seq'}) >= (2*$kmerMax))
+	    # -- if type 2 and a stop codon is found, get this ORF
 	{
 	    $refOrf->{$name} = $orfob2->{'cds_seq'};
 	    return(2);
 	}
     }
     # Type 3
-    if($type==3 || $type==4)                              # -- if type 3 or 4, take the longest ORF between type 1 and 2 (orfob and orfob2)
+    if($type==3 || $type==4)
+	# -- if type 3 or 4, take the longest ORF between type 1 and 2 (orfob and orfob2)
     {
-	if(length($orfob->{'cds_seq'}) >= length($orfob2->{'cds_seq'})) # if ORF with start codon >= ORF with stop codon, take ORF start, else take ORF stop
+	if(length($orfob->{'cds_seq'}) > length($orfob2->{'cds_seq'}) && length($orfob->{'cds_seq'}) >= (2*$kmerMax))
+	    # if ORF with start codon >= ORF with stop codon, take ORF start, else take ORF stop
 	{
 	    $refOrf->{$name} = $orfob->{'cds_seq'};
 	    return(3);
 	}
-	else
+	elsif(length($orfob2->{'cds_seq'}) >= length($orfob->{'cds_seq'}) && length($orfob2->{'cds_seq'}) >= (2*$kmerMax))
 	{
 	    $refOrf->{$name} = $orfob2->{'cds_seq'};
 	    return(3);
 	}
     }
     # Type 4
-    if($type==4)                                          # -- if type 4, take the longest ORF whatever there is a start/stop codon
+    if($type==4 && length($orfob->{'cds_seq'}) >= (2*$kmerMax))
+	# -- if type 4, take the longest ORF whatever there is a start/stop codon
     {
 	$orfob = Orf::longestORF2($seq,$str, 1, 1, undef, 1);
 	$refOrf->{$name} = $orfob->{'cds_seq'};
 	return(4);
     }
 
-    return(-1); # if no ORF found, return -1
+    return(-1);
+    # if no ORF found, return -1
 }
 
 
 sub CreateORFcDNAFromGTF
 {
-    my ($gtfFile, $cdnaFile, $orfFile, $nbtx, $minnumtx, $genome, $lineType, $refBiotype, $orfType, $verbosity) = @_;
+    my ($gtfFile, $cdnaFile, $orfFile, $nbtx, $minnumtx, $genome, $lineType, $refBiotype, $orfType, $verbosity, $kmerMax) = @_;
     # Note if $nbtx is undefined, we extract all ORF and cDNA
 
     # die if genome not specified
@@ -123,7 +133,7 @@ sub CreateORFcDNAFromGTF
 	if (! $containCDS )
 	{
 	    warn "\tYour input GTF file does not contain CDS information... the program will extract the longest one for each transcript...\n" if ($countseqok < 1 && $verbosity > 5);
-	    $orfFlag = &getTypeOrf($tr, $cdnaseq, $strand, \%h_orf, $orfType);
+	    $orfFlag = &getTypeOrf($tr, $cdnaseq, $strand, \%h_orf, $orfType, $kmerMax);
 
 	    # Print accordingly to getTypeOrf result
 	    if ($orfFlag != -1)
@@ -214,7 +224,7 @@ sub CreateORFcDNAFromGTF
 
 sub CreateORFcDNAFromFASTA
 {
-    my ($fastaFile, $cdnaFile, $orfFile, $nbtx, $minnumtx, $orfType, $verbosity) = @_;
+    my ($fastaFile, $cdnaFile, $orfFile, $nbtx, $minnumtx, $orfType, $verbosity, $kmerMax) = @_;
     # If $nbtx is undef, extract all sequences
 
     print STDERR "Extract ORF/cDNA from fasta file '$fastaFile'..\n";
@@ -243,7 +253,7 @@ sub CreateORFcDNAFromFASTA
 
 	my $tr = $seq->id();
 
-	$orfFlag = &getTypeOrf($tr, $seq->seq(), $strand, \%h_orf, $orfType);
+	$orfFlag = &getTypeOrf($tr, $seq->seq(), $strand, \%h_orf, $orfType, $kmerMax);
 
 	# Print according to getTypeOrf result
 	if ($orfFlag != -1)
@@ -370,7 +380,7 @@ sub writefastafile{
 
 sub randomizedGTFtoFASTA{
 
-    my ($h, $ref_cDNA_passed, $cdnafile, $orffile, $genome, $nbtx, $minnumtx, $sizecorrec, $orfType, $maxTries, $maxN, $verbosity) = @_;
+    my ($h, $ref_cDNA_passed, $cdnafile, $orffile, $genome, $nbtx, $minnumtx, $sizecorrec, $orfType, $maxTries, $maxN, $verbosity, $kmerMax) = @_;
 
     $nbtx      ||= 1000; # number of random tx required
     $maxTries  ||= 10;   # max tries to for computing both overlap and N
@@ -404,6 +414,7 @@ sub randomizedGTFtoFASTA{
     my %h_orf;       # to store the orf
     my %h_orf_tmp;   # to temporary store the orf
     my $orfFlag = 0; # to get the type of ORF
+    my $cptok   = 0; # to get the number of extracted sequence
 
     srand(1234); # the seed is initiated to have reproducibility
 
@@ -416,7 +427,6 @@ sub randomizedGTFtoFASTA{
 	my $overlap    = 1; # Initialize variable for iterative search for selfoverlap
 	my $includeN   = 1; # Initialize variable for iterative search for N
 	my $countTries = -1; # Number of tries
-	my $cptok      = 0;
 
 	# data for new sequence
 	my ($chrrdm, $beg, $end, $seq);
@@ -478,13 +488,14 @@ sub randomizedGTFtoFASTA{
 
 	    $id = $tx."_random_($chrrdm:$beg-$end)";
 	    # Get ORF sequence
-	    $orfFlag = &getTypeOrf($id, $seq, "+", \%h_orf_tmp, $orfType);
+	    $orfFlag = &getTypeOrf($id, $seq, "+", \%h_orf_tmp, $orfType, $kmerMax);
 	    $seqORF = $h_orf_tmp{$id};
 	}
 	# Write New random sequence
 	$h_cdna_rdm{$id} = $seq;
 	$h_orf{$id}      = $seqORF;
-	print STDERR "\tExtracting ORFs&cDNAs with random coordinate ", $cptok++,"/$nbtx...\r" if( defined $nbtx);
+	print STDERR "\tExtracting ORFs&cDNAs with random coordinate ", $cptok++,"/$nbtx...\r" if( defined  $nbtx);
+	print STDERR "\tExtracting ORFs&cDNAs with random coordinate ", $cptok++,"...\r"       if( !defined $nbtx);
 
 	# verbosity
 	$i++;

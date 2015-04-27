@@ -175,8 +175,9 @@ sub getKmerRatio
     my $nbKmer = @kmerTab;
     my $log    = 0;
 
+    # VW No header for KmerInShort
     # Print the file header
-    print FILE "kmer\tkmerSize_logRatio\n";
+    #print FILE "kmer\tkmerSize_logRatio\n";
     for($i=0; $i<$nbKmer; $i++)
     {
 	# logratio = 0                      -- if the kmer is not found in any gene files
@@ -201,7 +202,9 @@ sub getKmerRatio
 	}
 
 	#$logTab[$i] = $log;
-	print FILE "$kmerTab[$i]\t$log\n";
+	#print FILE "$kmerTab[$i]\t$log\n";
+	# VW only the log for KmerInShort
+	print FILE "$log\n";
     }
     close FILE;
 
@@ -216,6 +219,51 @@ sub getKmerRatio
 }
 
 
+# Function to compute the scoring function of a multifasta file of ORF
+#	$orfFile   = multi fasta file with the ORF of the genes to be scored
+#	$modFile   = file with the log ratio score compute on learning files
+#	$outFile   = file where the logRatio of kmer frequency need to be written
+#	$kmerSize  = size of the kmer
+#	$step      = step for the counting of kmer
+#	$proc      = number of proc to be use for minidsk
+#	$verbosity = value to define the verbosity
+sub scoreORF
+{
+    my($orfFile, $modFile, $outFile, $kmerSize, $step, $proc, $verbosity) = @_;
+    $orfFile  ||= undef;
+    $modFile  ||= undef;
+    $outFile  ||= undef;
+    $kmerSize ||= 6;
+    $step     ||= 3;
+    $proc     ||= 1;
+
+    # Check if mendatory arguments have been given
+    die "Scoring ORF file: ORF file for scoring sequences is not defined... exiting\n"                     if(!defined $orfFile);
+    die "Scoring ORF file: model of log ratio score file is not defined... exiting\n"                      if(!defined $modFile);
+    die "Scoring ORF file: output file to write kmer score for test sequences is not defined... exiting\n" if(!defined $outFile);
+
+    # emtpy
+    die "Scoring ORF file: ORF file for scoring sequences '$orfFile' is empty... exiting\n" unless (-s $orfFile);
+    die "Scoring ORF file: model of log ratio score file '$modFile' is empty... exiting\n"  unless (-s $modFile);
+
+    # Path to minidsk
+    my $kisPath = Utils::pathProg("KmerInShort");
+
+    print "\tRun KmerInShort on '$orfFile' and '$modFile' to '$outFile'" if($verbosity >= 5);
+    # Run KmerInShort
+    my $cmd = "$kisPath -file $orfFile -kval $modFile -nb-cores $proc -kmer-size $kmerSize -out $outFile -dont-reverse -step $step 1>/dev/null 2>/dev/null";
+    system($cmd);
+
+    # To add the header to the $outFile
+    open FILE, "$outFile";
+    my @cp = <FILE>;
+    close FILE;
+    open FILE, "> $outFile";
+    print FILE "name\tkmerScore_".$kmerSize."mer\n";
+    print FILE @cp;
+    close FILE;
+}
+
 
 # Temporary function to compute the scoring function of a multifasta file of ORF
 #	$orfFile   = multi fasta file with the ORF of the genes to be scored
@@ -227,7 +275,7 @@ sub getKmerRatio
 #	$verbosity = value to define the verbosity
 #	$keepTmp   = keep or not the temporary files
 #	$outTmp    = temporary file output directory
-sub scoreORF
+sub OldscoreORF
 {
     my($orfFile, $modFile, $outFile, $kmerSize, $step, $proc, $verbosity, $keepTmp, $outTmp) = @_;
     $orfFile  ||= undef;
@@ -586,14 +634,14 @@ sub getRunModel
 #	$testFile        = fasta file of the test sequences
 #	$orfTestFile     = fasta file of the ORF test sequences
 #	$outFile         = file to write the result of the random forest
-#	$kmerListString  = list of size of kmer as '2,3,4,5,6' (default value) as string
+#	$kmerListString  = list of size of kmer as '1,2,3,4,5,6' (default value) as string
 #	$thres           = the threshold for the random forest, if it is not defined then it is set using a 10-fold cross-validation on learning data
 #	$verbosity       = value for level of verbosity
 #	$keepTmp         = keep or not the temporary files
 sub runRF
 {
     my ($codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $outDir, $verbosity, $keepTmp) = @_;
-    $kmerListString ||= "2,3,4,5,6";
+    $kmerListString ||= "1,2,3,4,5,6";
     $verbosity      ||= 0;
 
     # Make a variable to keep temporay file in the outdir if --keeptmp is specify
@@ -657,17 +705,20 @@ sub runRF
 	## Coding
 	$kmerFile = $outTmp.basename($orfCodLearnFile)."_".$kmerList[$i]."_".$randVal."_kmerScoreCodLearn.tmp";
 	push(@kmerScoreCodLearnFileList, $kmerFile);
-	scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp, $outTmp);
+	#scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp, $outTmp);
+	scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
 
 	## Non coding
 	$kmerFile = $outTmp.basename($orfNonLearnFile)."_".$kmerList[$i]."_".$randVal."_kmerScoreNonLearn.tmp";
 	push(@kmerScoreNonLearnFileList, $kmerFile);
-	scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp, $outTmp);
+	#scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp, $outTmp);
+	scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
 
 	# Test
 	$kmerFile = $outTmp.basename($orfTestFile)."_".$kmerList[$i]."_".$randVal."_kmerScoreTest.tmp";
 	push(@kmerScoreTestFileList, $kmerFile);
-	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp, $outTmp);
+	#scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp, $outTmp);
+	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
     }
 
 
@@ -689,7 +740,7 @@ sub runRF
     # 5. Make the model on learning sequences and apply it on test sequences
     print "5. Make the model on learning sequences and apply it on test sequences\n";
 
-    &getRunModel($outModCodLearn, $outModNonLearn, $outModTest, $outFile);
+    &getRunModel($outModCodLearn, $outModNonLearn, $outModTest, $outFile, $thres);
 
     # Delete temporary files
     if($keepTmp == 0)
@@ -948,14 +999,6 @@ number of proc to be use for minidsk
 
 define the verbosity of the program
 
-=item $keepTmp
-
-if the temporary files need to be kept (0: delete; !0: keep)
-
-=item $outTmp
-
-temporary file output directory
-
 =back
 
 ##############################################################################
@@ -1074,7 +1117,7 @@ file to write the result of the random forest
 
 =item $kmerListString
 
-list of size of kmer as '2,3,4,5,6' (default value) as a string
+list of size of kmer as '1,2,3,4,5,6' (default value) as a string
 
 =item $thres
 
