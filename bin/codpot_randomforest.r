@@ -82,8 +82,6 @@ dat.featID  <- (2:(ncol(dat)-1))
 dat.labelID <- ncol(dat)
 
 
-cat("\tRunning 10-fold cross-validation on learning.\n")
-
 ## variables counting
 number_row   <- nrow(dat)
 chunk        <- list()
@@ -92,7 +90,7 @@ models       <- list()
 nb_cross_val <- 10
 
 ## Progress bar
-cat("\t10-fold cross-validation progress:\n")
+cat("\tRunning 10-fold cross-validation on learning:\n")
 progress <- txtProgressBar(1, nb_cross_val, style=3)
 setTxtProgressBar(progress, 0)
 
@@ -132,13 +130,14 @@ mean_Sn     <- mean(sapply(1:length(pred@predictions), function(i) { P@y.values[
 ## If no threshold, set the best one found with 10-fold cross-validation
 if(is.null(thres))
     {
-        cat("\t10-fold cross-validation step is finish. Best threshold found: '", thres, "'.\n", sep="")
         thres    <- mean_cutoff
         meanSens <- mean_Sn
+        cat("\t10-fold cross-validation step is finish. Best threshold found: '", thres, "'.\n", sep="")
     }
 
 ## Print in outStats the sensitivity, specificity, accuracy and precision
-cat("\tPrinting stats in '", outStats, "' the sensitivity, specificity, precision and accuracy obtain on learning data using threshold found with 10-fold cross-validation.\n", sep="")
+#cat("\tPrinting stats in '", outStats, "' the sensitivity, specificity, precision and accuracy obtain on learning data using threshold found with 10-fold cross-validation.\n", sep="")
+cat("\tPrinting stats found with the 10-fold cross-validation in '", outStats, "'.\n", sep="")
 
 res <- matrix(0, ncol=4, nrow=(nb_cross_val+1), dimnames=list(c((1:nb_cross_val),"mean"),c("sen","spe","pre","acc")))
 for(i in 1:nb_cross_val)
@@ -174,7 +173,7 @@ if(length(args) == 5)
 ##### BEGIN THE PLOT OF THE ROCR #####
 ######################################
 ## plot curve
-cat("\tTwo-graphs ROCR curves ploting in '", outROC, "'.\n", sep="")
+cat("\tTwo-graphs ROCR curves in '", outROC, "'.\n", sep="")
 png(outROC, h=800, w=800)
 par(cex.axis=1.2, cex.lab=1.2)
 
@@ -188,9 +187,6 @@ plot(P,lwd=2,avg="vertical",add=TRUE,col="red")
 ## Sn
 abline(h=meanSens,lty="dashed",lwd=0.5)
 text(x=0, y = meanSens, labels = round(meanSens, digits = 3), cex=1.5 )
-#text(x=meanSens, y=0, labels = round(meanSens, digits = 3), cex=1.5 )
-
-cat("\n\n", thres, "\t\t", meanSens, "\n\n")
 
 ## Cutoffs
 abline(v=thres,lty="dashed",lwd=0.5)
@@ -207,7 +203,7 @@ tt <- dev.off()
 
 
 ## Make the random forest model
-cat("\tMaking random forest model on '", codFile, "' and '", nonFile ,"' and apply it on '", testFile, "'.\n", sep="")
+cat("\tMaking random forest model on '", basename(codFile), "' and '", basename(nonFile), "' and apply it on '", basename(testFile), "'.\n", sep="")
 
 ## RF model
 dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=500)
@@ -254,12 +250,12 @@ dat.rf.test <- predict(dat.rf, testMat[,dat.featID], cutoff=c(1-thres, thres))
 ## res[dat.rf$test$votes[,2]>=thres] <- 1
 
 ## Write the output
-cat("\tWrite the coding label for '", testFile, "' in '", outFile, "'.\n", sep="")
+cat("\tWrite the coding label for '", basename(testFile), "' in '", outFile, "'.\n", sep="")
 ## write.table(x=cbind(testMat, label=res), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
 write.table(x=cbind(testMat, label=dat.rf.test), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
 
 ## Write the plot for variable importance
-cat("\tPlot the variable importance as measured by a random forest in '", outStats, "'.\n", sep="")
+cat("\tPlot the variable importance as measured by random forest in '", outStats, "'.\n", sep="")
 png(outVar, h=800, w=800)
 varImpPlot(dat.rf)
 tt <- dev.off()

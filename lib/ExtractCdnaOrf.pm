@@ -22,6 +22,204 @@ use Orf;
 
 
 # Return $typeOrf if there is an ORF extracted, -1 if no ORF found (regarding the parameters)
+sub getTypeOrf2
+{
+    my ($name, $seq, $str, $refOrf, $type, $kmerMax) = @_;
+    my $orfob0;
+    my $orfob1;
+    my $orfob2;
+    my $orfob4;
+    my $flag0 = 0;
+    my $flag1 = 0;
+    my $flag2 = 0;
+
+    return(-1) if($seq eq "");
+    # -- if the sequence is empty, return -1
+
+    $orfob0 = Orf::longestORF2($seq,$str, 0, 0, undef, 1);
+    $orfob1 = Orf::longestORF2($seq,$str, 0, 1, undef, 1);
+    $orfob2 = Orf::longestORF2($seq,$str, 1, 0, undef, 1);
+    $orfob4 = Orf::longestORF2($seq,$str, 1, 1, undef, 1);
+
+
+    if($orfob0->{'check_start'} && $orfob0->{'check_stop'} && (length($orfob0->{'cds_seq'}) >= (2*$kmerMax)))
+    {
+	$flag0 = 1;
+    }
+    if($orfob1->{'check_start'} && (length($orfob1->{'cds_seq'}) >= (2*$kmerMax)))
+    {
+	$flag1 = 1;
+    }
+    if($orfob2->{'check_stop'} && (length($orfob2->{'cds_seq'}) >= (2*$kmerMax)))
+    {
+	$flag2 = 1;
+    }
+
+
+    # Type 0
+    if($type==0 && $flag0==1)
+    {
+	$refOrf->{$name} = $orfob0->{'cds_seq'};
+	return(0);
+    }
+    elsif($type==0 && $flag0==0)
+    {
+	return(-1);
+    }
+
+    # Type 1
+    if($type==1)
+    {
+	if($flag0==1 && $flag1==1)
+	{
+	    if(length($orfob0->{'cds_seq'}) >= length($orfob1->{'cds_seq'}))
+	    {
+		$refOrf->{$name} = $orfob0->{'cds_seq'};
+		return(0);
+	    }
+	    else
+	    {
+		$refOrf->{$name} = $orfob1->{'cds_seq'};
+		return(1);
+	    }
+	}
+	elsif($flag0==1 && $flag1==0)
+	{
+	    $refOrf->{$name} = $orfob0->{'cds_seq'};
+	    return(0);
+	}
+	elsif($flag0==0 && $flag1==1)
+	{
+	    $refOrf->{$name} = $orfob1->{'cds_seq'};
+	    return(1);
+	}
+	else
+	{
+	    return(-1);
+	}
+    }
+
+    # Type 2
+    if($type==2)
+    {
+	if($flag0==1 && $flag2==1)
+	{
+	    if(length($orfob0->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
+	    {
+		$refOrf->{$name} = $orfob0->{'cds_seq'};
+		return(0);
+	    }
+	    else
+	    {
+		$refOrf->{$name} = $orfob2->{'cds_seq'};
+		return(2);
+	    }
+	}
+	elsif($flag0==1 && $flag2==0)
+	{
+	    $refOrf->{$name} = $orfob0->{'cds_seq'};
+	    return(0);
+	}
+	elsif($flag0==0 && $flag2==1)
+	{
+	    $refOrf->{$name} = $orfob2->{'cds_seq'};
+	    return(2);
+	}
+	else
+	{
+	    return(-1);
+	}
+    }
+
+
+    # Type 3
+    if($type==3)
+    {
+	if($flag0==1 && $flag1==1 && $flag2==1)
+	{
+	    if(length($orfob0->{'cds_seq'}) >= length($orfob1->{'cds_seq'}) && length($orfob0->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
+	    {
+		$refOrf->{$name} = $orfob0->{'cds_seq'};
+		return(0);
+	    }
+	    elsif(length($orfob0->{'cds_seq'}) <= length($orfob1->{'cds_seq'}) && length($orfob1->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
+	    {
+		$refOrf->{$name} = $orfob1->{'cds_seq'};
+		return(1);
+	    }
+	    else
+	    {
+		$refOrf->{$name} = $orfob2->{'cds_seq'};
+		return(2);
+	    }
+
+	}
+	elsif($flag0==1 && $flag1==1 && $flag2==0)
+	{
+	    if(length($orfob0->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
+	    {
+		$refOrf->{$name} = $orfob0->{'cds_seq'};
+		return(0);
+	    }
+	    else
+	    {
+		$refOrf->{$name} = $orfob1->{'cds_seq'};
+		return(1);
+	    }
+	}
+	elsif($flag0==1 && $flag1==0 && $flag2==1)
+	{
+	    if(length($orfob0->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
+	    {
+		$refOrf->{$name} = $orfob0->{'cds_seq'};
+		return(0);
+	    }
+	    else
+	    {
+		$refOrf->{$name} = $orfob2->{'cds_seq'};
+		return(2);
+	    }
+	}
+	elsif($flag0==0 && $flag1==1 && $flag2==1)
+	{
+	    if(length($orfob1->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
+	    {
+		$refOrf->{$name} = $orfob1->{'cds_seq'};
+		return(1);
+	    }
+	    else
+	    {
+		$refOrf->{$name} = $orfob2->{'cds_seq'};
+		return(2);
+	    }
+	}
+	elsif($flag0==1 && $flag1==0 && $flag2==0)
+	{
+	    $refOrf->{$name} = $orfob0->{'cds_seq'};
+	    return(0);
+	}
+	elsif($flag0==0 && $flag1==1 && $flag2==0)
+	{
+	    $refOrf->{$name} = $orfob1->{'cds_seq'};
+	    return(1);
+	}
+	elsif($flag0==0 && $flag1==0 && $flag2==1)
+	{
+		$refOrf->{$name} = $orfob2->{'cds_seq'};
+		return(2);
+	}
+	else
+	{
+	    return(-1);
+	}
+    }
+
+    return(-1);
+    # if no ORF found, return -1
+}
+
+
+# Return $typeOrf if there is an ORF extracted, -1 if no ORF found (regarding the parameters)
 sub getTypeOrf
 {
     my ($name, $seq, $str, $refOrf, $type, $kmerMax) = @_;
@@ -133,7 +331,7 @@ sub CreateORFcDNAFromGTF
 	if (! $containCDS )
 	{
 	    warn "\tYour input GTF file does not contain CDS information... the program will extract the longest one for each transcript...\n" if ($countseqok < 1 && $verbosity > 5);
-	    $orfFlag = &getTypeOrf($tr, $cdnaseq, $strand, \%h_orf, $orfType, $kmerMax);
+	    $orfFlag = &getTypeOrf2($tr, $cdnaseq, $strand, \%h_orf, $orfType, $kmerMax);
 
 	    # Print accordingly to getTypeOrf result
 	    if ($orfFlag != -1)
@@ -253,7 +451,7 @@ sub CreateORFcDNAFromFASTA
 
 	my $tr = $seq->id();
 
-	$orfFlag = &getTypeOrf($tr, $seq->seq(), $strand, \%h_orf, $orfType, $kmerMax);
+	$orfFlag = &getTypeOrf2($tr, $seq->seq(), $strand, \%h_orf, $orfType, $kmerMax);
 
 	# Print according to getTypeOrf result
 	if ($orfFlag != -1)
@@ -488,7 +686,7 @@ sub randomizedGTFtoFASTA{
 
 	    $id = $tx."_random_($chrrdm:$beg-$end)";
 	    # Get ORF sequence
-	    $orfFlag = &getTypeOrf($id, $seq, "+", \%h_orf_tmp, $orfType, $kmerMax);
+	    $orfFlag = &getTypeOrf2($id, $seq, "+", \%h_orf_tmp, $orfType, $kmerMax);
 	    $seqORF = $h_orf_tmp{$id};
 	}
 	# Write New random sequence
