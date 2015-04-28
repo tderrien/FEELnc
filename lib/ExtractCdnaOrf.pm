@@ -21,6 +21,45 @@ use Utils;
 use Orf;
 
 
+# Compare length of two or three orf objects and return the longest
+sub compOrfLen
+{
+    my ($obj1, $ty1, $obj2, $ty2, $obj3, $ty3) = @_;
+    $obj3 ||= undef;
+    $ty3  ||= undef;
+
+    die "Error compOrfLen: need at least two ORF object. Exit.\n" if( (! defined $obj1) || (! defined $ty1) || (! defined $obj2) || (! defined $ty2) );
+
+    if( (! defined $obj3) )
+    {
+	if($obj1->{'orflength'} >= $obj2->{'orflength'})
+	{
+	    return( ($obj1, $ty1) );
+	}
+	else
+	{
+	    return( ($obj2, $ty2) );
+	}
+    }
+    else
+    {
+	if($obj1->{'orflength'} >= $obj2->{'orflength'} && $obj1->{'orflength'} >= $obj3->{'orflength'})
+	{
+	    return( ($obj1, $ty1) );
+	}
+	elsif($obj2->{'orflength'} >= $obj1->{'orflength'} && $obj2->{'orflength'} >= $obj3->{'orflength'})
+	{
+	    return( ($obj2, $ty2) );
+	}
+	else
+	{
+	    return( ($obj3, $ty3) );
+	}
+    }
+
+    return( (undef, undef) );
+}
+
 # Return $typeOrf if there is an ORF extracted, -1 if no ORF found (regarding the parameters)
 sub getTypeOrf2
 {
@@ -29,59 +68,58 @@ sub getTypeOrf2
     my $orfob1;
     my $orfob2;
     my $orfob4;
+    my $best;
+    my $bestTy;
     my $flag0 = 0;
     my $flag1 = 0;
     my $flag2 = 0;
+    my $flag4 = 0;
 
     return(-1) if($seq eq "");
     # -- if the sequence is empty, return -1
 
-    $orfob0 = Orf::longestORF2($seq,$str, 0, 0, undef, 1);
-    $orfob1 = Orf::longestORF2($seq,$str, 0, 1, undef, 1);
-    $orfob2 = Orf::longestORF2($seq,$str, 1, 0, undef, 1);
-    $orfob4 = Orf::longestORF2($seq,$str, 1, 1, undef, 1);
-
-
-    if($orfob0->{'check_start'} && $orfob0->{'check_stop'} && (length($orfob0->{'cds_seq'}) >= (2*$kmerMax)))
-    {
-	$flag0 = 1;
-    }
-    if($orfob1->{'check_start'} && (length($orfob1->{'cds_seq'}) >= (2*$kmerMax)))
-    {
-	$flag1 = 1;
-    }
-    if($orfob2->{'check_stop'} && (length($orfob2->{'cds_seq'}) >= (2*$kmerMax)))
-    {
-	$flag2 = 1;
-    }
-
-
     # Type 0
-    if($type==0 && $flag0==1)
+    if($type==0)
     {
-	$refOrf->{$name} = $orfob0->{'cds_seq'};
-	return(0);
-    }
-    elsif($type==0 && $flag0==0)
-    {
-	return(-1);
+	$orfob0 = Orf::longestORF2($seq,$str, 0, 0, undef, 1);
+
+	if(defined $orfob0 && $orfob0->{'orflength'} >= 2*$kmerMax)
+	{
+	    $flag0 = 1;
+	}
+
+	if($flag0==1)
+	{
+
+	    $refOrf->{$name} = $orfob0->{'cds_seq'};
+	    return(0);
+	}
+	else
+	{
+	    return(-1);
+	}
     }
 
     # Type 1
     if($type==1)
     {
+	$orfob0 = Orf::longestORF2($seq,$str, 0, 0, undef, 1);
+	$orfob1 = Orf::longestORF2($seq,$str, 0, 1, undef, 1);
+
+	if(defined $orfob0 && $orfob0->{'orflength'} >= 2*$kmerMax)
+	{
+	    $flag0 = 1;
+	}
+	if(defined $orfob1 && $orfob1->{'orflength'} >= 2*$kmerMax)
+	{
+	    $flag1 = 1;
+	}
+
 	if($flag0==1 && $flag1==1)
 	{
-	    if(length($orfob0->{'cds_seq'}) >= length($orfob1->{'cds_seq'}))
-	    {
-		$refOrf->{$name} = $orfob0->{'cds_seq'};
-		return(0);
-	    }
-	    else
-	    {
-		$refOrf->{$name} = $orfob1->{'cds_seq'};
-		return(1);
-	    }
+	    ($best, $bestTy) = &compOrfLen($orfob0, 0, $orfob1, 1);
+	    $refOrf->{$name} = $best->{'cds_seq'};
+	    return($bestTy);
 	}
 	elsif($flag0==1 && $flag1==0)
 	{
@@ -102,18 +140,22 @@ sub getTypeOrf2
     # Type 2
     if($type==2)
     {
+	$orfob0 = Orf::longestORF2($seq,$str, 0, 0, undef, 1);
+	$orfob2 = Orf::longestORF2($seq,$str, 1, 0, undef, 1);
+	if(defined $orfob0 && $orfob0->{'orflength'} >= 2*$kmerMax)
+	{
+	    $flag0 = 1;
+	}
+	if(defined $orfob2 && $orfob2->{'orflength'} >= 2*$kmerMax)
+	{
+	    $flag2 = 1;
+	}
+
 	if($flag0==1 && $flag2==1)
 	{
-	    if(length($orfob0->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
-	    {
-		$refOrf->{$name} = $orfob0->{'cds_seq'};
-		return(0);
-	    }
-	    else
-	    {
-		$refOrf->{$name} = $orfob2->{'cds_seq'};
-		return(2);
-	    }
+	    ($best, $bestTy) = &compOrfLen($orfob0, 0, $orfob2, 2);
+	    $refOrf->{$name} = $best->{'cds_seq'};
+	    return($bestTy);
 	}
 	elsif($flag0==1 && $flag2==0)
 	{
@@ -131,67 +173,48 @@ sub getTypeOrf2
 	}
     }
 
-
-    # Type 3
-    if($type==3)
+    # Type 3 or 4
+    if($type==3 || $type==4)
     {
+	$orfob0 = Orf::longestORF2($seq,$str, 0, 0, undef, 1);
+	$orfob1 = Orf::longestORF2($seq,$str, 0, 1, undef, 1);
+	$orfob2 = Orf::longestORF2($seq,$str, 1, 0, undef, 1);
+	if(defined $orfob0 && $orfob0->{'orflength'} >= 2*$kmerMax)
+	{
+	    $flag0 = 1;
+	}
+	if(defined $orfob1 && $orfob1->{'orflength'} >= 2*$kmerMax)
+	{
+	    $flag1 = 1;
+	}
+	if(defined $orfob2 && $orfob2->{'orflength'} >= 2*$kmerMax)
+	{
+	    $flag2 = 1;
+	}
+
 	if($flag0==1 && $flag1==1 && $flag2==1)
 	{
-	    if(length($orfob0->{'cds_seq'}) >= length($orfob1->{'cds_seq'}) && length($orfob0->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
-	    {
-		$refOrf->{$name} = $orfob0->{'cds_seq'};
-		return(0);
-	    }
-	    elsif(length($orfob0->{'cds_seq'}) <= length($orfob1->{'cds_seq'}) && length($orfob1->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
-	    {
-		$refOrf->{$name} = $orfob1->{'cds_seq'};
-		return(1);
-	    }
-	    else
-	    {
-		$refOrf->{$name} = $orfob2->{'cds_seq'};
-		return(2);
-	    }
-
+	    ($best, $bestTy) = &compOrfLen($orfob0, 0, $orfob1, 1, $orfob2, 2);
+	    $refOrf->{$name} = $best->{'cds_seq'};
+	    return($bestTy);
 	}
 	elsif($flag0==1 && $flag1==1 && $flag2==0)
 	{
-	    if(length($orfob0->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
-	    {
-		$refOrf->{$name} = $orfob0->{'cds_seq'};
-		return(0);
-	    }
-	    else
-	    {
-		$refOrf->{$name} = $orfob1->{'cds_seq'};
-		return(1);
-	    }
+	    ($best, $bestTy) = &compOrfLen($orfob0, 0, $orfob1, 1);
+	    $refOrf->{$name} = $best->{'cds_seq'};
+	    return($bestTy);
 	}
 	elsif($flag0==1 && $flag1==0 && $flag2==1)
 	{
-	    if(length($orfob0->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
-	    {
-		$refOrf->{$name} = $orfob0->{'cds_seq'};
-		return(0);
-	    }
-	    else
-	    {
-		$refOrf->{$name} = $orfob2->{'cds_seq'};
-		return(2);
-	    }
+	    ($best, $bestTy) = &compOrfLen($orfob0, 0, $orfob2, 2);
+	    $refOrf->{$name} = $best->{'cds_seq'};
+	    return($bestTy);
 	}
 	elsif($flag0==0 && $flag1==1 && $flag2==1)
 	{
-	    if(length($orfob1->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
-	    {
-		$refOrf->{$name} = $orfob1->{'cds_seq'};
-		return(1);
-	    }
-	    else
-	    {
-		$refOrf->{$name} = $orfob2->{'cds_seq'};
-		return(2);
-	    }
+	    ($best, $bestTy) = &compOrfLen($orfob1, 1, $orfob2, 2);
+	    $refOrf->{$name} = $best->{'cds_seq'};
+	    return($bestTy);
 	}
 	elsif($flag0==1 && $flag1==0 && $flag2==0)
 	{
@@ -205,8 +228,28 @@ sub getTypeOrf2
 	}
 	elsif($flag0==0 && $flag1==0 && $flag2==1)
 	{
-		$refOrf->{$name} = $orfob2->{'cds_seq'};
-		return(2);
+	    $refOrf->{$name} = $orfob2->{'cds_seq'};
+	    return(2);
+	}
+	elsif($type==3 && $flag0==0 && $flag1==0 && $flag2==0)
+	{
+	    return(-1);
+	}
+    }
+
+    # Type 4
+    if($type==4)
+    {
+	$orfob4 = Orf::longestORF2($seq,$str, 1, 1, undef, 1);
+	if(defined $orfob4 && $orfob4->{'orflength'} >= 2*$kmerMax)
+	{
+	    $flag4 = 1;
+	}
+
+	if($flag4==1)
+	{
+	    $refOrf->{$name} = $orfob4->{'cds_seq'};
+	    return(4);
 	}
 	else
 	{
@@ -215,8 +258,205 @@ sub getTypeOrf2
     }
 
     return(-1);
-    # if no ORF found, return -1
 }
+
+
+# # Return $typeOrf if there is an ORF extracted, -1 if no ORF found (regarding the parameters)
+# sub getTypeOrf2
+# {
+#     my ($name, $seq, $str, $refOrf, $type, $kmerMax) = @_;
+#     my $orfob0;
+#     my $orfob1;
+#     my $orfob2;
+#     my $orfob4;
+#     my $flag0 = 0;
+#     my $flag1 = 0;
+#     my $flag2 = 0;
+
+#     return(-1) if($seq eq "");
+#     # -- if the sequence is empty, return -1
+
+#     $orfob0 = Orf::longestORF2($seq,$str, 0, 0, undef, 1);
+#     $orfob1 = Orf::longestORF2($seq,$str, 0, 1, undef, 1);
+#     $orfob2 = Orf::longestORF2($seq,$str, 1, 0, undef, 1);
+#     $orfob4 = Orf::longestORF2($seq,$str, 1, 1, undef, 1);
+
+
+#     if($orfob0->{'check_start'} && $orfob0->{'check_stop'} && (length($orfob0->{'cds_seq'}) >= (2*$kmerMax)))
+#     {
+# 	$flag0 = 1;
+#     }
+#     if($orfob1->{'check_start'} && (length($orfob1->{'cds_seq'}) >= (2*$kmerMax)))
+#     {
+# 	$flag1 = 1;
+#     }
+#     if($orfob2->{'check_stop'} && (length($orfob2->{'cds_seq'}) >= (2*$kmerMax)))
+#     {
+# 	$flag2 = 1;
+#     }
+
+
+#     # Type 0
+#     if($type==0 && $flag0==1)
+#     {
+# 	$refOrf->{$name} = $orfob0->{'cds_seq'};
+# 	return(0);
+#     }
+#     elsif($type==0 && $flag0==0)
+#     {
+# 	return(-1);
+#     }
+
+#     # Type 1
+#     if($type==1)
+#     {
+# 	if($flag0==1 && $flag1==1)
+# 	{
+# 	    if(length($orfob0->{'cds_seq'}) >= length($orfob1->{'cds_seq'}))
+# 	    {
+# 		$refOrf->{$name} = $orfob0->{'cds_seq'};
+# 		return(0);
+# 	    }
+# 	    else
+# 	    {
+# 		$refOrf->{$name} = $orfob1->{'cds_seq'};
+# 		return(1);
+# 	    }
+# 	}
+# 	elsif($flag0==1 && $flag1==0)
+# 	{
+# 	    $refOrf->{$name} = $orfob0->{'cds_seq'};
+# 	    return(0);
+# 	}
+# 	elsif($flag0==0 && $flag1==1)
+# 	{
+# 	    $refOrf->{$name} = $orfob1->{'cds_seq'};
+# 	    return(1);
+# 	}
+# 	else
+# 	{
+# 	    return(-1);
+# 	}
+#     }
+
+#     # Type 2
+#     if($type==2)
+#     {
+# 	if($flag0==1 && $flag2==1)
+# 	{
+# 	    if(length($orfob0->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
+# 	    {
+# 		$refOrf->{$name} = $orfob0->{'cds_seq'};
+# 		return(0);
+# 	    }
+# 	    else
+# 	    {
+# 		$refOrf->{$name} = $orfob2->{'cds_seq'};
+# 		return(2);
+# 	    }
+# 	}
+# 	elsif($flag0==1 && $flag2==0)
+# 	{
+# 	    $refOrf->{$name} = $orfob0->{'cds_seq'};
+# 	    return(0);
+# 	}
+# 	elsif($flag0==0 && $flag2==1)
+# 	{
+# 	    $refOrf->{$name} = $orfob2->{'cds_seq'};
+# 	    return(2);
+# 	}
+# 	else
+# 	{
+# 	    return(-1);
+# 	}
+#     }
+
+
+#     # Type 3
+#     if($type==3)
+#     {
+# 	if($flag0==1 && $flag1==1 && $flag2==1)
+# 	{
+# 	    if(length($orfob0->{'cds_seq'}) >= length($orfob1->{'cds_seq'}) && length($orfob0->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
+# 	    {
+# 		$refOrf->{$name} = $orfob0->{'cds_seq'};
+# 		return(0);
+# 	    }
+# 	    elsif(length($orfob0->{'cds_seq'}) <= length($orfob1->{'cds_seq'}) && length($orfob1->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
+# 	    {
+# 		$refOrf->{$name} = $orfob1->{'cds_seq'};
+# 		return(1);
+# 	    }
+# 	    else
+# 	    {
+# 		$refOrf->{$name} = $orfob2->{'cds_seq'};
+# 		return(2);
+# 	    }
+
+# 	}
+# 	elsif($flag0==1 && $flag1==1 && $flag2==0)
+# 	{
+# 	    if(length($orfob0->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
+# 	    {
+# 		$refOrf->{$name} = $orfob0->{'cds_seq'};
+# 		return(0);
+# 	    }
+# 	    else
+# 	    {
+# 		$refOrf->{$name} = $orfob1->{'cds_seq'};
+# 		return(1);
+# 	    }
+# 	}
+# 	elsif($flag0==1 && $flag1==0 && $flag2==1)
+# 	{
+# 	    if(length($orfob0->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
+# 	    {
+# 		$refOrf->{$name} = $orfob0->{'cds_seq'};
+# 		return(0);
+# 	    }
+# 	    else
+# 	    {
+# 		$refOrf->{$name} = $orfob2->{'cds_seq'};
+# 		return(2);
+# 	    }
+# 	}
+# 	elsif($flag0==0 && $flag1==1 && $flag2==1)
+# 	{
+# 	    if(length($orfob1->{'cds_seq'}) >= length($orfob2->{'cds_seq'}))
+# 	    {
+# 		$refOrf->{$name} = $orfob1->{'cds_seq'};
+# 		return(1);
+# 	    }
+# 	    else
+# 	    {
+# 		$refOrf->{$name} = $orfob2->{'cds_seq'};
+# 		return(2);
+# 	    }
+# 	}
+# 	elsif($flag0==1 && $flag1==0 && $flag2==0)
+# 	{
+# 	    $refOrf->{$name} = $orfob0->{'cds_seq'};
+# 	    return(0);
+# 	}
+# 	elsif($flag0==0 && $flag1==1 && $flag2==0)
+# 	{
+# 	    $refOrf->{$name} = $orfob1->{'cds_seq'};
+# 	    return(1);
+# 	}
+# 	elsif($flag0==0 && $flag1==0 && $flag2==1)
+# 	{
+# 		$refOrf->{$name} = $orfob2->{'cds_seq'};
+# 		return(2);
+# 	}
+# 	else
+# 	{
+# 	    return(-1);
+# 	}
+#     }
+
+#     return(-1);
+#     # if no ORF found, return -1
+# }
 
 
 # Return $typeOrf if there is an ORF extracted, -1 if no ORF found (regarding the parameters)

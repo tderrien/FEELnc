@@ -203,7 +203,7 @@ tt <- dev.off()
 
 
 ## Make the random forest model
-cat("\tMaking random forest model on '", basename(codFile), "' and '", basename(nonFile), "' and apply it on '", basename(testFile), "'.\n", sep="")
+cat("\tMaking random forest model on '", basename(codFile), "' and '", basename(nonFile), "' and apply it to '", basename(testFile), "'.\n", sep="")
 
 ## RF model
 dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=500)

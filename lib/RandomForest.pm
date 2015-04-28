@@ -839,6 +839,7 @@ sub rfPredToOut
 	# Read the GTF file and put the line in the right file depending on which tab the transcript is
 	my $outNon = $outDir.basename($testFile).".lncRNA.gtf";
 	my $outCod = $outDir.basename($testFile).".mRNA.gtf";
+	my $noOrf  = $outDir.basename($testFile).".noORF.gtf";
 	my $line   = "";
 	my $name   = "";
 
@@ -846,6 +847,7 @@ sub rfPredToOut
 	open FILE,  "$testFile" or die "Error! Cannot access to the GTF input for new transcripts '". $testFile . "': ".$!;
 	open LNC, "> $outNon"   or die "Error! Cannot access to the lncRNA GTF output file '". $outNon . "': ".$!;
 	open RNA, "> $outCod"   or die "Error! Cannot access to the mRNA GTF output file '". $outCod . "': ".$!;
+	open NO,  "> $noOrf"    or die "Error! Cannot access to the no ORF GTF output file '". $noOrf . "': ".$!;
 
 	while(<FILE>)
 	{
@@ -864,23 +866,26 @@ sub rfPredToOut
 	    }
 	    else
 	    {
-		warn "Warning: $name is not in the random forest output file...\n";
+		print NO $line;
 	    }
 	}
 	close FILE;
 	close LNC;
 	close RNA;
+	close NO;
     }
     else # if FASTA format
     {
 	# Read the FASTA file and put the line in the right file depending on which tab the transcript is
 	my $outNon = $outDir.basename($testFile).".lncRNA.fa";
 	my $outCod = $outDir.basename($testFile).".mRNA.fa";
+	my $noOrf  = $outDir.basename($testFile).".noORF.fa";
 
 	print "Writing the two FASTA output files: '$outNon' and '$outCod'\n";
 	my $multiFasta = new Bio::SeqIO(-file  => "$testFile", '-format' => 'Fasta');
 	my $lnc        = new Bio::SeqIO(-file => "> $outNon" , '-format' => 'Fasta');
 	my $rna        = new Bio::SeqIO(-file => "> $outCod" , '-format' => 'Fasta');
+	my $noorf      = new Bio::SeqIO(-file => "> $noOrf" ,  '-format' => 'Fasta');
 
 	my @seqTab;
 	my $seq;
@@ -897,7 +902,7 @@ sub rfPredToOut
 	    }
 	    else
 	    {
-		warn "Warning: $seq->id() is not in the random forest output file...\n";
+		$noorf->write_seq($seq);
 	    }
 	}
     }

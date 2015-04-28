@@ -363,10 +363,10 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
   -s,--sizeinter=0.75			Ratio between mRNA sequence lengths and non coding intergenic region sequence lengths as, by default, ncInter = mRNA * 0.75
   --learnorftype=0			Integer [0,1,2,3,4] to specify the type of longest ORF calculate (default: 0) for learning data set.
 					If the CDS is annotated in the .GTF, then the CDS is considered as the longest ORF, whatever the --orftype value.
-						'0': only ORF with start and stop codon;
-						'1': same as '0' and if no ORF found, take the longest with a start codon;
+						'0': ORF with start and stop codon;
+						'1': same as '0' and ORF with only a strat codon, take the longest;
 						'2': same as '1' but with a stop codon;
-						'3': same as '0' and if no ORF found, take the longest between ORF with start or stop codon (see '1' and '2');
+						'3': same as '0' and ORF with a start or a stop, take the longest (see '1' and '2');
 						'4': same as '3' but if no ORF is found, take the input sequence as ORF.
   --testorftype=3			Integer [0,1,2,3,4] to specify the type of longest ORF calculate (default: 3) for test data set. See --learnortype description for more informations.
   --keeptmp=0				To keep the temporary files in a 'tmp' directory the outdir, by default don't keep it (0 value). Any other value than 0 will keep the temporary files
