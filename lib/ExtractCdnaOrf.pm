@@ -578,8 +578,8 @@ sub CreateORFcDNAFromGTF
 	    {
 		# Get the sequence only if an ORF is found
 		$h_cdna{$tr} = $cdnaseq;
-		print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$nbtx...\r" if( defined $nbtx);
-		print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"...\r"       if(!defined $nbtx);
+		print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$nbtx...\r"                 if( defined $nbtx);
+		print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/".keys(%{$refmrna})."...\r" if(!defined $nbtx);
 	    }
 	    else
 	    {
@@ -596,8 +596,8 @@ sub CreateORFcDNAFromGTF
 	    $orfob        = Orf::orfSeq2orfOb($orfseq, $strand, $verbosity);
 	    $h_orf{$tr}   = $orfob->{'cds_seq'};
 	    $h_cdna{$tr}  = $cdnaseq;
-	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$nbtx...\r" if( defined $nbtx);
-	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"...\r"       if(!defined $nbtx);
+	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$nbtx...\r"                 if( defined $nbtx);
+	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/".keys(%{$refmrna})."...\r" if(!defined $nbtx);
 	}
 
 	if (defined $nbtx && $countseqok == $nbtx) # Check for transcript extraction limit
@@ -698,8 +698,8 @@ sub CreateORFcDNAFromFASTA
 	{
 	    # Add cDNA only if an ORF is found
 	    $h_cdna{$tr} = $seq->seq();
-	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$nbtx...\r" if( defined $nbtx);
-	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"...\r"       if(!defined $nbtx);
+	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$nbtx...\r"  if( defined $nbtx);
+	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$nbseq...\r" if(!defined $nbtx);
 	}
 	else
 	{
@@ -932,8 +932,8 @@ sub randomizedGTFtoFASTA{
 	# Write New random sequence
 	$h_cdna_rdm{$id} = $seq;
 	$h_orf{$id}      = $seqORF;
-	print STDERR "\tExtracting ORFs&cDNAs with random coordinate ", $cptok++,"/$nbtx...\r" if( defined  $nbtx);
-	print STDERR "\tExtracting ORFs&cDNAs with random coordinate ", $cptok++,"...\r"       if( !defined $nbtx);
+	print STDERR "\tExtracting ORFs&cDNAs with random coordinate ", $cptok++,"/$nbtx...\r"                      if( defined  $nbtx);
+	print STDERR "\tExtracting ORFs&cDNAs with random coordinate ", $cptok++,"/".keys(%{$refannotsize})."...\r" if( !defined $nbtx);
 
 	# verbosity
 	$i++;
