@@ -263,11 +263,11 @@ sub longestORF2{
 
 	if($rest != 0)
 	{
-	    if($checkstart && !$checkstop)
+	    if(check_start_codon_dna($bestorf))
 	    {
 		$bestorf = substr($bestorf, 0, -$rest);
 	    }
-	    elsif(!$checkstart && $checkstop)
+	    elsif(check_stop_codon_dna($bestorf))
 	    {
 		$bestorf = substr($bestorf, $rest);
 	    }
@@ -358,6 +358,18 @@ sub check_start_codon{
 	}
 }
 
+# Function that takes a dna sequence and
+# return 1 if sequence start with ATG, 0 otherwise
+sub check_start_codon_dna{
+	my ($seqdna) = @_;
+
+	if ($seqdna ne "" && $seqdna=~m/^atg/gi){
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
 
 # Function that takes a protein sequence and
 # return 1 if sequence stop with *, 0 otherwise
@@ -365,6 +377,18 @@ sub check_stop_codon{
 	my ($seqprot) = @_;
 
 	if ($seqprot ne "" && $seqprot =~m/\*$/){
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+# Function that takes a dna sequence and
+# return 1 if sequence stop with taa|tga|tag, 0 otherwise
+sub check_stop_codon_dna{
+	my ($seqdna) = @_;
+
+	if ($seqdna ne "" && $seqdna =~m/taa|tga|tag$/gi){
 		return 1;
 	} else {
 		return 0;
