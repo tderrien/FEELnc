@@ -604,7 +604,6 @@ sub getRunModel
 
 
     # Get the path to RSCRIPT_RF.R to run the learning and assignment of the sequences
-    print "\tRunning codpot_randomforest.r.\n";
     my $rprogpath = $ENV{'FEELNCPATH'}."/bin/codpot_randomforest.r";
     my $cmd       = "";
 
