@@ -263,7 +263,14 @@ sub longestORF2{
 
 	if($rest != 0)
 	{
-	    $bestorf = substr($bestorf, 0, -$rest);
+	    if($checkstart && !$checkstop)
+	    {
+		$bestorf = substr($bestorf, 0, -$rest);
+	    }
+	    elsif(!$checkstart && $checkstop)
+	    {
+		$bestorf = substr($bestorf, $rest);
+	    }
 	}
 
 	# Get translation
