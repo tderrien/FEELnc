@@ -604,7 +604,7 @@ sub getRunModel
 
 
     # Get the path to RSCRIPT_RF.R to run the learning and assignment of the sequences
-    my $rprogpath = $ENV{'FEELNCPATH'}."/bin/codpot_randomforest.r";
+    my $rprogpath = $ENV{'FEELNCPATH'}."/utils/codpot_randomforest.r";
     my $cmd       = "";
 
     # test for a valid value for the threshold is done in FEELnc_codpot.pl
