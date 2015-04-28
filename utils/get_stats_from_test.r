@@ -20,13 +20,21 @@ if(length(args)!=2)
 testFile <- args[1]
 rfFile   <- args[2]
 
-## Include the tools package to get file with no extension
-library(tools)
-
 matTest <- read.table(file=testFile, header=TRUE, sep="\t")
 matRf   <- read.table(file=rfFile,   header=TRUE, sep="\t")
 
-labTest <- matTest[,ncol(matTest)]
+rownames(matTest) <- matTest[,1]
+rownames(matRf)   <- matRf[,1]
+
+test.namesSort <- sort(as.character(matTest[,1]))
+rf.namesSort   <- sort(as.character(matRf[,1]))
+
+matTest <- matTest[test.namesSort,]
+matRf   <- matRf[rf.namesSort,]
+
+checkIn <- rownames(matTest) %in% rownames(matRf)
+
+labTest <- matTest[checkIn,ncol(matTest)]
 labRf   <- matRf[,ncol(matRf)]
 
 cont <- table(test = labTest, randomForest=labRf)
@@ -40,5 +48,6 @@ spe <- tn / (fp+tn)
 pre <- tp / (tp+fp)
 acc <- (tp+tn) / sum(cont)
 
-cat("Contingency:\n", cont, "\n", sep="")
-cat("Stats:\n\tsensibility\t", sen, "\n\tspecificity\t", spe, "\n\tprecision\t", pre, "\n\taccuracy\t", acc, "\n", sep="")
+cat("Contingency:\n")
+print(cont)
+cat("Stats:\nsensibility\t", sen, "\nspecificity\t", spe, "\nprecision\t", pre, "\naccuracy\t", acc, "\n", sep="")
