@@ -851,10 +851,7 @@ sub randomizedGTFtoFASTA{
     my $orfFlag = 0; # to get the type of ORF
     my $cptok   = 0; # to get the number of extracted sequence
 
-    if(defined $seed)
-    {
-    	srand($seed); # the seed is initiated to have reproducibility
-    }
+    srand($seed); # the seed is initiated to have reproducibility
 
   TX:
     foreach my $tx (sort keys %{$refannotsize}){ # sort for reproducibility
@@ -887,9 +884,6 @@ sub randomizedGTFtoFASTA{
 		next TX;
 	    }
 
-	    # my $seed = $i+$countTries; # the seed is initiated accroding to the $i (tx) and the nb of try... if only $i, the same chr:pos will be returned...
-	    # # Initialize srand foreach tx
-	    # srand($seed);
 	    # define a rand indice for all chr hash
 	    my $randindex = int( rand(scalar keys %{$refgenomesize}) );
 	    my @chrrdm    = sort keys(%{$refgenomesize}); # sort hash for reproducibility
