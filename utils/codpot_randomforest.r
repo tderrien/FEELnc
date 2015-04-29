@@ -17,25 +17,26 @@ codFile  <- args[1]
 nonFile  <- args[2]
 testFile <- args[3]
 outFile  <- args[4]
+numberT  <- as.numeric(args[5])
 outVar   <- paste(file_path_sans_ext(outFile), "_varImpPlot.png", sep="")
 outROC   <- paste(file_path_sans_ext(outFile), "_TGROC.png", sep="")
 outStats <- paste(file_path_sans_ext(outFile), "_stats.txt", sep="")
 list.of.packages <- c("ROCR","randomForest")
 
-## If number of argument == 4 then the threshold is not set, need to run 10-cross fold-validation
+## If number of argument == 5 then the threshold is not set, need to run 10-cross fold-validation
 ## and the packages randomForest and ROCR is needed
-if(length(args) == 4)
+if(length(args) == 5)
     {
         thres <- NULL
-    } else if(length(args) == 5)
-## If number of argument == 5 then the threshold is set
+    } else if(length(args) == 6)
+## If number of argument == 6 then the threshold is set
 ## and only the library randomForest is needed
     {
-        thres <- as.numeric(args[5])
+        thres <- as.numeric(args[6])
     } else
 ## Else the number of arguments is not good
     {
-        cat("Error: the number of argument pass to codpot_randomforest.r is wrong:\nUsing 10-fold cross-validation:\tcodpot_randomforest.r inCoding inNonCoding testFile outFile\nUsing a pre-defined threshold:\tcodpot_randomforest.r inCoding inNonCoding testFile outFile threshold\nQuit\n")
+        cat("Error: the number of argument pass to codpot_randomforest.r is wrong:\nUsing 10-fold cross-validation:\tcodpot_randomforest.r inCoding inNonCoding testFile outFile nTree\nUsing a pre-defined threshold:\tcodpot_randomforest.r inCoding inNonCoding testFile outFile nTree threshold\nQuit\n")
         quit()
     }
 
@@ -103,7 +104,7 @@ for (n in 1:nb_cross_val)
         ## Train the random forest model with (nb_cross_val-1) chunks and predict the value for the test dat set
         models[[n]] <- randomForest(    x=dat[-chunk[[n]], dat.featID],    y=as.factor(dat[-chunk[[n]], dat.labelID]),
                                     xtest=dat[chunk[[n]], dat.featID], ytest=as.factor(dat[chunk[[n]], dat.labelID]),
-                                    ntree=500)
+                                    ntree=numberT)
 
         ## Output results in list output
         output[[n]] <- as.data.frame(cbind(dat[chunk[[n]], dat.featID], "Label"=dat[chunk[[n]], dat.labelID], "Prob"=models[[n]]$test$votes[,2], "Pred"=models[[n]]$test$predicted))
@@ -206,7 +207,7 @@ tt <- dev.off()
 cat("\tMaking random forest model on '", basename(codFile), "' and '", basename(nonFile), "' and apply it to '", basename(testFile), "'.\n", sep="")
 
 ## RF model
-dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=500)
+dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=numberT)
 
 ## ## Prediction on learning data
 ## dat.rf.learn <- predict(dat.rf, dat[,dat.featID], cutoff=c(1-thres, thres))

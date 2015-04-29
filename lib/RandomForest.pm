@@ -111,8 +111,8 @@ sub getKmerRatio
     my $minidskPath = Utils::pathProg("minidsk");
     my $cmd = "";
     # Temporary files to put kmer counting for ORF coding genes and non coding genes
-    my $codOut = $outTmp."cod_".$kmerSize."_".$randVal.".tmp";
-    my $nonOut = $outTmp."non_".$kmerSize."_".$randVal.".tmp";
+    my $codOut = $outTmp."kmerCounting_coding_".basename($codFile).$kmerSize."_".$randVal.".tmp";
+    my $nonOut = $outTmp."kmerCounting_nonCoding_".basename($nonFile).$kmerSize."_".$randVal.".tmp";
 
     # Run minidsk on ORF for coding genes
     print "\tRunning minidsk on '$codFile'.\n" if($verbosity >= 5);
@@ -582,14 +582,16 @@ sub getSizeFastaFile
 #	$testFile     = file where the kmerscores, mRNA and ORF size are put for test sequences
 #	$outFile      = file to write the result of the random forest
 #	$thres        = if a valid value is given ([0,1]) then it would be the threshold for the random forest as val>=$thres => coding, if undef then the threshold is obtain by 10-fold cross validation
+#	$nTree           = number of trees used in random forest
 sub getRunModel
 {
-    my ($codLearnFile, $nonLearnFile, $testFile, $outFile, $thres) = @_;
+    my ($codLearnFile, $nonLearnFile, $testFile, $outFile, $thres, $nTree) = @_;
     $codLearnFile ||= undef;
     $nonLearnFile ||= undef;
     $testFile     ||= undef;
     $outFile      ||= undef;
     $thres        ||= undef;
+    $nTree        ||= 500;
 
     # Check if mendatory arguments have been given
     die "Running random forest: predictor file for learning coding sequences is not defined... exiting\n"     if(!defined $codLearnFile);
@@ -612,13 +614,13 @@ sub getRunModel
     {
 	# If no threshold given, run codpot_randomforest.r without threshold (4 arguments)
 	print "\tThe threshold for the voting in random forest is not defined. Use 10-fold cross-validation to determine the best threshold.\n";
-	$cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile";
+	$cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile $nTree";
     }
     else
     {
 	# If a threshold is given, run codpot_randomforest.r with this threshold (5 arguments)
 	print "\tThe threshold for the voting in random forest is '$thres'.\n";
-	$cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile $thres";
+	$cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile $nTree $thres";
     }
     system($cmd);
     #print "LA COMMANDE : $cmd\n";
@@ -635,11 +637,12 @@ sub getRunModel
 #	$outFile         = file to write the result of the random forest
 #	$kmerListString  = list of size of kmer as '1,2,3,4,5,6' (default value) as string
 #	$thres           = the threshold for the random forest, if it is not defined then it is set using a 10-fold cross-validation on learning data
+#	$nTree           = number of trees used in random forest
 #	$verbosity       = value for level of verbosity
 #	$keepTmp         = keep or not the temporary files
 sub runRF
 {
-    my ($codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $outDir, $verbosity, $keepTmp) = @_;
+    my ($codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $nTree, $outDir, $verbosity, $keepTmp) = @_;
     $kmerListString ||= "1,2,3,4,5,6";
     $verbosity      ||= 0;
 
@@ -739,7 +742,7 @@ sub runRF
     # 5. Make the model on learning sequences and apply it on test sequences
     print "5. Make the model on learning sequences and apply it on test sequences\n";
 
-    &getRunModel($outModCodLearn, $outModNonLearn, $outModTest, $outFile, $thres);
+    &getRunModel($outModCodLearn, $outModNonLearn, $outModTest, $outFile, $thres, $nTree);
 
     # Delete temporary files
     if($keepTmp == 0)
@@ -780,13 +783,15 @@ sub runRF
 # With a .gtf and a result file from a random forest, write 2 .gtf file, each one respectively for coding and non coding genes
 #	$testGTF = the GTF file of the unknown transcripts
 #	$reFile  = the output file from the random forest giving ranscripts class (0: non coding; 1: coding)
-#	$outDir  = ouptu directory
+#	$outDir  = ouptut directory
 sub rfPredToOut
 {
-    my($testFile, $rfFile, $outDir) = @_;
+    my($testFile, $rfFile, $outDir, $outName) = @_;
     $testFile ||= undef;
     $rfFile   ||= undef;
     $outDir   ||= undef;
+    $outName  ||= basename($testFile);
+
 
     # Check if mendatory arguments have been given
     die "Parsing random forest output: GTF file with the new transcripts is not defined... exiting\n" if(!defined $testFile);
@@ -837,9 +842,9 @@ sub rfPredToOut
     if(Utils::guess_format($testFile) eq "gtf")
     {
 	# Read the GTF file and put the line in the right file depending on which tab the transcript is
-	my $outNon = $outDir.basename($testFile).".lncRNA.gtf";
-	my $outCod = $outDir.basename($testFile).".mRNA.gtf";
-	my $noOrf  = $outDir.basename($testFile).".noORF.gtf";
+	my $outNon = $outDir.$outName.".lncRNA.gtf";
+	my $outCod = $outDir.$outName.".mRNA.gtf";
+	my $noOrf  = $outDir.$outName.".noORF.gtf";
 	my $line   = "";
 	my $name   = "";
 
@@ -1081,6 +1086,10 @@ file where the kmerscores, mRNA and ORF size are put for test sequences
 
 if it is given, the threshold for random forest (>$thres = coding), if undef then the threshold is obtain by 10-fold cross validation
 
+=item $nTree
+
+the number of trees used in random forest
+
 =back
 
 ##############################################################################
@@ -1127,6 +1136,10 @@ list of size of kmer as '1,2,3,4,5,6' (default value) as a string
 
 the threshold for the random forest, if it is not defined then it is set using a 10-fold cross-validation on learning data
 
+=item $nTree
+
+the number of trees used in random forest
+
 =item $outDir
 
 output directory
@@ -1160,6 +1173,10 @@ the output file from the random forest giving ranscripts class (0: non coding; 1
 =item $outDir
 
 output directory
+
+=item $outName
+
+output name
 
 =back
 

@@ -43,10 +43,10 @@ my $help       = 0;
 my $verbosity  = 0;
 # my $outputlog;
 my $numtx    = 3000;	# number of tx for training
-my $minnumtx = 100;	# Min number of tx for training (a too small value will result in a bad regression)
+my $minnumtx = 100;	# Min number of tx for training (a too small value will result in a bad learning)
 
 
-# VW Add a variable to get the kmer size which are used to calculat the kmer scores
+# VW Add a variable to get the kmer size which are used to get the kmer scores
 my $kmerList = '1,2,3,4,5,6';
 
 # VW Add a variable to keep tmp file, default don't keep
@@ -59,8 +59,12 @@ my $rfcut = undef;
 my $orfTypeLearn = 1;
 my $orfTypeTest  = 3;
 
-# VW Add an option to specify the output directory, default current directory
-my $outDir = "./";
+# VW Add an option to specify the output directory, default current directoryand an out name
+my $outDir  = "./";
+my $outName = "";
+
+# VW Add an option to change the number of trees use in random forest
+my $nTree = 500;
 
 # Intergenic extraction:
 my $maxTries   = 10;
@@ -81,7 +85,9 @@ GetOptions(
     's|sizeinter=f'  => \$sizecorrec,
     'learnorftype=i' => \$orfTypeLearn,
     'testorftype=i'  => \$orfTypeTest,
-    'o|outdir=s'     => \$outDir,
+    'ntree=i'        => \$nTree,
+    'outdir=s'       => \$outDir,
+    'o|outname=s'    => \$outName,
     'keeptmp'        => \$keepTmp,
     'v|verbosity=i'  => \$verbosity,
     'help|?'         => \$help,
@@ -104,6 +110,7 @@ pod2usage ("- Error: \$sizecorrec option (ratio between mRNAs sequence lenghts a
 pod2usage ("- Error: \$orfTypeLearn option '$orfTypeLearn' should be equal to 0, 1, 2, 3 or 4 (see 'FEELnc_codpot.pl --help' for more information) \n") unless ($orfTypeLearn==0 || $orfTypeLearn==1 || $orfTypeLearn==2 || $orfTypeLearn==3 || $orfTypeLearn==4);
 pod2usage ("- Error: \$orfTypeTest option '$orfTypeTest' should be equal to 0, 1, 2, 3 or 4 (see 'FEELnc_codpot.pl --help' for more information) \n") unless ($orfTypeTest==0 || $orfTypeTest==1 || $orfTypeTest==2 || $orfTypeTest==3 || $orfTypeTest==4);
 pod2usage ("- Error: \$outDir option '$outDir' is not a directory or it does not exist \n") unless (-d $outDir);
+pod2usage ("- Error: \$nTree option '$nTree' should be strictly positive\n") unless ($nTree > 0);
 
 
 # Check the max kmersize
@@ -112,6 +119,11 @@ my $kmerMax   = max @kmerTable;
 pod2usage ("- Error: \$kmerList option '$kmerList' is not valid. One of the size is stricly greater than '15' (see --help for more details). \n") unless ($kmerMax <= 15);
 
 
+# Default option for $outName
+if(!defined $outName)
+{
+    my $outName=basename($infile);
+}
 
 # For $outDiradd a '/' at the end of the path
 $outDir = $outDir."/";
@@ -181,7 +193,7 @@ my $testFile    = $outTmp.Utils::renamefile($infile, ".test.fa");
 my $testOrfFile = $outTmp.Utils::renamefile($infile, ".testOrf.fa");
 
 # Define output name
-my $rfout = $outDir.basename($infile)."_RF.txt";
+my $rfout = $outDir.$outName."_RF.txt";
 
 
 ##########################################################
@@ -290,10 +302,10 @@ else
 # Launch RF on $infile in fasta
 
 print STDERR "> Run random Forest on '$testFile':\n";
-RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $outDir, $verbosity, $keepTmp);
+RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $keepTmp);
 
 # Parse RF result
-RandomForest::rfPredToOut($infile, $rfout, $outDir);
+RandomForest::rfPredToOut($infile, $rfout, $outDir, $outName);
 
 
 # Cleaning temporary files
@@ -369,6 +381,8 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
 						'3': same as '0' and ORF with a start or a stop, take the longest (see '1' and '2');
 						'4': same as '3' but if no ORF is found, take the input sequence as ORF.
   --testorftype=3			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 3 ] for test data set. See --learnortype description for more informations.
+  --ntree				Number of trees used in random forest [ default 500 ]
+
   --keeptmp=0				To keep the temporary files in a 'tmp' directory the outdir, by default don't keep it (0 value). Any other value than 0 will keep the temporary files
 
 

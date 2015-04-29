@@ -37,7 +37,7 @@ checkIn <- rownames(matTest) %in% rownames(matRf)
 labTest <- matTest[checkIn,ncol(matTest)]
 labRf   <- matRf[,ncol(matRf)]
 
-cont <- table(test = labTest, randomForest=labRf)
+cont <- table(labTest, labRf, dnn=list(basename(testFile), basename(rfFile)))
 tp   <- cont[2,2]
 fp   <- cont[1,2]
 tn   <- cont[1,1]
