@@ -882,9 +882,9 @@ sub rfPredToOut
     else # if FASTA format
     {
 	# Read the FASTA file and put the line in the right file depending on which tab the transcript is
-	my $outNon = $outDir.basename($testFile).".lncRNA.fa";
-	my $outCod = $outDir.basename($testFile).".mRNA.fa";
-	my $noOrf  = $outDir.basename($testFile).".noORF.fa";
+	my $outNon = $outDir.$outName.".lncRNA.fa";
+	my $outCod = $outDir.$outName.".mRNA.fa";
+	my $noOrf  = $outDir.$outName.".noORF.fa";
 
 	print "Writing the two FASTA output files: '$outNon' and '$outCod'\n";
 	my $multiFasta = new Bio::SeqIO(-file  => "$testFile", '-format' => 'Fasta');
