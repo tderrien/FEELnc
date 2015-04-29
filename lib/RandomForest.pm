@@ -468,7 +468,7 @@ sub getSizeFastaFile
 #	$nTree           = number of trees used in random forest
 sub getRunModel
 {
-    my ($codLearnFile, $nonLearnFile, $testFile, $outFile, $thres, $nTree) = @_;
+    my ($codLearnFile, $nonLearnFile, $testFile, $outFile, $thres, $nTree, $seed) = @_;
     $codLearnFile ||= undef;
     $nonLearnFile ||= undef;
     $testFile     ||= undef;
@@ -495,15 +495,15 @@ sub getRunModel
     # test for a valid value for the threshold is done in FEELnc_codpot.pl
     if(!defined $thres)
     {
-	# If no threshold given, run codpot_randomforest.r without threshold (4 arguments)
+	# If no threshold given, run codpot_randomforest.r without threshold (6 arguments)
 	print "\tThe threshold for the voting in random forest is not defined. Use 10-fold cross-validation to determine the best threshold.\n";
-	$cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile $nTree";
+	$cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile $nTree $seed";
     }
     else
     {
-	# If a threshold is given, run codpot_randomforest.r with this threshold (5 arguments)
+	# If a threshold is given, run codpot_randomforest.r with this threshold (7 arguments)
 	print "\tThe threshold for the voting in random forest is '$thres'.\n";
-	$cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile $nTree $thres";
+	$cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile $nTree $seed $thres";
     }
     system($cmd);
     #print "LA COMMANDE : $cmd\n";
@@ -525,7 +525,7 @@ sub getRunModel
 #	$keepTmp         = keep or not the temporary files
 sub runRF
 {
-    my ($codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $nTree, $outDir, $verbosity, $keepTmp) = @_;
+    my ($codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $nTree, $outDir, $verbosity, $keepTmp, $seed) = @_;
     $kmerListString ||= "3,6,9";
     $verbosity      ||= 0;
 
@@ -625,7 +625,7 @@ sub runRF
     # 5. Make the model on learning sequences and apply it on test sequences
     print "5. Make the model on learning sequences and apply it on test sequences\n";
 
-    &getRunModel($outModCodLearn, $outModNonLearn, $outModTest, $outFile, $thres, $nTree);
+    &getRunModel($outModCodLearn, $outModNonLearn, $outModTest, $outFile, $thres, $nTree, $seed);
 
     # Delete temporary files
     if($keepTmp == 0)
@@ -973,6 +973,10 @@ if it is given, the threshold for random forest (>$thres = coding), if undef the
 
 the number of trees used in random forest
 
+=item $seed
+
+seed to fixe random fonction during the shuffling of the input matrix and for the random forest
+
 =back
 
 ##############################################################################
@@ -1034,6 +1038,10 @@ define the verbosity of the program
 =item $keepTmp
 
 if the temporary files need to be kept (0: delete; !0: keep)
+
+=item $seed
+
+seed to fixe random fonction during the shuffling of the input matrix and for the random forest
 
 =back
 

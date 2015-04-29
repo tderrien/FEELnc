@@ -64,7 +64,7 @@ my $outName = "";
 my $nTree = 500;
 
 # VW Add an option to fixe the seed
-my $seed = undef;
+my $seed = 1234;
 
 
 # Intergenic extraction:
@@ -304,7 +304,7 @@ else
 # Launch RF on $infile in fasta
 
 print STDERR "> Run random Forest on '$testFile':\n";
-RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $keepTmp);
+RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $keepTmp, $seed);
 
 # Parse RF result
 RandomForest::rfPredToOut($infile, $rfout, $outDir, $outName);
@@ -390,7 +390,7 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
 
   --keeptmp=0				To keep the temporary files in a 'tmp' directory the outdir, by default don't keep it (0 value). Any other value than 0 will keep the temporary files
   --verbosity=0				Which level of information that need to be print [ default 0 ]
-  --seed=undef				Use to fixe the seed value for the extraction of intergenic DNA region to get lncRNA like sequences [ default undef ]
+  --seed=1234				Use to fixe the seed value for the extraction of intergenic DNA region to get lncRNA like sequences and for the random forest [ default 1234 ]
 
 =head2 Intergenic lncRNA extraction
 

@@ -18,6 +18,7 @@ nonFile  <- args[2]
 testFile <- args[3]
 outFile  <- args[4]
 numberT  <- as.numeric(args[5])
+seed     <- as.numeric(args[6])
 outVar   <- paste(file_path_sans_ext(outFile), "_varImpPlot.png", sep="")
 outROC   <- paste(file_path_sans_ext(outFile), "_TGROC.png", sep="")
 outStats <- paste(file_path_sans_ext(outFile), "_stats.txt", sep="")
@@ -25,14 +26,14 @@ list.of.packages <- c("ROCR","randomForest")
 
 ## If number of argument == 5 then the threshold is not set, need to run 10-cross fold-validation
 ## and the packages randomForest and ROCR is needed
-if(length(args) == 5)
+if(length(args) == 6)
     {
         thres <- NULL
-    } else if(length(args) == 6)
+    } else if(length(args) == 7)
 ## If number of argument == 6 then the threshold is set
 ## and only the library randomForest is needed
     {
-        thres <- as.numeric(args[6])
+        thres <- as.numeric(args[7])
     } else
 ## Else the number of arguments is not good
     {
@@ -75,7 +76,8 @@ dat    <- rbind(codMat, nonMat)
 outDat <- paste(file_path_sans_ext(outFile), "_learningData.txt", sep="")
 write.table(x=dat, file=outDat, sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
 
-## Random step
+## Random ordering of input matrix (fixe by seed)
+set.seed(seed)
 randomOrder <- sample(nrow(codMat)+nrow(nonMat))
 dat         <- dat[randomOrder,]
 dat.nameID  <- 1
@@ -101,6 +103,7 @@ for (n in 1:nb_cross_val)
         ## split the dat in 'nb_cross_val' chunks
         chunk[[n]] <-  seq(as.integer((n-1)*number_row/nb_cross_val)+1,as.integer(n*number_row/nb_cross_val))
 
+        set.seed(seed)
         ## Train the random forest model with (nb_cross_val-1) chunks and predict the value for the test dat set
         models[[n]] <- randomForest(    x=dat[-chunk[[n]], dat.featID],    y=as.factor(dat[-chunk[[n]], dat.labelID]),
                                     xtest=dat[chunk[[n]], dat.featID], ytest=as.factor(dat[chunk[[n]], dat.labelID]),
@@ -165,7 +168,7 @@ res             <- cbind(mod=rownames(res), round(res, digits=2))
 
 write.table(x=res, file=outStats, quote=FALSE, sep="\t", row.names=FALSE)
 
-if(length(args) == 6)
+if(length(args) == 7)
     {
         meanSens <- as.numeric(res[nrow(res), 2])
     }
@@ -207,6 +210,7 @@ tt <- dev.off()
 cat("\tMaking random forest model on '", basename(codFile), "' and '", basename(nonFile), "' and apply it to '", basename(testFile), "'.\n", sep="")
 
 ## RF model
+set.seed(seed)
 dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=numberT)
 
 ## ## Prediction on learning data
