@@ -165,7 +165,7 @@ res             <- cbind(mod=rownames(res), round(res, digits=2))
 
 write.table(x=res, file=outStats, quote=FALSE, sep="\t", row.names=FALSE)
 
-if(length(args) == 5)
+if(length(args) == 6)
     {
         meanSens <- as.numeric(res[nrow(res), 2])
     }

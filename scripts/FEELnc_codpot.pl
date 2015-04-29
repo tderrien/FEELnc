@@ -44,7 +44,7 @@ my $minnumtx = 100;	# Min number of tx for training (a too small value will resu
 
 
 # VW Add a variable to get the kmer size which are used to get the kmer scores
-my $kmerList = '1,2,3,4,5,6';
+my $kmerList = '3,6,9';
 
 # VW Add a variable to keep tmp file, default don't keep
 my $keepTmp = 0;
@@ -372,7 +372,7 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
   -b,--biotype				Only consider transcripts having this(these) biotype(s) from the reference annotation (e.g : -b transcript_biotype=protein_coding,pseudogene) [default undef i.e all transcripts]
   -n,--numtx=2000			Number of transcripts required for the training [ default 2000 ]
   -r,--rfcut=[0-1]			Random forest voting cutoff [ default undef i.e will compute best cutoff ]
-  -k,--kmer="1,2,3,4,5,6"		Kmer size list with size separate by ',' as string [ default "1,2,3,4,5,6" ], the maximum value for one size is '15'
+  -k,--kmer="3,6,9"			Kmer size list with size separate by ',' as string [ default "3,6,9" ], the maximum value for one size is '15'
   -o,--outdir="./"			Output directory [ default current directory ]
   -s,--sizeinter=0.75			Ratio between mRNA sequence lengths and non coding intergenic region sequence lengths as, by default, ncInter = mRNA * 0.75
   --learnorftype=1			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 1 ] for learning data set.

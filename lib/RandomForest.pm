@@ -98,6 +98,12 @@ sub getKmerRatio
     $proc    ||= 1;
     $keepTmp ||= 0;
 
+    if($kmerSize < $codStep)
+    {
+	$codStep = 1;
+	$nonStep = 1;
+    }
+
     # Check if mendatory arguments have been given
     die "Bulding model: ORF coding genes training file not defined... exiting\n" if (!defined $codFile);
     die "Bulding model: lncRNA training file not defined... exiting\n"           if (!defined $nonFile);
@@ -116,12 +122,12 @@ sub getKmerRatio
 
     # Run kis on ORF for coding genes
     print "\tRunning KmerInShort on '$codFile'.\n" if($verbosity >= 5);
-    $cmd = "$kisPath -file $codFile -nb-cores $proc -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
+    $cmd = "$kisPath -file $codFile -nb-cores 4 -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
     system($cmd);
 
     # Run kis on non coding genes
     print "\tRunning KmerInShort on '$nonFile'.\n" if($verbosity >= 5);
-    $cmd = "$kisPath -file $nonFile -nb-cores $proc -kmer-size $kmerSize -out $nonOut -dont-reverse -step $nonStep 1>/dev/null 2>/dev/null";
+    $cmd = "$kisPath -file $nonFile -nb-cores 4 -kmer-size $kmerSize -out $nonOut -dont-reverse -step $nonStep 1>/dev/null 2>/dev/null";
     system($cmd);
 
     # Read the two kmer files and put value in a table and get the total number of kmer to comput frequency
@@ -237,6 +243,11 @@ sub scoreORF
     $step     ||= 3;
     $proc     ||= 1;
 
+    if($kmerSize < $step)
+    {
+	$step = 1;
+    }
+
     # Check if mendatory arguments have been given
     die "Scoring ORF file: ORF file for scoring sequences is not defined... exiting\n"                     if(!defined $orfFile);
     die "Scoring ORF file: model of log ratio score file is not defined... exiting\n"                      if(!defined $modFile);
@@ -256,7 +267,7 @@ sub scoreORF
     close FILE;
 
     # Run KmerInShort
-    my $cmd = "$kisPath -file $orfFile -kval $modFile -nb-cores $proc -kmer-size $kmerSize -dont-reverse -step $step 1>> $outFile 2>/dev/null";
+    my $cmd = "$kisPath -file $orfFile -kval $modFile -nb-cores 4 -kmer-size $kmerSize -dont-reverse -step $step 1>> $outFile 2>/dev/null";
     system($cmd);
 
     # To add the header to the $outFile
@@ -507,7 +518,7 @@ sub getRunModel
 #	$testFile        = fasta file of the test sequences
 #	$orfTestFile     = fasta file of the ORF test sequences
 #	$outFile         = file to write the result of the random forest
-#	$kmerListString  = list of size of kmer as '1,2,3,4,5,6' (default value) as string
+#	$kmerListString  = list of size of kmer as '3,6,9' (default value) as string
 #	$thres           = the threshold for the random forest, if it is not defined then it is set using a 10-fold cross-validation on learning data
 #	$nTree           = number of trees used in random forest
 #	$verbosity       = value for level of verbosity
@@ -515,7 +526,7 @@ sub getRunModel
 sub runRF
 {
     my ($codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $nTree, $outDir, $verbosity, $keepTmp) = @_;
-    $kmerListString ||= "1,2,3,4,5,6";
+    $kmerListString ||= "3,6,9";
     $verbosity      ||= 0;
 
     # Make a variable to keep temporay file in the outdir if --keeptmp is specify
@@ -1002,7 +1013,7 @@ file to write the result of the random forest
 
 =item $kmerListString
 
-list of size of kmer as '1,2,3,4,5,6' (default value) as a string
+list of size of kmer as '3,6,9' (default value) as a string
 
 =item $thres
 
