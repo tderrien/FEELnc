@@ -818,7 +818,7 @@ sub writefastafile{
 
 sub randomizedGTFtoFASTA{
 
-    my ($h, $ref_cDNA_passed, $cdnafile, $orffile, $genome, $nbtx, $minnumtx, $sizecorrec, $orfType, $maxTries, $maxN, $verbosity, $kmerMax) = @_;
+    my ($h, $ref_cDNA_passed, $cdnafile, $orffile, $genome, $nbtx, $minnumtx, $sizecorrec, $orfType, $maxTries, $maxN, $verbosity, $kmerMax, $seed) = @_;
 
     $nbtx      ||= 1000; # number of random tx required
     $maxTries  ||= 10;   # max tries to for computing both overlap and N
@@ -837,12 +837,9 @@ sub randomizedGTFtoFASTA{
 	next if ($id =~ /^KI|^GL/ ); # for human chromosome GRCh38 : Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa
 	$refgenomesize->{$id} = $db->length($id); # populate hash with id => seq_length
     }
-    # 	print Dumper $refgenomesize;
 
     #  hashref tx annotation sizes
     my $refannotsize = ExtractFromHash::getCumulSizeFromGtfHash ($h,$verbosity, 0);
-
-    # 	print Dumper $refannotsize;
 
     print STDERR "- Relocate Transcripts \n" if ($verbosity > 0);
     my $i = 0;
@@ -854,7 +851,10 @@ sub randomizedGTFtoFASTA{
     my $orfFlag = 0; # to get the type of ORF
     my $cptok   = 0; # to get the number of extracted sequence
 
-    srand(1234); # the seed is initiated to have reproducibility
+    if(defined $seed)
+    {
+    	srand($seed); # the seed is initiated to have reproducibility
+    }
 
   TX:
     foreach my $tx (sort keys %{$refannotsize}){ # sort for reproducibility

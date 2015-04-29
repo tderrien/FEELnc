@@ -1,12 +1,9 @@
 #!/usr/bin/perl -w
 
-
-
 #
 # Modification by V.Wucher april 16 2015:
 # 	Modification of the predicting method: use now random forest (package R randomForest)
 #
-
 
 # Perl libs
 use warnings;
@@ -66,6 +63,10 @@ my $outName = "";
 # VW Add an option to change the number of trees use in random forest
 my $nTree = 500;
 
+# VW Add an option to fixe the seed
+my $seed = undef;
+
+
 # Intergenic extraction:
 my $maxTries   = 10;
 my $maxN       = 5;
@@ -90,6 +91,7 @@ GetOptions(
     'o|outname=s'    => \$outName,
     'keeptmp'        => \$keepTmp,
     'v|verbosity=i'  => \$verbosity,
+    'seed=i'         => \$seed,
     'help|?'         => \$help,
     'man'            => \$man
     # 	"o|outlog=s"     => \$outputlog,
@@ -120,9 +122,9 @@ pod2usage ("- Error: \$kmerList option '$kmerList' is not valid. One of the size
 
 
 # Default option for $outName
-if(!defined $outName)
+if($outName eq "")
 {
-    my $outName=basename($infile);
+    $outName=basename($infile);
 }
 
 # For $outDiradd a '/' at the end of the path
@@ -245,7 +247,7 @@ else                    # -- if lncRNA training file not defined
     my $refmrna = Parser::parseGTF($mRNAfile, 'exon,CDS,stop_codon,start_codon', undef , \%biotype , $verbosity);
     # Relocated mRNA sequence in intergenic regions to be used as a training lncRNA file
     print STDERR "> The lncRNA training file is not set...will extract intergenic region for training (can take a while...)\n";
-    ExtractCdnaOrf::randomizedGTFtoFASTA($refmrna, $ref_cDNA_passed, $nonFile, $nonOrfFile, $genome, $numtx, $minnumtx, $sizecorrec, $orfTypeLearn, $maxTries, $maxN, $verbosity, $kmerMax);
+    ExtractCdnaOrf::randomizedGTFtoFASTA($refmrna, $ref_cDNA_passed, $nonFile, $nonOrfFile, $genome, $numtx, $minnumtx, $sizecorrec, $orfTypeLearn, $maxTries, $maxN, $verbosity, $kmerMax, $seed);
 }
 
 
@@ -383,8 +385,12 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
   --testorftype=3			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 3 ] for test data set. See --learnortype description for more informations.
   --ntree				Number of trees used in random forest [ default 500 ]
 
-  --keeptmp=0				To keep the temporary files in a 'tmp' directory the outdir, by default don't keep it (0 value). Any other value than 0 will keep the temporary files
 
+=head2 Debug arguments
+
+  --keeptmp=0				To keep the temporary files in a 'tmp' directory the outdir, by default don't keep it (0 value). Any other value than 0 will keep the temporary files
+  --verbosity=0				Which level of information that need to be print [ default 0 ]
+  --seed=undef				Use to fixe the seed value for the extraction of intergenic DNA region to get lncRNA like sequences [ default undef ]
 
 =head2 Intergenic lncRNA extraction
 

@@ -74,14 +74,14 @@ rfPredToOut: With a .gtf and a result file from a random forest, write 2 .gtf fi
 =cut
 
 
-# Run minidsk on training set and generate output model (logRatio values for each kmer)
+# Run KmerInShort (kis) on training set and generate output model (logRatio values for each kmer)
 #	$codFile   = fasta file with the ORF of coding genes
 #	$nonFile   = fasta file with sequence of non coding genes
 #	$outFile   = file where the logRatio of kmer frequency need to be written
 #	$kmerSize  = size of the kmer
 #	$codStep   = step for the counting of kmer for the ORF coding genes
 #	$nonStep   = step for the counting of kmer for the non coding genes
-#	$proc      = number of proc to be use for minidsk
+#	$proc      = number of proc to be use for KmerInShort
 #	$verbosity = value to define the verbosity
 #	$keepTmp   = keeping or not the temporary files
 #	$outTmp    = temporary file output directory
@@ -107,21 +107,21 @@ sub getKmerRatio
     die "Bulding model: ORF coding genes training file '$codFile' is empty... exiting\n" unless (-s $codFile);
     die "Bulding model: lncRNA training file '$nonFile' is empty... exiting\n"           unless (-s $nonFile);
 
-    # Path to minidsk
-    my $minidskPath = Utils::pathProg("minidsk");
+    # Path to kis
+    my $kisPath = Utils::pathProg("KmerInShort");
     my $cmd = "";
     # Temporary files to put kmer counting for ORF coding genes and non coding genes
-    my $codOut = $outTmp."kmerCounting_coding_".basename($codFile).$kmerSize."_".$randVal.".tmp";
-    my $nonOut = $outTmp."kmerCounting_nonCoding_".basename($nonFile).$kmerSize."_".$randVal.".tmp";
+    my $codOut = $outTmp."kmerCounting_coding_".basename($codFile)."_".$kmerSize."_".$randVal.".tmp";
+    my $nonOut = $outTmp."kmerCounting_nonCoding_".basename($nonFile)."_".$kmerSize."_".$randVal.".tmp";
 
-    # Run minidsk on ORF for coding genes
-    print "\tRunning minidsk on '$codFile'.\n" if($verbosity >= 5);
-    $cmd = "$minidskPath -file $codFile -nb-cores $proc -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
+    # Run kis on ORF for coding genes
+    print "\tRunning KmerInShort on '$codFile'.\n" if($verbosity >= 5);
+    $cmd = "$kisPath -file $codFile -nb-cores $proc -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
     system($cmd);
 
-    # Run minidsk on non coding genes
-    print "\tRunning minidsk on '$nonFile'.\n" if($verbosity >= 5);
-    $cmd = "$minidskPath -file $nonFile -nb-cores $proc -kmer-size $kmerSize -out $nonOut -dont-reverse -step $nonStep 1>/dev/null 2>/dev/null";
+    # Run kis on non coding genes
+    print "\tRunning KmerInShort on '$nonFile'.\n" if($verbosity >= 5);
+    $cmd = "$kisPath -file $nonFile -nb-cores $proc -kmer-size $kmerSize -out $nonOut -dont-reverse -step $nonStep 1>/dev/null 2>/dev/null";
     system($cmd);
 
     # Read the two kmer files and put value in a table and get the total number of kmer to comput frequency
@@ -225,7 +225,7 @@ sub getKmerRatio
 #	$outFile   = file where the logRatio of kmer frequency need to be written
 #	$kmerSize  = size of the kmer
 #	$step      = step for the counting of kmer
-#	$proc      = number of proc to be use for minidsk
+#	$proc      = number of proc to be use for kis
 #	$verbosity = value to define the verbosity
 sub scoreORF
 {
@@ -246,156 +246,28 @@ sub scoreORF
     die "Scoring ORF file: ORF file for scoring sequences '$orfFile' is empty... exiting\n" unless (-s $orfFile);
     die "Scoring ORF file: model of log ratio score file '$modFile' is empty... exiting\n"  unless (-s $modFile);
 
-    # Path to minidsk
+    # Path to kis
     my $kisPath = Utils::pathProg("KmerInShort");
 
     print "\tRun KmerInShort on '$orfFile' and '$modFile' to '$outFile'" if($verbosity >= 5);
+    # Print header
+    open FILE, "> $outFile";
+    print FILE "name\tkmerScore_".$kmerSize."mer\n";
+    close FILE;
+
     # Run KmerInShort
-    my $cmd = "$kisPath -file $orfFile -kval $modFile -nb-cores $proc -kmer-size $kmerSize -out $outFile -dont-reverse -step $step 1>/dev/null 2>/dev/null";
+    my $cmd = "$kisPath -file $orfFile -kval $modFile -nb-cores $proc -kmer-size $kmerSize -dont-reverse -step $step 1>> $outFile 2>/dev/null";
     system($cmd);
 
     # To add the header to the $outFile
-    open FILE, "$outFile";
-    my @cp = <FILE>;
-    close FILE;
-    open FILE, "> $outFile";
-    print FILE "name\tkmerScore_".$kmerSize."mer\n";
-    print FILE @cp;
-    close FILE;
+    # open FILE, "$outFile";
+    # my @cp = <FILE>;
+    # close FILE;
+    # open FILE, "> $outFile";
+    # print FILE "name\tkmerScore_".$kmerSize."mer\n";
+    # print FILE @cp;
+    # close FILE;
 }
-
-
-# Temporary function to compute the scoring function of a multifasta file of ORF
-#	$orfFile   = multi fasta file with the ORF of the genes to be scored
-#	$modFile   = file with the log ratio score compute on learning files
-#	$outFile   = file where the logRatio of kmer frequency need to be written
-#	$kmerSize  = size of the kmer
-#	$step      = step for the counting of kmer
-#	$proc      = number of proc to be use for minidsk
-#	$verbosity = value to define the verbosity
-#	$keepTmp   = keep or not the temporary files
-#	$outTmp    = temporary file output directory
-sub OldscoreORF
-{
-    my($orfFile, $modFile, $outFile, $kmerSize, $step, $proc, $verbosity, $keepTmp, $outTmp) = @_;
-    $orfFile  ||= undef;
-    $modFile  ||= undef;
-    $outFile  ||= undef;
-    $kmerSize ||= 6;
-    $step     ||= 3;
-    $proc     ||= 1;
-
-    # Check if mendatory arguments have been given
-    die "Scoring ORF file: ORF file for test sequences is not defined... exiting\n"                        if(!defined $orfFile);
-    die "Scoring ORF file: model of log ratio score file is not defined... exiting\n"                      if(!defined $modFile);
-    die "Scoring ORF file: output file to write kmer score for test sequences is not defined... exiting\n" if(!defined $outFile);
-
-    # emtpy
-    die "Scoring ORF file: ORF file for test sequences '$orfFile' is empty... exiting\n"   unless (-s $orfFile);
-    die "Scoring ORF file: model of log ratio score file '$modFile' is empty... exiting\n" unless (-s $modFile);
-
-    # Path to minidsk
-    my $minidskPath = Utils::pathProg("minidsk");
-
-    # Parse ORF file and put ORF sequence in an array
-    print "\tRead ORF file '$orfFile'.\n" if($verbosity >=5);
-    my $multiFasta = new Bio::SeqIO(-file  => $orfFile);
-    my @seqTab;
-    my $seq;
-    while( $seq = $multiFasta->next_seq() )
-    {
-	push(@seqTab, $seq);
-    }
-    # Fermer le fichier ou autres ?
-
-
-    # Read the model file
-    print "\tRead the log ratio file '$modFile'.\n" if($verbosity >= 5);
-    my @kmerTab;
-    my @logTab;
-    my $flag = 0;
-    open FILE, "$modFile" or die "Error! Cannot open the model file '". $modFile . "': ".$!;
-    while(<FILE>)
-    {
-	if($flag == 0)
-	{
-	    $flag = 1;
-	    next;
-	}
-
-	chop;
-	my ($kmer, $log) = split(/\t/);
-	push(@kmerTab, $kmer);
-	push(@logTab, $log);
-    }
-    close FILE;
-
-    my $tmpFile    = $outTmp."orf_".$kmerSize."_".$randVal.".tmp";
-    my $tmpFileOut = $outTmp."out_".$kmerSize."_".$randVal.".tmp";
-    my $id         = "";
-    my $length     = 0;
-    my $logSum     = 0;
-    my $totKmer    = 0;
-    my $i          = 0;
-    my $res        = 0;
-    open FILEOUT, "> $outFile" or die "Error! Cannot access output file '". $outFile . "': ".$!;
-
-    # Print the header of the output file
-    print FILEOUT "name\tkmerScore_".$kmerSize."mer\n";
-    # For each ORF, print the sequence on a temporary file $tmpFile and run minidsk on this sequence and print the result in $tmpFileOut
-    foreach $seq (@seqTab)
-    {
-	$id     = $seq->id();
-	$length = $seq->length();
-
-	# Check if there is a sequence
-	if($length == 0)
-	{
-                warn "Warning: no sequence for ", $id, " (certainly because the scaffold of the transcript does not exists and the sequence has not been extracted correctly)";
-                next;
-	}
-
-	# Write the ORF sequence on $tmpFile
-	my $seqout  = Bio::SeqIO->new(-format => 'fasta', -file => '> '.$tmpFile, -alphabet =>'dna', ); # la ',' à la fin chelou
-	my $new_seq = Bio::Seq->new(-id => $id, -seq => $seq->seq());
-	$seqout->write_seq($new_seq);
-
-	# Run minidsk on this sequence
-	my $cmd = "$minidskPath -file $tmpFile -nb-cores $proc -kmer-size $kmerSize -out $tmpFileOut -dont-reverse -step $step 1>/dev/null 2>/dev/null";
-	system($cmd);
-
-	# Read the minidsk output (FILEMINI) and write it on the output file (FILEOUT)
-	open FILEMINI, "$tmpFileOut" or die "Error! Cannot access the temporary output minidsk file '". $tmpFileOut . "': ".$!;
-	$i       = 0;
-	$totKmer = 0;
-	$logSum  = 0;
-	while(<FILEMINI>)
-	{
-	    chop;
-	    my ($kmer, $nbr) = split(/\t/);
-	    die "Error: kmer order is not the same between '$modFile' and '$tmpFileOut'.\nExit." if($kmerTab[$i] ne $kmer);
-
-	    $logSum  = $logSum + ( int($nbr)*$logTab[$i] );
-	    $totKmer = $totKmer + int($nbr);
-	    $i = $i+1;
-	}
-	close FILEMINI;
-
-	$res = $logSum/$totKmer;
-	print FILEOUT "$id\t$res\n";
-    }
-    close FILEOUT;
-
-
-    # Delete temporary files
-    if($keepTmp == 0)
-    {
-	unlink $tmpFile;
-	unlink $tmpFileOut;
-    }
-}
-
-
 
 
 # Fusion of the kmerScore files for a list of kmer size
@@ -924,7 +796,7 @@ __END__
 
 =head2 getKmerRatio
 
-Run minidsk on learning set and generate output model (logRatio values for each kmer)
+Run KmerInShort on learning set and generate output model (logRatio values for each kmer)
 
 =over
 
@@ -954,7 +826,7 @@ step for the counting of kmer for the non coding genes
 
 =item $proc
 
-number of proc to be use for minidsk
+number of proc to be use for KmerInShort
 
 =item $verbosity
 
@@ -1002,7 +874,7 @@ step for the counting of kmer
 
 =item $proc
 
-number of proc to be use for minidsk
+number of proc to be use for KmerInShort
 
 =item $verbosity
 
