@@ -3,6 +3,10 @@
 ## Running the Random Forest to classify transcripts between coding and non coding
 ## Need the randomForest and ROCR library
 
+######################################
+##### Version for two thresholds #####
+######################################
+
 #########################
 ##### PREPROCESSING #####
 #########################
@@ -13,31 +17,22 @@ library(tools)
 args <- commandArgs(TRUE)
 
 ## Set generic values
-codFile  <- args[1]
-nonFile  <- args[2]
-testFile <- args[3]
-outFile  <- args[4]
-numberT  <- as.numeric(args[5])
-seed     <- as.numeric(args[6])
-outVar   <- paste(file_path_sans_ext(outFile), "_varImpPlot.png", sep="")
-outROC   <- paste(file_path_sans_ext(outFile), "_TGROC.png", sep="")
-outStats <- paste(file_path_sans_ext(outFile), "_stats.txt", sep="")
+codFile   <- args[1]
+nonFile   <- args[2]
+testFile  <- args[3]
+outFile   <- args[4]
+numberT   <- as.numeric(args[5])
+seed      <- as.numeric(args[6])
+thresSpeM <- as.numeric(args[7])
+thresSpeL <- as.numeric(args[8])
+outVar    <- paste(file_path_sans_ext(outFile), "_varImpPlot.png", sep="")
+outROC    <- paste(file_path_sans_ext(outFile), "_TGROC.png", sep="")
+outStats  <- paste(file_path_sans_ext(outFile), "_stats.txt", sep="")
 list.of.packages <- c("ROCR","randomForest")
 
-## If number of argument == 5 then the threshold is not set, need to run 10-cross fold-validation
-## and the packages randomForest and ROCR is needed
-if(length(args) == 6)
+if(length(args) != 8)
     {
-        thres <- NULL
-    } else if(length(args) == 7)
-## If number of argument == 6 then the threshold is set
-## and only the library randomForest is needed
-    {
-        thres <- as.numeric(args[7])
-    } else
-## Else the number of arguments is not good
-    {
-        cat("Error: the number of argument pass to codpot_randomforest.r is wrong:\nUsing 10-fold cross-validation:\tcodpot_randomforest.r inCoding inNonCoding testFile outFile nTree\nUsing a pre-defined threshold:\tcodpot_randomforest.r inCoding inNonCoding testFile outFile nTree threshold\nQuit\n")
+        cat("Error: the number of argument pass to codpot_randomforest_2thres.r is wrong:\ncodpot_randomforest_2thres.r inCoding inNonCoding testFile outFile nTree seed specificityThresholdMrna specificityThresholdLncrna\nQuit\n")
         quit()
     }
 
@@ -78,11 +73,13 @@ write.table(x=dat, file=outDat, sep="\t", quote=FALSE, row.names=FALSE, col.name
 
 ## Random ordering of input matrix (fixe by seed)
 set.seed(seed)
-randomOrder <- sample(nrow(codMat)+nrow(nonMat))
-dat         <- dat[randomOrder,]
-dat.nameID  <- 1
-dat.featID  <- (2:(ncol(dat)-1))
-dat.labelID <- ncol(dat)
+randomOrder  <- sample(nrow(codMat)+nrow(nonMat))
+dat          <- dat[randomOrder,]
+dat.nameID   <- 1
+dat.featID   <- (2:(ncol(dat)-1))
+dat.labelID  <- ncol(dat)
+test.nameID  <- 1
+test.featID  <- (2:ncol(testMat))
 
 
 ## variables counting
@@ -93,8 +90,8 @@ models       <- list()
 nb_cross_val <- 10
 
 ## Progress bar
-cat("\tRunning 10-fold cross-validation on learning:\n")
-progress <- txtProgressBar(1, nb_cross_val, style=3)
+cat("\tRunning ", nb_cross_val, "-fold cross-validation on learning:\n", sep="")
+progress <- txtProgressBar(0, nb_cross_val, style=3)
 setTxtProgressBar(progress, 0)
 
 ## Split in 'nb_cross_val' fold cross validation
@@ -131,47 +128,65 @@ P <- performance(pred,measure="spec")
 mean_cutoff <- mean(sapply(1:length(pred@predictions), function(i) { S@x.values[[i]][which.min(abs(S@y.values[[i]]-P@y.values[[i]]))] } ))
 mean_Sn     <- mean(sapply(1:length(pred@predictions), function(i) { P@y.values[[i]][which.min(abs(S@y.values[[i]]-P@y.values[[i]]))] } ))
 
-## If no threshold, set the best one found with 10-fold cross-validation
-if(is.null(thres))
+
+## If the cutting between the spe and sens is higher than the giving specificity threshold, then use classical threshold
+if(mean_Sn >= thresSpeM & mean_Sn >= thresSpeL)
     {
-        thres    <- mean_cutoff
-        meanSens <- mean_Sn
-        cat("\t10-fold cross-validation step is finish. Best threshold found: '", thres, "'.\n", sep="")
+        cutoffThresSpeM <- mean_cutoff
+        cutoffThresSpeL <- mean_cutoff
+        thresSpeM       <- mean_Sn
+        thresSpeL       <- mean_Sn
+
+        cat("WARNING: the value where sensitivity equal specicifity: ", mean_Sn," is greater than the specificity threshold: ", thresSpeM, " and ", thresSpeL, ". Use the best value.\n", sep="")
+    } else {
+        ## Get the threshold for each model with a mRNA specificity >= thresSpeM
+        cutoffThresSpeM <- mean( sapply(1:length(pred@predictions), function(i) { min(P@x.values[[i]][which(P@y.values[[i]]>=thresSpeM)]) } ) )
+        ## Same for thresSpeL
+        cutoffThresSpeL <- mean( sapply(1:length(pred@predictions), function(i) { max(S@x.values[[i]][which(S@y.values[[i]]>=thresSpeL)]) } ) )
+
+        cat("\t10-fold cross-validation step is finish. Best thresholds found: mRNA: '", cutoffThresSpeM, "'; lncRNA: '", cutoffThresSpeL,"'.\n", sep="")
     }
 
+
+
 ## Print in outStats the sensitivity, specificity, accuracy and precision
-#cat("\tPrinting stats in '", outStats, "' the sensitivity, specificity, precision and accuracy obtain on learning data using threshold found with 10-fold cross-validation.\n", sep="")
 cat("\tPrinting stats found with the 10-fold cross-validation in '", outStats, "'.\n", sep="")
 
-res <- matrix(0, ncol=4, nrow=(nb_cross_val+1), dimnames=list(c((1:nb_cross_val),"mean"),c("sen","spe","pre","acc")))
+res <- matrix(0, ncol=10, nrow=(nb_cross_val+1), dimnames=list(c((1:nb_cross_val),"mean"),c("sen","spe","pre","acc","tp","tn","fp","fn","TUCp_mRNA","TUCp_lncRNA")))
 for(i in 1:nb_cross_val)
     {
-        mod.lab                                    <- rep(0, length.out=nrow(dat[chunk[[i]],]))
-        mod.lab[models[[i]]$test$votes[,2]>=thres] <- 1
+        mod.lab                                              <- rep(-1, length.out=nrow(dat[chunk[[i]],]))
+        mod.lab[models[[i]]$test$votes[,2]>=cutoffThresSpeM] <- 1
+        mod.lab[models[[i]]$test$votes[,2]<=cutoffThresSpeL] <- 0
 
-        cont <- table(dat[chunk[[i]],dat.labelID], mod.lab)
-        tp   <- cont[2,2]
-        fp   <- cont[1,2]
-        tn   <- cont[1,1]
-        fn   <- cont[2,1]
+        cont2 <- table(dat[chunk[[i]],dat.labelID], mod.lab)
+        if(all(dim(cont2) == c(2,2)))
+            {
+                cont  <- cont2
+                tm    <- 0
+                tl    <- 0
+            } else {
+                cont  <- cont2[,-1]
+                tm    <- cont2[2,1]
+                tl    <- cont2[1,1]
+            }
+        tp <- cont[2,2]
+        fp <- cont[1,2]
+        tn <- cont[1,1]
+        fn <- cont[2,1]
 
         sen <- tp / (tp+fn)
         spe <- tn / (fp+tn)
         pre <- tp / (tp+fp)
         acc <- (tp+tn) / sum(cont)
 
-        res[i,] <- c(sen,spe,pre,acc)
+        res[i,] <- c(sen,spe,pre,acc,tp,tn,fp,fn,tm,tl)
     }
-
 res[nrow(res),] <- colMeans(res[-nrow(res),])
 res             <- cbind(mod=rownames(res), round(res, digits=2))
 
 write.table(x=res, file=outStats, quote=FALSE, sep="\t", row.names=FALSE)
 
-if(length(args) == 7)
-    {
-        meanSens <- as.numeric(res[nrow(res), 2])
-    }
 
 ######################################
 ##### BEGIN THE PLOT OF THE ROCR #####
@@ -183,21 +198,26 @@ par(cex.axis=1.2, cex.lab=1.2)
 
 ymin=0.5
 ymax=1
-plot(S,col="blue",lty=3,ylab="Performance",xlab="Coding Probability Cutoff",ylim=c(ymin,ymax),cex.axis=1.2,cex.label=1.2, main="Two-Graph ROC curves")
+plot(S,col="blue",lty=3,ylab="Specificity",xlab="Coding Probability Cutoff",ylim=c(ymin,ymax),cex.axis=1.2,cex.label=1.2, main="Two-Graph ROC curves")
 plot(S,lwd=2,avg="vertical",add=TRUE,col="blue")
 plot(P,col="red",lty=3, add=TRUE,)
 plot(P,lwd=2,avg="vertical",add=TRUE,col="red")
 
-## Sn
-abline(h=meanSens,lty="dashed",lwd=0.5)
-text(x=0, y = meanSens, labels = round(meanSens, digits = 3), cex=1.5 )
+## Specificity line (red: mRNA; blue: lncRNA)
+abline(h=thresSpeM,lty="dashed",lwd=1.5, col="red")
+abline(h=thresSpeL,lty="dashed",lwd=1.5, col="blue")
+text(x=0, y = thresSpeM, col="red",  labels = round(thresSpeM, digits = 3), cex=1.5, pos=3 )
+text(x=0, y = thresSpeL, col="blue", labels = round(thresSpeL, digits = 3), cex=1.5, pos=1 )
 
-## Cutoffs
-abline(v=thres,lty="dashed",lwd=0.5)
-text(x=thres, y = ymin, labels = round(thres, digits = 3), cex=1.5)
+## Cutoffs (red: mRNA; blue: lncRNA)
+abline(v=cutoffThresSpeM,lty="dashed",lwd=1.5, col="red")
+abline(v=cutoffThresSpeL,lty="dashed",lwd=1.5, col="blue")
+text(x=cutoffThresSpeM, y = ymin, labels = round(cutoffThresSpeM, digits = 3), cex=1.5, pos=4, col="red")
+text(x=cutoffThresSpeL, y = ymin, labels = round(cutoffThresSpeL, digits = 3), cex=1.5, pos=2, col="blue")
 
 ## Legend
-legend("right",col=c("blue","red"),lwd=2,legend=c("Sensitivity","Specificity"))
+#legend("right",col=c("blue","red"),lwd=2,legend=c("Sensitivity","Specificity"))
+legend("right",col=c("red","blue"),lwd=2,legend=c("mRNA specificity","lncRNA specificity"))
 
 tt <- dev.off()
 
@@ -213,50 +233,15 @@ cat("\tMaking random forest model on '", basename(codFile), "' and '", basename(
 set.seed(seed)
 dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=numberT)
 
-## ## Prediction on learning data
-## dat.rf.learn <- predict(dat.rf, dat[,dat.featID], cutoff=c(1-thres, thres))
-
 ## Prediction on test data
-dat.rf.test <- predict(dat.rf, testMat[,dat.featID], cutoff=c(1-thres, thres))
+dat.rf.test.votes                                   <- predict(dat.rf, testMat[,test.featID], type="vote")
+dat.rf.test                                         <- rep(-1, length.out=nrow(testMat))
+dat.rf.test[dat.rf.test.votes[,2]>=cutoffThresSpeM] <- 1
+dat.rf.test[dat.rf.test.votes[,2]<=cutoffThresSpeL] <- 0
 
-## RF on learning for stats
-## dat.rf.learn <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]),
-##                        xtest=dat[,dat.featID],
-##                        ntree=50)
-## RF on test
-## dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]),
-##                        xtest=testMat[,dat.featID],
-##                        ntree=50)
-
-## ## Get sensitivity, specificity, accuracy and precision on learning set using the model and the threshold
-## cat("\tPrinting stats in '", outStats, "' the sensitivity, specificity, precision and accuracy obtain on learning data.\n", sep="")
-## ## res <- rep(0, length.out=nrow(dat))
-## ## res[dat.rf.learn$test$votes[,2]>=thres] <- 1
-
-## ## cont <- table(data=dat[,dat.labelID], prediction=res)
-## cont <- table(data=dat[,dat.labelID], prediction=dat.rf.learn)
-## tp   <- cont[2,2]
-## fp   <- cont[1,2]
-## tn   <- cont[1,1]
-## fn   <- cont[2,1]
-## sen  <- tp / (tp+fn)
-## spe  <- tn / (fp+tn)
-## pre  <- tp / (tp+fp)
-## acc  <- (tp+tn) / sum(cont)
-
-## cont <- cbind(c("true negative","false negative","false positive","true positive"), as.data.frame(cont)[,3])
-## write.table(x="Number of true/false positives/negatives:", file=outStats, quote=FALSE, sep="", col.names=FALSE, row.names=FALSE)
-## write.table(x=cont, file=outStats, append=TRUE, quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE)
-## write.table(x="\nMetric values:", file=outStats, append=TRUE, sep="", quote=FALSE, col.names=FALSE, row.names=FALSE)
-## write.table(x=cbind(c("Sensitivity","Specificity","Precision","Accuracy"), c(sen,spe,pre,acc)), file=outStats, append=TRUE, quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
-
-## Obtain the coding label prediction on test data
-## res <- rep(0, length.out=nrow(testMat))
-## res[dat.rf$test$votes[,2]>=thres] <- 1
 
 ## Write the output
 cat("\tWrite the coding label for '", basename(testFile), "' in '", outFile, "'.\n", sep="")
-## write.table(x=cbind(testMat, label=res), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
 write.table(x=cbind(testMat, label=dat.rf.test), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
 
 ## Write the plot for variable importance

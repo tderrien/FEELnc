@@ -37,7 +37,7 @@ if(length(args) == 6)
     } else
 ## Else the number of arguments is not good
     {
-        cat("Error: the number of argument pass to codpot_randomforest.r is wrong:\nUsing 10-fold cross-validation:\tcodpot_randomforest.r inCoding inNonCoding testFile outFile nTree\nUsing a pre-defined threshold:\tcodpot_randomforest.r inCoding inNonCoding testFile outFile nTree threshold\nQuit\n")
+        cat("Error: the number of argument pass to codpot_randomforest.r is wrong:\nUsing 10-fold cross-validation:\tcodpot_randomforest.r inCoding inNonCoding testFile outFile nTree seed\nUsing a pre-defined threshold:\tcodpot_randomforest.r inCoding inNonCoding testFile outFile nTree seed threshold\nQuit\n")
         quit()
     }
 
@@ -55,6 +55,10 @@ for(pack in list.of.packages)
     {
         suppressMessages(library(pack, quietly=TRUE, verbose=FALSE, character.only=TRUE))
     }
+
+
+## Fix the seed
+set.seed(seed)
 
 ###########################
 ##### CODE START HERE #####
@@ -77,12 +81,13 @@ outDat <- paste(file_path_sans_ext(outFile), "_learningData.txt", sep="")
 write.table(x=dat, file=outDat, sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
 
 ## Random ordering of input matrix (fixe by seed)
-set.seed(seed)
-randomOrder <- sample(nrow(codMat)+nrow(nonMat))
-dat         <- dat[randomOrder,]
-dat.nameID  <- 1
-dat.featID  <- (2:(ncol(dat)-1))
-dat.labelID <- ncol(dat)
+randomOrder  <- sample(nrow(codMat)+nrow(nonMat))
+dat          <- dat[randomOrder,]
+dat.nameID   <- 1
+dat.featID   <- (2:(ncol(dat)-1))
+dat.labelID  <- ncol(dat)
+test.nameID  <- 1
+test.featID  <- (2:ncol(testMat))
 
 
 ## variables counting
@@ -91,11 +96,20 @@ chunk        <- list()
 output       <- list()
 models       <- list()
 nb_cross_val <- 10
+### TEST ###
+models.votes <- list()
+### TEST ###
 
 ## Progress bar
-cat("\tRunning 10-fold cross-validation on learning:\n")
-progress <- txtProgressBar(1, nb_cross_val, style=3)
+cat("\tRunning ", nb_cross_val, "-fold cross-validation on learning:\n", sep="")
+progress <- txtProgressBar(0, nb_cross_val, style=3)
 setTxtProgressBar(progress, 0)
+
+
+### TEST ###
+## nSize <- 1500
+### TEST ###
+
 
 ## Split in 'nb_cross_val' fold cross validation
 for (n in 1:nb_cross_val)
@@ -103,14 +117,14 @@ for (n in 1:nb_cross_val)
         ## split the dat in 'nb_cross_val' chunks
         chunk[[n]] <-  seq(as.integer((n-1)*number_row/nb_cross_val)+1,as.integer(n*number_row/nb_cross_val))
 
-        set.seed(seed)
         ## Train the random forest model with (nb_cross_val-1) chunks and predict the value for the test dat set
-        models[[n]] <- randomForest(    x=dat[-chunk[[n]], dat.featID],    y=as.factor(dat[-chunk[[n]], dat.labelID]),
-                                    xtest=dat[chunk[[n]], dat.featID], ytest=as.factor(dat[chunk[[n]], dat.labelID]),
-                                    ntree=numberT)
+        models[[n]]        <- randomForest(    x=dat[-chunk[[n]], dat.featID], y=as.factor(dat[-chunk[[n]], dat.labelID]),
+                                           ntree=numberT)
+        models.votes[[n]]  <- predict(models[[n]], dat[chunk[[n]], dat.featID], type="vote")
+
 
         ## Output results in list output
-        output[[n]] <- as.data.frame(cbind(dat[chunk[[n]], dat.featID], "Label"=dat[chunk[[n]], dat.labelID], "Prob"=models[[n]]$test$votes[,2], "Pred"=models[[n]]$test$predicted))
+        output[[n]] <- as.data.frame(cbind(dat[chunk[[n]], dat.featID], "Label"=dat[chunk[[n]], dat.labelID], "Prob"=models.votes[[n]][,2]))
 
         setTxtProgressBar(progress, n)
     }
@@ -140,14 +154,13 @@ if(is.null(thres))
     }
 
 ## Print in outStats the sensitivity, specificity, accuracy and precision
-#cat("\tPrinting stats in '", outStats, "' the sensitivity, specificity, precision and accuracy obtain on learning data using threshold found with 10-fold cross-validation.\n", sep="")
 cat("\tPrinting stats found with the 10-fold cross-validation in '", outStats, "'.\n", sep="")
 
-res <- matrix(0, ncol=4, nrow=(nb_cross_val+1), dimnames=list(c((1:nb_cross_val),"mean"),c("sen","spe","pre","acc")))
+res <- matrix(0, ncol=8, nrow=(nb_cross_val+1), dimnames=list(c((1:nb_cross_val),"mean"), c("sen","spe","pre","acc","tp","tn","fp","fn")))
 for(i in 1:nb_cross_val)
     {
-        mod.lab                                    <- rep(0, length.out=nrow(dat[chunk[[i]],]))
-        mod.lab[models[[i]]$test$votes[,2]>=thres] <- 1
+        mod.lab                               <- rep(0, length.out=nrow(dat[chunk[[i]],]))
+        mod.lab[models.votes[[i]][,2]>=thres] <- 1
 
         cont <- table(dat[chunk[[i]],dat.labelID], mod.lab)
         tp   <- cont[2,2]
@@ -160,9 +173,8 @@ for(i in 1:nb_cross_val)
         pre <- tp / (tp+fp)
         acc <- (tp+tn) / sum(cont)
 
-        res[i,] <- c(sen,spe,pre,acc)
+        res[i,] <- c(sen,spe,pre,acc,tp,tn,fp,fn)
     }
-
 res[nrow(res),] <- colMeans(res[-nrow(res),])
 res             <- cbind(mod=rownames(res), round(res, digits=2))
 
@@ -189,11 +201,11 @@ plot(P,col="red",lty=3, add=TRUE,)
 plot(P,lwd=2,avg="vertical",add=TRUE,col="red")
 
 ## Sn
-abline(h=meanSens,lty="dashed",lwd=0.5)
+abline(h=meanSens,lty="dashed",lwd=1.5)
 text(x=0, y = meanSens, labels = round(meanSens, digits = 3), cex=1.5 )
 
 ## Cutoffs
-abline(v=thres,lty="dashed",lwd=0.5)
+abline(v=thres,lty="dashed",lwd=1.5)
 text(x=thres, y = ymin, labels = round(thres, digits = 3), cex=1.5)
 
 ## Legend
@@ -205,58 +217,19 @@ tt <- dev.off()
 ##### END THE PLOT OF THE ROCR #####
 ####################################
 
-
 ## Make the random forest model
 cat("\tMaking random forest model on '", basename(codFile), "' and '", basename(nonFile), "' and apply it to '", basename(testFile), "'.\n", sep="")
 
 ## RF model
-set.seed(seed)
 dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=numberT)
 
-## ## Prediction on learning data
-## dat.rf.learn <- predict(dat.rf, dat[,dat.featID], cutoff=c(1-thres, thres))
-
 ## Prediction on test data
-dat.rf.test <- predict(dat.rf, testMat[,dat.featID], cutoff=c(1-thres, thres))
-
-## RF on learning for stats
-## dat.rf.learn <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]),
-##                        xtest=dat[,dat.featID],
-##                        ntree=50)
-## RF on test
-## dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]),
-##                        xtest=testMat[,dat.featID],
-##                        ntree=50)
-
-## ## Get sensitivity, specificity, accuracy and precision on learning set using the model and the threshold
-## cat("\tPrinting stats in '", outStats, "' the sensitivity, specificity, precision and accuracy obtain on learning data.\n", sep="")
-## ## res <- rep(0, length.out=nrow(dat))
-## ## res[dat.rf.learn$test$votes[,2]>=thres] <- 1
-
-## ## cont <- table(data=dat[,dat.labelID], prediction=res)
-## cont <- table(data=dat[,dat.labelID], prediction=dat.rf.learn)
-## tp   <- cont[2,2]
-## fp   <- cont[1,2]
-## tn   <- cont[1,1]
-## fn   <- cont[2,1]
-## sen  <- tp / (tp+fn)
-## spe  <- tn / (fp+tn)
-## pre  <- tp / (tp+fp)
-## acc  <- (tp+tn) / sum(cont)
-
-## cont <- cbind(c("true negative","false negative","false positive","true positive"), as.data.frame(cont)[,3])
-## write.table(x="Number of true/false positives/negatives:", file=outStats, quote=FALSE, sep="", col.names=FALSE, row.names=FALSE)
-## write.table(x=cont, file=outStats, append=TRUE, quote=FALSE, sep="\t", col.names=FALSE, row.names=FALSE)
-## write.table(x="\nMetric values:", file=outStats, append=TRUE, sep="", quote=FALSE, col.names=FALSE, row.names=FALSE)
-## write.table(x=cbind(c("Sensitivity","Specificity","Precision","Accuracy"), c(sen,spe,pre,acc)), file=outStats, append=TRUE, quote=FALSE, sep="\t", row.names=FALSE, col.names=FALSE)
-
-## Obtain the coding label prediction on test data
-## res <- rep(0, length.out=nrow(testMat))
-## res[dat.rf$test$votes[,2]>=thres] <- 1
+dat.rf.test.votes                         <- predict(dat.rf, testMat[,test.featID], type="vote")
+dat.rf.test                               <- rep(0, length.out=nrow(testMat))
+dat.rf.test[dat.rf.test.votes[,2]>=thres] <- 1
 
 ## Write the output
 cat("\tWrite the coding label for '", basename(testFile), "' in '", outFile, "'.\n", sep="")
-## write.table(x=cbind(testMat, label=res), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
 write.table(x=cbind(testMat, label=dat.rf.test), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
 
 ## Write the plot for variable importance

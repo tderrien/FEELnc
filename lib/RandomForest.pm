@@ -488,25 +488,42 @@ sub getRunModel
     die "Running random forest: predictor file for testing sequences '$testFile' is empty... exiting\n"              unless (-s $testFile);
 
 
-    # Get the path to RSCRIPT_RF.R to run the learning and assignment of the sequences
-    my $rprogpath = $ENV{'FEELNCPATH'}."/utils/codpot_randomforest.r";
+    my $rprogpath = "";
     my $cmd       = "";
-
-    # test for a valid value for the threshold is done in FEELnc_codpot.pl
+    # First check if $thres is defined
     if(!defined $thres)
     {
+	# Get the path to codpot_randomforest.r to run the learning and assignment of the sequences
+	$rprogpath = $ENV{'FEELNCPATH'}."/utils/codpot_randomforest.r";
+	$cmd       = "";
 	# If no threshold given, run codpot_randomforest.r without threshold (6 arguments)
 	print "\tThe threshold for the voting in random forest is not defined. Use 10-fold cross-validation to determine the best threshold.\n";
 	$cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile $nTree $seed";
     }
+    # Second check if there is one threshold or two
     else
     {
-	# If a threshold is given, run codpot_randomforest.r with this threshold (7 arguments)
-	print "\tThe threshold for the voting in random forest is '$thres'.\n";
-	$cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile $nTree $seed $thres";
+	my @thresList = split(/,/, $thres);
+	if(@thresList==1)
+	{
+	    # Get the path to codpot_randomforest.r to run the learning and assignment of the sequences
+	    $rprogpath = $ENV{'FEELNCPATH'}."/utils/codpot_randomforest.r";
+	    $cmd       = "";
+	    # If a unique threshold is given, run codpot_randomforest.r with this threshold (7 arguments)
+	    print "\tThe threshold for the voting in random forest is '$thres'.\n";
+	    $cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile $nTree $seed $thres";
+	}
+	else
+	{
+	    # Get the path to codpot_randomforest.r to run the learning and assignment of the sequences
+	    $rprogpath = $ENV{'FEELNCPATH'}."/utils/codpot_randomforest_2thres.r";
+	    $cmd       = "";
+	    # If two thresholds are given, run codpot_randomforest_2thres.r
+	    print "\tTwo specificity thresholds based on mRNA and lncRNA and 10-fold cross-validation: $thresList[0] and $thresList[1].\n";
+	    $cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile $nTree $seed $thresList[0] $thresList[1]";
+	}
     }
     system($cmd);
-    #print "LA COMMANDE : $cmd\n";
 }
 
 
@@ -663,10 +680,10 @@ sub runRF
 
 
 
-# With a .gtf and a result file from a random forest, write 2 .gtf file, each one respectively for coding and non coding genes
-#	$testGTF = the GTF file of the unknown transcripts
-#	$reFile  = the output file from the random forest giving ranscripts class (0: non coding; 1: coding)
-#	$outDir  = ouptut directory
+# With a .GTF/FASTA and a result file from a random forest, write 2 or 3 (if TUCps) .GTF/.FASTA file, each one respectively for coding and non coding genes plus one for sequences with no ORF. Unlink $outTuc and $noOrf if they are empty
+#	$testFile = the GTF/FASTA file of the unknown transcripts
+#	$reFile   = the output file from the random forest giving transcripts class (-1: TUCp; 0: non coding; 1: coding)
+#	$outDir   = ouptut directory
 sub rfPredToOut
 {
     my($testFile, $rfFile, $outDir, $outName) = @_;
@@ -687,9 +704,10 @@ sub rfPredToOut
 
     # Start by reading the result file from the random forest
     open FILE, "$rfFile" or die "Error! Cannot access to the random forest output file '". $rfFile . "': ".$!;
-    # Put transcript names on 2 tab, one for coding genes and the other for non coding genes
+    # Put transcript names on 3 tab, one for coding genes, one for non coding genes and the other for TUCp
     my %nonHas;
     my %codHas;
+    my %tucHas;
     my @info;
     my $flag = 0;
 
@@ -714,6 +732,10 @@ sub rfPredToOut
 	{
 	    $codHas{$info[0]} = 1;
 	}
+	elsif($info[-1] == -1)
+	{
+	    $tucHas{$info[0]} = -1;
+	}
 	else
 	{
 	    die "Not a valid value for coding label for the transcript '$info[0]'. Exit.\n";
@@ -727,14 +749,16 @@ sub rfPredToOut
 	# Read the GTF file and put the line in the right file depending on which tab the transcript is
 	my $outNon = $outDir.$outName.".lncRNA.gtf";
 	my $outCod = $outDir.$outName.".mRNA.gtf";
+	my $outTuc = $outDir.$outName.".TUCp.gtf";
 	my $noOrf  = $outDir.$outName.".noORF.gtf";
 	my $line   = "";
 	my $name   = "";
 
-	print "Writing the two GTF output files: '$outNon' and '$outCod'\n";
+	print "Writing the GTF output files\n";
 	open FILE,  "$testFile" or die "Error! Cannot access to the GTF input for new transcripts '". $testFile . "': ".$!;
 	open LNC, "> $outNon"   or die "Error! Cannot access to the lncRNA GTF output file '". $outNon . "': ".$!;
 	open RNA, "> $outCod"   or die "Error! Cannot access to the mRNA GTF output file '". $outCod . "': ".$!;
+	open TUC, "> $outTuc"   or die "Error! Cannot access to the TUCp GTF output file '". $outTuc . "': ".$!;
 	open NO,  "> $noOrf"    or die "Error! Cannot access to the no ORF GTF output file '". $noOrf . "': ".$!;
 
 	while(<FILE>)
@@ -752,6 +776,10 @@ sub rfPredToOut
 	    {
 		print RNA $line;
 	    }
+	    elsif(exists $tucHas{$name})
+	    {
+		print TUC $line;
+	    }
 	    else
 	    {
 		print NO $line;
@@ -760,19 +788,26 @@ sub rfPredToOut
 	close FILE;
 	close LNC;
 	close RNA;
+	close TUC;
 	close NO;
+
+	# Delete $outTuc and $noOrf if they are empty
+	unlink $outTuc if( ! (-s $outTuc) );
+	unlink $noOrf  if( ! (-s $noOrf) );
     }
     else # if FASTA format
     {
 	# Read the FASTA file and put the line in the right file depending on which tab the transcript is
 	my $outNon = $outDir.$outName.".lncRNA.fa";
 	my $outCod = $outDir.$outName.".mRNA.fa";
+	my $outTuc = $outDir.$outName.".TUCp.fa";
 	my $noOrf  = $outDir.$outName.".noORF.fa";
 
-	print "Writing the two FASTA output files: '$outNon' and '$outCod'\n";
+	print "Writing the FASTA output files\n";
 	my $multiFasta = new Bio::SeqIO(-file  => "$testFile", '-format' => 'Fasta');
 	my $lnc        = new Bio::SeqIO(-file => "> $outNon" , '-format' => 'Fasta');
 	my $rna        = new Bio::SeqIO(-file => "> $outCod" , '-format' => 'Fasta');
+	my $tuc        = new Bio::SeqIO(-file => "> $outTuc" , '-format' => 'Fasta');
 	my $noorf      = new Bio::SeqIO(-file => "> $noOrf" ,  '-format' => 'Fasta');
 
 	my @seqTab;
@@ -788,11 +823,19 @@ sub rfPredToOut
 	    {
 		$rna->write_seq($seq);
 	    }
+	    elsif(exists $tucHas{$seq->id()})
+	    {
+		$tuc->write_seq($seq);
+	    }
 	    else
 	    {
 		$noorf->write_seq($seq);
 	    }
 	}
+
+	# Delete $outTuc and $noOrf if they are empty
+	unlink $outTuc if( ! (-s $outTuc) );
+	unlink $noOrf  if( ! (-s $noOrf) );
     }
 }
 
@@ -967,7 +1010,8 @@ file where the kmerscores, mRNA and ORF size are put for test sequences
 
 =item $thres
 
-if it is given, the threshold for random forest (>$thres = coding), if undef then the threshold is obtain by 10-fold cross validation
+if it is given, the threshold for random forest (>$thres = coding), if undef then the threshold is obtain by 10-fold cross validation and if it is a string with two float separated by a ',', then use two specificity thresholds
+
 
 =item $nTree
 
@@ -1021,7 +1065,7 @@ list of size of kmer as '3,6,9' (default value) as a string
 
 =item $thres
 
-the threshold for the random forest, if it is not defined then it is set using a 10-fold cross-validation on learning data
+the threshold for the random forest, if it is not defined then it is set using a 10-fold cross-validation on learning data and if it is a string with two float separated by a ',', then use two specificity thresholds
 
 =item $nTree
 

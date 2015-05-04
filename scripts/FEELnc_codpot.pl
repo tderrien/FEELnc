@@ -39,7 +39,7 @@ my $man        = 0;
 my $help       = 0;
 my $verbosity  = 0;
 # my $outputlog;
-my $numtx    = 3000;	# number of tx for training
+my $numtx    = undef;	# number of tx for training, use undef for all transcripts (default)
 my $minnumtx = 100;	# Min number of tx for training (a too small value will result in a bad learning)
 
 
@@ -50,7 +50,10 @@ my $kmerList = '3,6,9';
 my $keepTmp = 0;
 
 # VW If random forest (rf/RF) cutoff is defined, no need to compute it on TP lncRNA and mRNA
-my $rfcut = undef;
+#    and a $speThres for the thresolds on mRNA and lncRNA specificity
+my $rfcut        = undef;
+my $speThres     = undef;
+my @speThresList = undef;
 
 # VW Add option to select the calculate orf for learning and test data sets
 my $orfTypeLearn = 1;
@@ -82,6 +85,7 @@ GetOptions(
     'n|numtx=i'      => \$numtx,
     'b|biotype=s'    => \%biotype,
     'r|rfcut=f'      => \$rfcut,
+    'spethres=s'     => \$speThres,
     'k|kmer=s'       => \$kmerList,
     's|sizeinter=f'  => \$sizecorrec,
     'learnorftype=i' => \$orfTypeLearn,
@@ -104,21 +108,35 @@ pod2usage(-verbose => 2) if $man;
 # Test parameters
 pod2usage("Error: Cannot read your input GTF file '$infile'...\nFor help, see:\n$progname --help\n") unless( -r $infile);
 pod2usage("Error: Cannot read your input annotation file '$mRNAfile'...\nFor help, see:\n$progname --help\n") unless( -r $mRNAfile);
-pod2usage ("- Error: \$numtx option (number of transcripts for training) '$numtx' should be greater than $minnumtx  \n") unless ($numtx >= $minnumtx);
+pod2usage ("- Error: If --numtx option (number of transcripts for training) is specified then it should be should be greater than $minnumtx (here  '$numtx')\n") unless ((!defined $numtx) || ($numtx >= $minnumtx));
 if (defined $rfcut){
-    pod2usage ("- Error: \$rfcut option '$rfcut' should be a float between 0 and 1 [0-1] \n") unless ($rfcut >= 0 and $rfcut <= 1);
+    pod2usage ("- Error: --rfcut option '$rfcut' should be a float between 0 and 1 [0-1] \n") unless ($rfcut >= 0 and $rfcut <= 1);
 }
-pod2usage ("- Error: \$sizecorrec option (ratio between mRNAs sequence lenghts and intergenic non coding sequence lenghts) '$sizecorrec' should be a float between 0 and 1 [0-1] \n") unless ($sizecorrec >= 0 and $sizecorrec <= 1);
-pod2usage ("- Error: \$orfTypeLearn option '$orfTypeLearn' should be equal to 0, 1, 2, 3 or 4 (see 'FEELnc_codpot.pl --help' for more information) \n") unless ($orfTypeLearn==0 || $orfTypeLearn==1 || $orfTypeLearn==2 || $orfTypeLearn==3 || $orfTypeLearn==4);
-pod2usage ("- Error: \$orfTypeTest option '$orfTypeTest' should be equal to 0, 1, 2, 3 or 4 (see 'FEELnc_codpot.pl --help' for more information) \n") unless ($orfTypeTest==0 || $orfTypeTest==1 || $orfTypeTest==2 || $orfTypeTest==3 || $orfTypeTest==4);
-pod2usage ("- Error: \$outDir option '$outDir' is not a directory or it does not exist \n") unless (-d $outDir);
-pod2usage ("- Error: \$nTree option '$nTree' should be strictly positive\n") unless ($nTree > 0);
-
+pod2usage ("- Error: --sizecorrec option (ratio between mRNAs sequence lenghts and intergenic non coding sequence lenghts) '$sizecorrec' should be a float between 0 and 1 [0-1]\n") unless ($sizecorrec >= 0 and $sizecorrec <= 1);
+pod2usage ("- Error: --orfTypeLearn option '$orfTypeLearn' should be equal to 0, 1, 2, 3 or 4 (see 'FEELnc_codpot.pl --help' for more information)\n") unless ($orfTypeLearn==0 || $orfTypeLearn==1 || $orfTypeLearn==2 || $orfTypeLearn==3 || $orfTypeLearn==4);
+pod2usage ("- Error: --orfTypeTest option '$orfTypeTest' should be equal to 0, 1, 2, 3 or 4 (see 'FEELnc_codpot.pl --help' for more information)\n") unless ($orfTypeTest==0 || $orfTypeTest==1 || $orfTypeTest==2 || $orfTypeTest==3 || $orfTypeTest==4);
+pod2usage ("- Error: --outDir option '$outDir' is not a directory or it does not exist \n") unless (-d $outDir);
+pod2usage ("- Error: --nTree option '$nTree' should be strictly positive\n") unless ($nTree > 0);
+pod2usage ("- Error: --rfcut and --spethres specified, only one of the two options can be used (default one threshold defined on a 10-fold cross-validation)\n") if((defined $rfcut) && (defined $speThres));
 
 # Check the max kmersize
 my @kmerTable = split(/,/,$kmerList);
 my $kmerMax   = max @kmerTable;
-pod2usage ("- Error: \$kmerList option '$kmerList' is not valid. One of the size is stricly greater than '15' (see --help for more details). \n") unless ($kmerMax <= 15);
+pod2usage ("- Error: \$kmerList option '$kmerList' is not valid. One of the size is stricly greater than '15' (see --help for more details)\n") unless ($kmerMax <= 15);
+
+# Check threshold values for the mRNAs and lncRNAs specificity
+if((defined $speThres))
+{
+    @speThresList = split(/,/, $speThres);
+    if(@speThresList!=2)
+    {
+	pod2usage ("- Error: --speThres option '$speThres' should be a list of two value separated by a ',' (see --help for more details)\n");
+    }
+    if(($speThresList[0]<=0) || ($speThresList[0]>=1) || ($speThresList[1]<=0) || ($speThresList[1]>=1))
+    {
+	pod2usage ("- Error: one value of --speThres option '$speThres' is equal or greater than 1 or equal or lesser than 0, should be in ]0,1[ (see --help for more details)\n");
+    }
+}
 
 
 # Default option for $outName
@@ -138,6 +156,9 @@ if($keepTmp!=0)
     mkdir $outTmp;
 }
 
+
+# If $numtx is undef, then learning on all transcripts, can be long so print a warning...
+print "You do not have specified a maximum number of transcripts for the training. Use all the annotation, can be long...\n" if(!defined $numtx);
 
 
 
@@ -270,45 +291,21 @@ else
 }
 
 
-# # VW modif crade !
-# # besoin des ORF pour lnc et test
-# my $lncOrfFile  = $outTmp."lncRNA_ORF.fa";
-# my $testOrfFile = $outTmp."test_ORF.fa";
-
-
-# # VW : Récupère les ORF du jeu lncRNA et test, crade !!!!
-# if (Utils::guess_format($lncfile) eq "gtf")
-# {
-#     &CreateORFcDNAFromGTF($lncfile, "/tmp/poubelle1", $lncOrfFile, $numtx, $genome, $orfTypeLearn, $verbosity);
-
-# }
-# else
-# {
-#     &CreateORFcDNAFromFASTA($lncfile, "/tmp/poubelle1", $lncOrfFile, $numtx, $orfTypeLearn, $verbosity);
-# }
-
-# # VW : utilise undef pour avoir l'ensemble des ORF
-# if (Utils::guess_format($infile) eq "gtf")
-# {
-#     &CreateORFcDNAFromGTF($refin, "/tmp/poubelle2",  $testOrfFile, undef, $genome, $orfTypeTest, $verbosity);
-# }
-# elsif (Utils::guess_format($infile) eq "fasta")
-# {
-#     &CreateORFcDNAFromFASTA($infile, "/tmp/poubelle2",  $testOrfFile, undef, $orfTypeTest, $verbosity);
-# }
-
-
-
-
 #################################
 # Launch RF on $infile in fasta
 
 print STDERR "> Run random Forest on '$testFile':\n";
-RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $keepTmp, $seed);
+if(! defined $speThres)
+{
+    RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $keepTmp, $seed);
+}
+else
+{
+    RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $speThres, $nTree, $outDir, $verbosity, $keepTmp, $seed);
+}
 
 # Parse RF result
 RandomForest::rfPredToOut($infile, $rfout, $outDir, $outName);
-
 
 # Cleaning temporary files
 if($keepTmp==0)
@@ -370,15 +367,16 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
   -g,--genome=genome.fa			Genome file or directory with chr files (mandatory if input is .GTF) [ default undef ]
   -l,--lncRNAfile=file.gtf/.fasta	Specify a known set of lncRNA for training .GTF or .FASTA  [ default undef ]
   -b,--biotype				Only consider transcripts having this(these) biotype(s) from the reference annotation (e.g : -b transcript_biotype=protein_coding,pseudogene) [default undef i.e all transcripts]
-  -n,--numtx=2000			Number of transcripts required for the training [ default 2000 ]
+  -n,--numtx=undef			Number of transcripts required for the training and for all transcripts in the annotation use undef [ default undef ]
   -r,--rfcut=[0-1]			Random forest voting cutoff [ default undef i.e will compute best cutoff ]
+  --spethres=undef			Two specificity threshold based on the 10-fold cross-validation, first one for mRNA and the second for lncRNA, need to be in ]0,1[ on separated by a ','
   -k,--kmer="3,6,9"			Kmer size list with size separate by ',' as string [ default "3,6,9" ], the maximum value for one size is '15'
   -o,--outdir="./"			Output directory [ default current directory ]
   -s,--sizeinter=0.75			Ratio between mRNA sequence lengths and non coding intergenic region sequence lengths as, by default, ncInter = mRNA * 0.75
   --learnorftype=1			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 1 ] for learning data set.
 					If the CDS is annotated in the .GTF, then the CDS is considered as the longest ORF, whatever the --orftype value.
 						'0': ORF with start and stop codon;
-						'1': same as '0' and ORF with only a strat codon, take the longest;
+						'1': same as '0' and ORF with only a start codon, take the longest;
 						'2': same as '1' but with a stop codon;
 						'3': same as '0' and ORF with a start or a stop, take the longest (see '1' and '2');
 						'4': same as '3' but if no ORF is found, take the input sequence as ORF.

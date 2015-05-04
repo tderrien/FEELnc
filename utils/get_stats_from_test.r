@@ -38,16 +38,29 @@ labTest <- matTest[checkIn,ncol(matTest)]
 labRf   <- matRf[,ncol(matRf)]
 
 cont <- table(labTest, labRf, dnn=list(basename(testFile), basename(rfFile)))
-tp   <- cont[2,2]
-fp   <- cont[1,2]
-tn   <- cont[1,1]
-fn   <- cont[2,1]
+if(all(dim(cont) == c(2,2)))
+    {
+        tp    <- cont[2,2]
+        fp    <- cont[1,2]
+        tn    <- cont[1,1]
+        fn    <- cont[2,1]
+        contS <- sum(cont)
+    } else if(all(dim(cont) == c(2,3))) {
+        tp    <- cont[2,3]
+        fp    <- cont[1,3]
+        tn    <- cont[1,2]
+        fn    <- cont[2,2]
+        contS <- sum(cont[,(2:3)])
+    } else {
+        cat("Error in the contingency table... Quit\n")
+        quit()
+    }
 
-sen <- tp / (tp+fn)
-spe <- tn / (fp+tn)
-pre <- tp / (tp+fp)
-acc <- (tp+tn) / sum(cont)
+sen <- round((tp / (tp+fn)), digits=2)
+spe <- round((tn / (fp+tn)), digits=2)
+pre <- round((tp / (tp+fp)), digits=2)
+acc <- round(((tp+tn) / contS), digits=2)
 
-cat("Contingency:\n")
+cat("Contingency (-1: TUCp; 0: lncRNA; 1: mRNA):\n")
 print(cont)
-cat("Stats:\nsensibility\t", sen, "\nspecificity\t", spe, "\nprecision\t", pre, "\naccuracy\t", acc, "\n", sep="")
+cat("Stats (on mRNA):\nsensibility\t", sen, "\nspecificity\t", spe, "\nprecision\t", pre, "\naccuracy\t", acc, "\n", sep="")
