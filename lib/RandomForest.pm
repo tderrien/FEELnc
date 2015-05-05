@@ -519,7 +519,7 @@ sub getRunModel
 	    $rprogpath = $ENV{'FEELNCPATH'}."/utils/codpot_randomforest_2thres.r";
 	    $cmd       = "";
 	    # If two thresholds are given, run codpot_randomforest_2thres.r
-	    print "\tTwo specificity thresholds based on mRNA and lncRNA and 10-fold cross-validation: $thresList[0] and $thresList[1].\n";
+	    print "\tTwo specificity thresholds based on mRNA and lncRNA and 10-fold cross-validation: '$thresList[0]' and '$thresList[1]'.\n";
 	    $cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile $nTree $seed $thresList[0] $thresList[1]";
 	}
     }

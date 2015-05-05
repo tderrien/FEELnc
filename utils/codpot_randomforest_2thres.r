@@ -132,12 +132,12 @@ mean_Sn     <- mean(sapply(1:length(pred@predictions), function(i) { P@y.values[
 ## If the cutting between the spe and sens is higher than the giving specificity threshold, then use classical threshold
 if(mean_Sn >= thresSpeM & mean_Sn >= thresSpeL)
     {
+        cat("WARNING: the value where sensitivity equal specicifity: '", mean_Sn,"' is greater than the specificity threshold: mRNA: '", thresSpeM, "'; lncRNA: '", thresSpeL, "'. Use the best value.\n", sep="")
+
         cutoffThresSpeM <- mean_cutoff
         cutoffThresSpeL <- mean_cutoff
         thresSpeM       <- mean_Sn
         thresSpeL       <- mean_Sn
-
-        cat("WARNING: the value where sensitivity equal specicifity: ", mean_Sn," is greater than the specificity threshold: ", thresSpeM, " and ", thresSpeL, ". Use the best value.\n", sep="")
     } else {
         ## Get the threshold for each model with a mRNA specificity >= thresSpeM
         cutoffThresSpeM <- mean( sapply(1:length(pred@predictions), function(i) { min(P@x.values[[i]][which(P@y.values[[i]]>=thresSpeM)]) } ) )
@@ -147,6 +147,14 @@ if(mean_Sn >= thresSpeM & mean_Sn >= thresSpeL)
         cat("\t10-fold cross-validation step is finish. Best thresholds found: mRNA: '", cutoffThresSpeM, "'; lncRNA: '", cutoffThresSpeL,"'.\n", sep="")
     }
 
+if (cutoffThresSpeM <= cutoffThresSpeL) {
+    cat("WARNING: the threshold obtain for mRNA '", cutoffThresSpeM, "' is lesser than the the one for lncRNA '", cutoffThresSpeL, "'. Use the threshold '", mean_cutoff, "' where sensitivity equal to specicifity for mRNA: '", mean_Sn,"'.\n", sep="")
+
+    cutoffThresSpeM <- mean_cutoff
+    cutoffThresSpeL <- mean_cutoff
+    thresSpeM       <- mean_Sn
+    thresSpeL       <- mean_Sn
+    }
 
 
 ## Print in outStats the sensitivity, specificity, accuracy and precision
