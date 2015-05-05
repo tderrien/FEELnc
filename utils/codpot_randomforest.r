@@ -106,11 +106,6 @@ progress <- txtProgressBar(0, nb_cross_val, style=3)
 setTxtProgressBar(progress, 0)
 
 
-### TEST ###
-## nSize <- 1500
-### TEST ###
-
-
 ## Split in 'nb_cross_val' fold cross validation
 for (n in 1:nb_cross_val)
     {
@@ -119,7 +114,7 @@ for (n in 1:nb_cross_val)
 
         ## Train the random forest model with (nb_cross_val-1) chunks and predict the value for the test dat set
         models[[n]]        <- randomForest(    x=dat[-chunk[[n]], dat.featID], y=as.factor(dat[-chunk[[n]], dat.labelID]),
-                                           ntree=numberT, replace=FALSE, sampsize=(0.2*length(-chunk[[n]])))
+                                           ntree=numberT)
         models.votes[[n]]  <- predict(models[[n]], dat[chunk[[n]], dat.featID], type="vote")
 
 
@@ -221,7 +216,7 @@ tt <- dev.off()
 cat("\tMaking random forest model on '", basename(codFile), "' and '", basename(nonFile), "' and apply it to '", basename(testFile), "'.\n", sep="")
 
 ## RF model
-dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=numberT, replace=FALSE, sampsize=(0.2*nrow(dat)))
+dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=numberT)
 
 ## Prediction on test data
 dat.rf.test.votes                         <- predict(dat.rf, testMat[,test.featID], type="vote")
