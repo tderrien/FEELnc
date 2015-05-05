@@ -119,7 +119,7 @@ for (n in 1:nb_cross_val)
 
         ## Train the random forest model with (nb_cross_val-1) chunks and predict the value for the test dat set
         models[[n]]        <- randomForest(    x=dat[-chunk[[n]], dat.featID], y=as.factor(dat[-chunk[[n]], dat.labelID]),
-                                           ntree=numberT)
+                                           ntree=numberT, replace=FALSE, sampsize=(0.2*length(-chunk[[n]])))
         models.votes[[n]]  <- predict(models[[n]], dat[chunk[[n]], dat.featID], type="vote")
 
 
@@ -221,7 +221,7 @@ tt <- dev.off()
 cat("\tMaking random forest model on '", basename(codFile), "' and '", basename(nonFile), "' and apply it to '", basename(testFile), "'.\n", sep="")
 
 ## RF model
-dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=numberT)
+dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=numberT, replace=FALSE, sampsize=(0.2*nrow(dat)))
 
 ## Prediction on test data
 dat.rf.test.votes                         <- predict(dat.rf, testMat[,test.featID], type="vote")
@@ -230,7 +230,7 @@ dat.rf.test[dat.rf.test.votes[,2]>=thres] <- 1
 
 ## Write the output
 cat("\tWrite the coding label for '", basename(testFile), "' in '", outFile, "'.\n", sep="")
-write.table(x=cbind(testMat, label=dat.rf.test), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
+write.table(x=cbind(testMat, coding_potential=dat.rf.test.votes[,2], label=dat.rf.test), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
 
 ## Write the plot for variable importance
 cat("\tPlot the variable importance as measured by random forest in '", outStats, "'.\n", sep="")

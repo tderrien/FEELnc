@@ -250,7 +250,7 @@ dat.rf.test[dat.rf.test.votes[,2]<=cutoffThresSpeL] <- 0
 
 ## Write the output
 cat("\tWrite the coding label for '", basename(testFile), "' in '", outFile, "'.\n", sep="")
-write.table(x=cbind(testMat, label=dat.rf.test), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
+write.table(x=cbind(testMat, coding_potential=dat.rf.test.votes[,2], label=dat.rf.test), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
 
 ## Write the plot for variable importance
 cat("\tPlot the variable importance as measured by random forest in '", outStats, "'.\n", sep="")
