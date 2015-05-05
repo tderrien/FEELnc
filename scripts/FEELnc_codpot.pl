@@ -57,7 +57,7 @@ my @speThresList = undef;
 
 # VW Add option to select the calculate orf for learning and test data sets
 my $orfTypeLearn = 1;
-my $orfTypeTest  = 3;
+my $orfTypeTest  = 1;
 
 # VW Add an option to specify the output directory, default current directoryand an out name
 my $outDir  = "./";
@@ -380,7 +380,7 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
 						'2': same as '1' but with a stop codon;
 						'3': same as '0' and ORF with a start or a stop, take the longest (see '1' and '2');
 						'4': same as '3' but if no ORF is found, take the input sequence as ORF.
-  --testorftype=3			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 3 ] for test data set. See --learnortype description for more informations.
+  --testorftype=1			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 3 ] for test data set. See --learnortype description for more informations.
   --ntree				Number of trees used in random forest [ default 500 ]
 
 
