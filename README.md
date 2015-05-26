@@ -90,7 +90,7 @@ Add FEELnc scripts and the distribution-specific binary of KmerInShort to your P
 
 
 	# Coding_Potential
-    # Note1 :  as a test, the training is only done on  100 tx (-n 100 option)
+    # Note1 :  as a test, the training is only done on  1000 tx (-n 1000 option)
 	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa -n 1000
 
     # Classifier
@@ -192,7 +192,7 @@ FEELnc_codpot uses a R script that will make a 10 fold cross-validation on the i
 
 **- OUTPUT :**
 
-If your input file is called **INPUT**, this second module will create 4 output files:
+If your input file is called **INPUT**, this second module will create these output files:
 
 	 - {INPUT}_RF_learningData.txt		: FEELnc metrics scores (ORF and mRNA sizes, k-mer frequencies and labels) for the training files
 	 - {INPUT}_RF_stats.txt  : statistics for n cross validation on the training files.
