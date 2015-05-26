@@ -405,12 +405,14 @@ sub CreateORFcDNAFromGTF{
 		die "ERROR: Tx '$tr' returns an empty sequence...\n" if (!defined $cdnaseq);
 		#######################################
 		# ORF
+	#	print STDERR "$tr\n";
 		if (defined $orffile){
 			my $containCDS =   ExtractFromFeature::checkCDS($h->{$tr}->{'feature'});
 			if (! $containCDS ){
 				warn "\tYour input GTF file does not contain CDS information... the program will extract the longest one for each transcript...\n" if ($countseqok < 1 && $verbosity > 5);
 				# we create an ORF hash based on extraction of longest ORF
 				$orfob	=	Orf::longestORF2($cdnaseq,$strand, $allow_no_start, $allow_no_stop, undef, 1);
+				
 		
 			} else {
 				warn "\tYour input GTF file does contain CDS information...\n" if ($countseqok < 1 && $verbosity > 5);
@@ -421,6 +423,7 @@ sub CreateORFcDNAFromGTF{
 		
 			}
 		
+			#print Dumper $orfob;
 			# Add ORF to a hash %h_orf only if the ORF is complete
 			if ($orfob->{'check_start'} && $orfob->{'check_stop'}){
 				$h_orf{$tr}	=	$orfob->{'cds_seq'};
