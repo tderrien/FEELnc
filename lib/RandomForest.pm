@@ -542,10 +542,16 @@ sub getRunModel
 #	$keepTmp         = keep or not the temporary files
 sub runRF
 {
-    my ($codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc) = @_;
+    my ($REFcodLearnFile, $REForfCodLearnFile, $REFnonLearnFile, $REForfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc) = @_;
     $kmerListString ||= "3,6,9";
     $verbosity      ||= 0;
     $proc           ||= 1;
+
+    # Get the name of the training files for the random forest
+    my $codLearnFile    = $REFcodLearnFile->[1];
+    my $orfCodLearnFile = $REForfCodLearnFile->[1];
+    my $nonLearnFile    = $REFnonLearnFile->[1];
+    my $orfNonLearnFile = $REForfNonLearnFile->[1];
 
     # Make a variable to keep temporay file in the outdir if --keeptmp is specify
     my $outTmp = "/tmp/";
@@ -595,7 +601,8 @@ sub runRF
 	push(@kmerRatioFileList, $kmerFile);
 
 	## VWTD: modification
-	&getKmerRatio($orfCodLearnFile, $nonLearnFile, $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp);
+	## Make the model on the first learning files 
+	&getKmerRatio($REForfCodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp);
     }
 
     # 3. Compute the kmer score for each kmer size on learning and test ORF and for each type
