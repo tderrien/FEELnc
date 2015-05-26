@@ -130,7 +130,7 @@ sub foverlap
 		warn "Warning: Mode stranded activated with strandA = '$s1' and strandB = '$s2' ($beg1-$end1 vs $beg2-$end2)\n" if ($s1 ne "+" && $s1 ne "-" && $s2 ne "+" && $s1 ne "-");
 	}
 	# if overlap
-		my $resustrand = strandmode($s1,$s2,$mode);
+# 		my $resustrand = strandmode($s1,$s2,$mode);
 # 	print STDERR "$resustrand == strandmode($s1,$s2,$mode) and ($end1>=$beg2)&&($beg1<=$end2)\n";
 	return ( strandmode($s1,$s2,$mode) and ($end1>=$beg2)&&($beg1<=$end2));
 
