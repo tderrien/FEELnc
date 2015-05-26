@@ -296,4 +296,61 @@ sub pathProg{
     }
 }
 
+
+
+# getFastaNbr: return the number of sequence in a FASTA file
+sub getFastaNbr
+{
+    my($input) = @_;
+
+    # Open input file
+    my $inputFasta = new Bio::SeqIO(-file => '$inFile', '-format' => 'fasta');
+    my $seq;
+    my $cpt = 0;
+
+    while($seq = $inputFasta->next_seq())
+    {
+	$cpt++;
+    }
+
+    return($cpt);
+}
+
+
+# divFasta: cut a FASTA file in two files, with the first one equal to X% of the sequences of the input file (default 0.5%)
+sub divFasta
+{
+    my($input, $name1, $name2, $perc) = @_;
+
+    my $nbrSeq = &getFastaNbr($input);
+    my $nbr1   = floor($perc * $nbrSeq);
+    my $nbr2   = $nbrSeq - $nbr1;
+
+    # Open input file
+    my $inputFasta = new Bio::SeqIO(-file => '$inFile', '-format' => 'fasta');
+    my $seq;
+    
+    # Open output files
+    my $out1 = new Bio::SeqIO(-file => "> $name1" , '-format' => 'fasta');
+    my $out2 = new Bio::SeqIO(-file => "> $name2" , '-format' => 'fasta');
+
+    # Write the first $nbr1 sequences into $name1
+    for(my $i=1; $i<=$nbr1; $i++)
+    {
+	$seq = $inputFasta->next_seq();
+	$name1->write_seq($seq);
+    }	
+    
+    # Write the laste $nbr2 sequences into $name1
+    for(my $i=1; $i<=$nbr2; $i++)
+    {
+	$seq = $inputFasta->next_seq();
+	$name1->write_seq($seq);
+    }	
+}
+
+
+
+
+
 1;
