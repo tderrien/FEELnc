@@ -72,6 +72,9 @@ my $seed = 1234;
 # VW Add nbr proc
 my $proc = 1;
 
+# VW Add a percentage to get two learning file
+my $perc = 0.5;
+
 # Intergenic extraction:
 my $maxTries   = 10;
 my $maxN       = 5;
@@ -95,6 +98,7 @@ GetOptions(
     'ntree=i'        => \$nTree,
     'outdir=s'       => \$outDir,
     'o|outname=s'    => \$outName,
+    'percentage=f'   => \$perc;
     'keeptmp'        => \$keepTmp,
     'v|verbosity=i'  => \$verbosity,
     'p|processor=i'  => \$proc,    
@@ -122,6 +126,7 @@ pod2usage ("- Error: --orfTypeTest option '$orfTypeTest' should be equal to 0, 1
 pod2usage ("- Error: --nTree option '$nTree' should be strictly positive\n") unless ($nTree > 0);
 pod2usage ("- Error: --rfcut and --spethres specified, only one of the two options can be used (default one threshold defined on a 10-fold cross-validation)\n") if((defined $rfcut) && (defined $speThres));
 pod2usage ("- Error: -p/--processor option '$proc' should be a positive integer\n") unless ($proc >= 1);
+pod2usage ("- Error: --percentage option '$perc' should be a number in ]0;1[\n") unless ($prec>0 && $prec<1);
 
 # Check the max kmersize
 my @kmerTable = split(/,/,$kmerList);
@@ -288,6 +293,20 @@ else
 
 
 #################################
+# Divide each learning file into two file: one for the kmermodel and one for the random forest
+
+my $codFileKmRf    = ($codFile."forKmerModel.fasta",    $codFile."forRandomForest.fasta");
+my $codOrfFileKmRf = ($codOrfFile."forKmerModel.fasta", $codOrfFile."forRandomForest.fasta");
+my $nonFileKmRf    = ($nonFile."forKmerModel.fasta",    $nonFile."forRandomForest.fasta");
+my $nonOrfFileKmRf = ($nonOrfFile."forKmerModel.fasta", $nonOrfFile."forRandomForest.fasta");
+
+Utils::divFasta($codFile,    $codFileKmRf[0],    $codFileKmRf[1],    $perc);
+Utils::divFasta($codOrfFile, $codOrfFileKmRf[0], $codOrfFileKmRf[1], $perc);
+Utils::divFasta($nonFile,    $nonFileKmRf[0],    $nonFileKmRf[1],    $perc);
+Utils::divFasta($nonOrfFile, $nonOrfFileKmRf[0], $nonOrfFileKmRf[1], $perc);
+
+
+#################################
 # Launch RF on $infile in fasta
 
 print STDERR "> Run random Forest on '$testFile':\n";
@@ -312,6 +331,14 @@ if($keepTmp==0)
     unlink $nonOrfFile;
     unlink $testFile;
     unlink $testOrfFile;
+    unlink $codFileKmRf[0];
+    unlink $codFileKmRf[1];
+    unlink $codOrfFileKmRf[0];
+    unlink $codOrfFileKmRf[1];
+    unlink $nonFileKmRf[0];
+    unlink $nonFileKmRf[1];
+    unlink $nonOrfFileKmRf[0];
+    unlink $nonOrfFileKmRf[1];
 }
 
 
@@ -379,7 +406,7 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
 						'4': same as '3' but if no ORF is found, take the input sequence as ORF.
   --testorftype=1			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 1 ] for test data set. See --learnortype description for more informations.
   --ntree				Number of trees used in random forest [ default 500 ]
-
+  --percentage=0.5			Percentage of the training file use for the training of the kmer model. What remains will be used to train the random forest
 
 =head2 Debug arguments
 
