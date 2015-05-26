@@ -542,9 +542,10 @@ sub getRunModel
 #	$keepTmp         = keep or not the temporary files
 sub runRF
 {
-    my ($codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $nTree, $outDir, $verbosity, $keepTmp, $seed) = @_;
+    my ($codLearnFile, $orfCodLearnFile, $nonLearnFile, $orfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc) = @_;
     $kmerListString ||= "3,6,9";
     $verbosity      ||= 0;
+    $proc           ||= 1;
 
     # Make a variable to keep temporay file in the outdir if --keeptmp is specify
     my $outTmp = "/tmp/";
@@ -583,17 +584,17 @@ sub runRF
     my @kmerScoreTestFileList;
     my $kmerFile;
     my $kmerSize;
-    my $codStep     = 3;
-    my $nonStep     = 1;
-    my $proc        = 1;
-    my $lenKmerList = @kmerList;
-    my $i           = 0;
+    my $codStep       = 3;
+    my $nonStep       = 1;
+    my $lenKmerList   = @kmerList;
+    my $i             = 0;
 
     foreach $kmerSize ( @kmerList )
     {
 	$kmerFile = $outTmp.basename($orfCodLearnFile)."_".$kmerSize."_".$randVal."_kmerRatio.tmp";
 	push(@kmerRatioFileList, $kmerFile);
 
+	## VWTD: modification
 	&getKmerRatio($orfCodLearnFile, $nonLearnFile, $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp);
     }
 

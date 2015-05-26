@@ -69,6 +69,8 @@ my $nTree = 500;
 # VW Add an option to fixe the seed
 my $seed = 1234;
 
+# VW Add nbr proc
+my $proc = 1;
 
 # Intergenic extraction:
 my $maxTries   = 10;
@@ -95,6 +97,7 @@ GetOptions(
     'o|outname=s'    => \$outName,
     'keeptmp'        => \$keepTmp,
     'v|verbosity=i'  => \$verbosity,
+    'p|processor=i'  => \$proc,    
     'seed=i'         => \$seed,
     'help|?'         => \$help,
     'man'            => \$man
@@ -115,9 +118,10 @@ if (defined $rfcut){
 pod2usage ("- Error: --sizecorrec option (ratio between mRNAs sequence lenghts and intergenic non coding sequence lenghts) '$sizecorrec' should be a float between 0 and 1 [0-1]\n") unless ($sizecorrec >= 0 and $sizecorrec <= 1);
 pod2usage ("- Error: --orfTypeLearn option '$orfTypeLearn' should be equal to 0, 1, 2, 3 or 4 (see 'FEELnc_codpot.pl --help' for more information)\n") unless ($orfTypeLearn==0 || $orfTypeLearn==1 || $orfTypeLearn==2 || $orfTypeLearn==3 || $orfTypeLearn==4);
 pod2usage ("- Error: --orfTypeTest option '$orfTypeTest' should be equal to 0, 1, 2, 3 or 4 (see 'FEELnc_codpot.pl --help' for more information)\n") unless ($orfTypeTest==0 || $orfTypeTest==1 || $orfTypeTest==2 || $orfTypeTest==3 || $orfTypeTest==4);
-pod2usage ("- Error: --outDir option '$outDir' is not a directory or it does not exist \n") unless (-d $outDir);
+# pod2usage ("- Error: --outDir option '$outDir' is not a directory or it does not exist \n") unless (-d $outDir);
 pod2usage ("- Error: --nTree option '$nTree' should be strictly positive\n") unless ($nTree > 0);
 pod2usage ("- Error: --rfcut and --spethres specified, only one of the two options can be used (default one threshold defined on a 10-fold cross-validation)\n") if((defined $rfcut) && (defined $speThres));
+pod2usage ("- Error: -p/--processor option '$proc' should be a positive integer\n") unless ($proc >= 1);
 
 # Check the max kmersize
 my @kmerTable = split(/,/,$kmerList);
@@ -146,7 +150,14 @@ if($outName eq "")
 }
 
 # For $outDiradd a '/' at the end of the path
-$outDir = $outDir."/";
+if (-d $outDir ){
+	warn "Warning: Output directory '$outDir' already exists... files might be overwritten!\n";
+}elsif (-r $outDir){
+	die "Error: Output directory '$outDir' is a file... aborting!\n";
+} else{
+	mkdir $outDir;
+}
+$outDir = $outDir."/"; # add "/" at the end in case it is forgotten in pasting outdir and outname
 
 # Create the directory for temporary files
 my $outTmp = "/tmp/";
@@ -166,26 +177,11 @@ print "You do not have specified a maximum number of transcripts for the trainin
 
 # test path
 die "Error: You should set the environnment variable FEELNCPATH to the dir of installation\nexport FEELNCPATH=my_dir_of_install/\n(See README)\n" unless (defined $ENV{'FEELNCPATH'});
-# my $rprogpath   = $ENV{'FEELNCPATH'}."/bin/".$rprog;
-# pod2usage("Error: Cannot access FEELnc bin dir with path '$rprogpath'...\nCheck the environnment variable FEELNCPATH\n") unless( -r $rprogpath);
-# my $pathRscript = Utils::pathProg("Rscript");
-#VW: don't need cpat anymore my $pathlogit   = Utils::pathProg("cpat.py");
-# test PYTHONPATH from CPAT : http://dldcc-web.brc.bcm.edu/lilab/liguow/CGI/cpat/_build/html/index.html#installation
-# die "Error: You should set the PYTHONPATH env. variable to CPAT installation
-# export PYTHONPATH=/home/user/CPAT/usr/local/lib/python2.7/site-packages:\$PYTHONPATH. #setup PYTHONPATH
-# (See http://dldcc-web.brc.bcm.edu/lilab/liguow/CGI/cpat/_build/html/index.html#installation)\n" unless (defined $ENV{'PYTHONPATH'});
-
-# Log File
-##########
-# my $commandline = qx/ps -o args $$/;
-# if (!defined $outputlog){
-# 	$outputlog	=	Utils::renamefile($infile, ".feelnccodpot.log");
-# }
-# open(LOG,">$outputlog") or die("Cannot open '$outputlog'");
-#
-#
-# print LOG $commandline;
-# print STDERR "> Results will be available in file: '$outputlog'\n";
+# Rscript 
+my $rprogpath = $ENV{'FEELNCPATH'}."/utils/codpot_randomforest.r";
+die "Error: The environnment variable FEELNCPATH does not reach the 'utils/codpot_randomforest.r' script\n" unless (-r $rprogpath);
+# KIS path
+my $kisPath = Utils::pathProg("KmerInShort");
 
 
 # Die if lnc training file is not set and mRNA file is in FASTA: no possibility of intergenic extraction
@@ -297,11 +293,11 @@ else
 print STDERR "> Run random Forest on '$testFile':\n";
 if(! defined $speThres)
 {
-    RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $keepTmp, $seed);
+    RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc);
 }
 else
 {
-    RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $speThres, $nTree, $outDir, $verbosity, $keepTmp, $seed);
+    RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $speThres, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc);
 }
 
 # Parse RF result
@@ -371,7 +367,8 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
   -r,--rfcut=[0-1]			Random forest voting cutoff [ default undef i.e will compute best cutoff ]
   --spethres=undef			Two specificity threshold based on the 10-fold cross-validation, first one for mRNA and the second for lncRNA, need to be in ]0,1[ on separated by a ','
   -k,--kmer="3,6,9"			Kmer size list with size separate by ',' as string [ default "3,6,9" ], the maximum value for one size is '15'
-  -o,--outdir="./"			Output directory [ default current directory ]
+  -o,--outname="./"			Output filename [ default infile_name ]
+  --outdir="./"				Output directory [ default current directory ]  
   -s,--sizeinter=0.75			Ratio between mRNA sequence lengths and non coding intergenic region sequence lengths as, by default, ncInter = mRNA * 0.75
   --learnorftype=1			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 1 ] for learning data set.
 					If the CDS is annotated in the .GTF, then the CDS is considered as the longest ORF, whatever the --orftype value.
@@ -380,7 +377,7 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
 						'2': same as '1' but with a stop codon;
 						'3': same as '0' and ORF with a start or a stop, take the longest (see '1' and '2');
 						'4': same as '3' but if no ORF is found, take the input sequence as ORF.
-  --testorftype=1			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 3 ] for test data set. See --learnortype description for more informations.
+  --testorftype=1			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 1 ] for test data set. See --learnortype description for more informations.
   --ntree				Number of trees used in random forest [ default 500 ]
 
 
@@ -390,17 +387,13 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
   --verbosity=0				Which level of information that need to be print [ default 0 ]
   --seed=1234				Use to fixe the seed value for the extraction of intergenic DNA region to get lncRNA like sequences and for the random forest [ default 1234 ]
 
+
 =head2 Intergenic lncRNA extraction
 
 	-to be added
-
-
-=head2 Log output
-
-  -o,--outlog=file.log		Specify the log file of output which [default infile.log]
-
-
-
+	
+	
+	
 =head1 AUTHORS
 
 =over 4
