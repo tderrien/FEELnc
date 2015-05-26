@@ -98,7 +98,7 @@ GetOptions(
     'ntree=i'        => \$nTree,
     'outdir=s'       => \$outDir,
     'o|outname=s'    => \$outName,
-    'percentage=f'   => \$perc;
+    'percentage=f'   => \$perc,
     'keeptmp'        => \$keepTmp,
     'v|verbosity=i'  => \$verbosity,
     'p|processor=i'  => \$proc,    
@@ -126,7 +126,7 @@ pod2usage ("- Error: --orfTypeTest option '$orfTypeTest' should be equal to 0, 1
 pod2usage ("- Error: --nTree option '$nTree' should be strictly positive\n") unless ($nTree > 0);
 pod2usage ("- Error: --rfcut and --spethres specified, only one of the two options can be used (default one threshold defined on a 10-fold cross-validation)\n") if((defined $rfcut) && (defined $speThres));
 pod2usage ("- Error: -p/--processor option '$proc' should be a positive integer\n") unless ($proc >= 1);
-pod2usage ("- Error: --percentage option '$perc' should be a number in ]0;1[\n") unless ($prec>0 && $prec<1);
+pod2usage ("- Error: --percentage option '$perc' should be a number in ]0;1[\n") unless ($perc>0 && $perc<1);
 
 # Check the max kmersize
 my @kmerTable = split(/,/,$kmerList);
