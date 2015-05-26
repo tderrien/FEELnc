@@ -221,6 +221,48 @@ sub printGTF{
 	}
 }
 
+sub printGTFrdmTx{
+	# parsing a hash in sub need dereference in shift
+	my ($refh, $mode, $verbosity)	= @_;
+	$mode 			||= "all"; 		# number of fields to be printed
+	$verbosity 		||= 0;
+
+	# print if verbosity	
+	print STDERR "\nPrinting transcripts GTF...\n" if ($verbosity > 0);
+	
+	my %seen_gn;
+	
+# 	print Dumper $refh;
+	# Parse gtfHash to be printed
+	
+	for my $tr (keys %{$refh}){
+
+        # increment hash gene counter
+        $seen_gn{$refh->{$tr}->{"gene_id"}}++;
+        
+        # next if already seen gene
+        next if ($seen_gn{$refh->{$tr}->{"gene_id"}} > 1 );
+	    
+	    
+	    # print normally as printGTF
+		foreach my $feat1 (@{$refh->{$tr}->{"feature"}}) {
+			print join("\t",$refh->{$tr}->{"chr"}, $refh->{$tr}->{"source"}, $feat1->{"feat_level"}, $feat1->{"start"}, $feat1->{"end"}, $refh->{$tr}->{"score"}, $refh->{$tr}->{"strand"}, $feat1->{"frame"});
+ 			print "\tgene_id \"".$refh->{$tr}->{"gene_id"}."\"; transcript_id \"$tr\";";
+ 			
+			if ($mode eq "all"){
+				my %tmph = %{$feat1};
+				# delete unnecesserary keys from hash %tmph
+				delete @tmph{qw/feat_level start end strand frame/};
+				for (sort keys %tmph){
+					print " $_ \"$tmph{$_}\";" if (defined $tmph{$_}); # id defined in order to test if parsinf $extrafield is OK (i.e in case people select FPKM and it does not exists in the file)
+				}
+			}	
+			print "\n";
+		}		
+	}
+}
+
+
 
 # print hash in GTF format with transcript line
 sub printGTFtx{
