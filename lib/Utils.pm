@@ -304,7 +304,7 @@ sub getFastaNbr
     my($input) = @_;
 
     # Open input file
-    my $inputFasta = new Bio::SeqIO(-file => '$inFile', '-format' => 'fasta');
+    my $inputFasta = new Bio::SeqIO(-file => '$input', '-format' => 'fasta');
     my $seq;
     my $cpt = 0;
 
@@ -327,12 +327,12 @@ sub divFasta
     my $nbr2   = $nbrSeq - $nbr1;
 
     # Open input file
-    my $inputFasta = new Bio::SeqIO(-file => '$inFile', '-format' => 'fasta');
+    my $inputFasta = new Bio::SeqIO(-file => '$input', '-format' => 'fasta');
     my $seq;
     
     # Open output files
-    my $out1 = new Bio::SeqIO(-file => "> $name1" , '-format' => 'fasta');
-    my $out2 = new Bio::SeqIO(-file => "> $name2" , '-format' => 'fasta');
+    my $out1 = new Bio::SeqIO(-file => '> $name1' , '-format' => 'fasta');
+    my $out2 = new Bio::SeqIO(-file => '> $name2' , '-format' => 'fasta');
 
     print "\tDividing $input file into two learning files";
     # Write the first $nbr1 sequences into $name1
