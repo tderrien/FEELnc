@@ -50,9 +50,9 @@ The following software and libraries must be installed on your machine:
  * [Parralell::ForkManager](http://search.cpan.org/~szabgab/Parallel-ForkManager-1.07/lib/Parallel/ForkManager.pm) : tested with version 1.07
 - R [Rscript](http://cran.r-project.org): tested with version 3.1.0.
  * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) test with version 1.0-5
- * [randomFOREST](http://cran.r-project.org/web/packages/randomForest/index.html) tested with version 4.6-10
+ * [randomForest](http://cran.r-project.org/web/packages/randomForest/index.html) tested with version 4.6-10
 
-\* *Note: R librairies should be installed automatically when running FEELnc. In case it does not work, please type in a R session:
+* Note: R librairies should be installed automatically when running FEELnc. In case it does not work, please type in a R session:
 	install.packages('ROCR')
 	install.packages('randomForest')
 
