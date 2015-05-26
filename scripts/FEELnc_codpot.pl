@@ -295,10 +295,10 @@ else
 #################################
 # Divide each learning file into two file: one for the kmermodel and one for the random forest
 
-my $codFileKmRf    = ($codFile."forKmerModel.fasta",    $codFile."forRandomForest.fasta");
-my $codOrfFileKmRf = ($codOrfFile."forKmerModel.fasta", $codOrfFile."forRandomForest.fasta");
-my $nonFileKmRf    = ($nonFile."forKmerModel.fasta",    $nonFile."forRandomForest.fasta");
-my $nonOrfFileKmRf = ($nonOrfFile."forKmerModel.fasta", $nonOrfFile."forRandomForest.fasta");
+my @codFileKmRf    = ($codFile."forKmerModel.fasta",    $codFile."forRandomForest.fasta");
+my @codOrfFileKmRf = ($codOrfFile."forKmerModel.fasta", $codOrfFile."forRandomForest.fasta");
+my @nonFileKmRf    = ($nonFile."forKmerModel.fasta",    $nonFile."forRandomForest.fasta");
+my @nonOrfFileKmRf = ($nonOrfFile."forKmerModel.fasta", $nonOrfFile."forRandomForest.fasta");
 
 Utils::divFasta($codFile,    $codFileKmRf[0],    $codFileKmRf[1],    $perc);
 Utils::divFasta($codOrfFile, $codOrfFileKmRf[0], $codOrfFileKmRf[1], $perc);
@@ -312,11 +312,13 @@ Utils::divFasta($nonOrfFile, $nonOrfFileKmRf[0], $nonOrfFileKmRf[1], $perc);
 print STDERR "> Run random Forest on '$testFile':\n";
 if(! defined $speThres)
 {
-    RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc);
+    # RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc);
+    RandomForest::runRF(\@codFileKmRf, \@codOrfFileKmRf, \@nonFileKmRf, \@nonOrfFileKmRf, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc);
 }
 else
 {
-    RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $speThres, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc);
+    # RandomForest::runRF($codFile, codOrfFile, nonFile, nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $speThres, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc);
+    RandomForest::runRF(\@codFileKmRf, \@codOrfFileKmRf, \@nonFileKmRf, \@nonOrfFileKmRf, $testFile, $testOrfFile, $rfout, $kmerList, $speThres, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc);
 }
 
 # Parse RF result
