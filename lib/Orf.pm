@@ -119,7 +119,7 @@ sub longestORF {
 				$e>$s && 
 				($s > $last_delete_pos{$start_pos_frame})){ #only count each stop once.
 		
-				print "e:$e - start: $s > $last_delete_pos{$start_pos_frame} $start_pos_frame\n";
+# 				print "e:$e - start: $s > $last_delete_pos{$start_pos_frame} $start_pos_frame\n";
 				$last_delete_pos{$start_pos_frame} = $e;
 				
 				if ($e-$s>$best) {
@@ -257,25 +257,40 @@ sub longestORF2{
 		}
 	}
 
-	# Get translation
-	my $seq_obj = Bio::Seq->new(-seq => $bestorf, -alphabet => 'dna' );						
-	$seqprot	= $seq_obj->translate->seq;	
+	my %orfobj;
+	# Test if empty sequence
+	if ($bestorf eq ""){
+		warn "Empty sequence for : \nsequence= $seq\nstrand=$strand\nallow_no_start=$allow_no_start\nallow_no_stop=$reverse_strand\nstrand=$reverse_strand\nmaxstopskip=$maxstopskip\n";
+		%orfobj =(start		=> 0, 
+					end			=> 0, 
+					seqlength 	=> $seqlength, 
+					cds_seq 	=> '', 
+					prot_seq 	=> '', 
+					strand 		=> $strand,  
+					check_start => 0,
+					check_stop  => 0				
+					);
+	} else {
+		# Get translation
+		my $seq_obj = Bio::Seq->new(-seq => $bestorf, -alphabet => 'dna' );						
+		$seqprot	= $seq_obj->translate->seq;	
 	
-	# Check start and stop
-	my $checkstart = check_start_codon($seqprot);
-	my $checkstop  = check_stop_codon($seqprot);
+		# Check start and stop
+		my $checkstart = check_start_codon($seqprot);
+		my $checkstop  = check_stop_codon($seqprot);
 	
-	# Store all data in hash
-	my %orfobj =(start		=> $bests, 
-				end			=> $beste, 
-				seqlength 	=> $seqlength, 
-				cds_seq 	=> $bestorf, 
-				prot_seq 	=> $seqprot, 
-				strand 		=> $strand,  
-				check_start => $checkstart,
-				check_stop  => $checkstop				
-				);
+		# Store all data in hash
+		%orfobj =(start		=> $bests, 
+					end			=> $beste, 
+					seqlength 	=> $seqlength, 
+					cds_seq 	=> $bestorf, 
+					prot_seq 	=> $seqprot, 
+					strand 		=> $strand,  
+					check_start => $checkstart,
+					check_stop  => $checkstop				
+					);
 	
+	}
 	return \%orfobj;
 
 }
