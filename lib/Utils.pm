@@ -334,6 +334,7 @@ sub divFasta
     my $out1 = new Bio::SeqIO(-file => "> $name1" , '-format' => 'fasta');
     my $out2 = new Bio::SeqIO(-file => "> $name2" , '-format' => 'fasta');
 
+    print "\tDividing $input file into two learning files";
     # Write the first $nbr1 sequences into $name1
     for(my $i=1; $i<=$nbr1; $i++)
     {
