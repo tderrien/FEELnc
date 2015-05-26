@@ -1,7 +1,7 @@
 # FEELnc
  Fast and Effective Extraction of Long non-coding RNAs
 
-*Version (18/02/2015)*
+*Version (26/05/2015) : Major update includes the use of RandomForest for FEELnc_codpot*
 
 ## Introduction
 
@@ -49,9 +49,12 @@ The following software and libraries must be installed on your machine:
  * [Bioperl](http://www.bioperl.org/wiki/Main_Page)  : tested with version BioPerl-1.6.924
  * [Parralell::ForkManager](http://search.cpan.org/~szabgab/Parallel-ForkManager-1.07/lib/Parallel/ForkManager.pm) : tested with version 1.07
 - R [Rscript](http://cran.r-project.org): tested with version 3.1.0.
- * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) R library (type "install.packages('ROCR')" in a R session)
-- [CPAT tool](http://rna-cpat.sourceforge.net/#installation): Coding Potential Assessment Tool: tested with version 1.2.2.
+ * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) test with version 1.0-5
+ * [randomFOREST](http://cran.r-project.org/web/packages/randomForest/index.html) tested with version 4.6-10
 
+\* *Note: R librairies should be installed automatically when running FEELnc. In case it does not work, please type in a R session:
+	install.packages('ROCR')
+	install.packages('randomForest')
 
 ### Installation
 
@@ -63,11 +66,19 @@ Go to FEELnc directory
 
 	cd FEELnc
 
-export PERL5LIB, FEELNCPATH and add it to your PATH
+Export PERL5LIB and FEELNCPATH variables
 
-	export PERL5LIB=${PWD}/lib/
 	export FEELNCPATH=${PWD}
-	export PATH=$PATH:$FEELNCPATH/scripts/
+	export PERL5LIB=$PERL5LIB:${FEELNCPATH}/lib/
+
+Add FEELnc scripts and the distribution-specific binary of KmerInShort to your PATH
+
+	export PATH=$PATH:${FEELNCPATH}/scripts/
+	#for MAC
+	export PATH=$PATH:${FEELNCPATH}/bin/MAC/
+	# for UNIX
+	export PATH=$PATH:${FEELNCPATH}/bin/LINUX/
+
 
 ### Test with toy example:
 
@@ -80,7 +91,7 @@ export PERL5LIB, FEELNCPATH and add it to your PATH
 
 	# Coding_Potential
     # Note1 :  as a test, the training is only done on  100 tx (-n 100 option)
-	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa -n 100
+	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa -n 1000
 
     # Classifier
 	FEELnc_classifier.pl -i candidate_lncRNA.gtf.lncRNA.gtf -a annotation_chr38.gtf > candidate_lncRNA_classes.txt
@@ -150,7 +161,8 @@ The second step of the pipeline (FEELnc_codpot) aims at computing the CPS i.e th
 
 **- INPUT :**
 
-It makes use of the CPAT tool which is an alignment-free program (thus very fast) which relies on  intrinsic properties of the fasta sequences of  two training files:
+It makes use of the intrinsic properties of fasta sequences (ORF and mRNA sizes, k-mer frequencies...) of two training files:
+
 
 	- known_mRNA.gtf   : a set of known protein_coding transcripts
 	- known_lncRNA.gtf : a set of known lncRNA transcripts
@@ -182,35 +194,63 @@ FEELnc_codpot uses a R script that will make a 10 fold cross-validation on the i
 
 If your input file is called **INPUT**, this second module will create 4 output files:
 
- 	- INPUT.cpat		: gathering all CPAT metric together with the CPS for all input tx
-	 - INPUT.Cutoff.png  : the .png image of the Two Graphic ROC curves to determine the optimal CPS cutoff value.
-     - INPUT.lncRNA.gtf  : a .GTF file of the transcripts below the CPS (Your final set of lncRNAs)
-     - INPUT.mRNA.gtf    : a .GTF file of the transcripts above the CPS (a a priori new set of mRNAs)
+	 - {INPUT}_RF_learningData.txt		: FEELnc metrics scores (ORF and mRNA sizes, k-mer frequencies and labels) for the training files
+	 - {INPUT}_RF_stats.txt  : statistics for n cross validation on the training files.
+	 - {INPUT}_RF_stats.txt  : statistics for n cross validation on the training files.
+	 - {INPUT}_RF_TGROC.png  : TwoGraph ROC curve plot to select the best coding potential cutoff
+	 - {INPUT}_RF.txt	:  FEELnc metrics scores (ORF and mRNA sizes, k-mer frequencies and labels) for the testing file
+	 - {INPUT}_RF_varImpPlot.png	:	Dotchart plot of variable importance as measured by a Random Forest
+
+	 - {INPUT}.lncRNA.gtf || {INPUT}.lncRNA.FA	:  a .GTF/.FA file of the transcripts below the CPS (i.e the final set of lncRNAs)
+	 - {INPUT}.mRNA.gtf || {INPUT}.mRNA.FA	:  a .GTF/.FA file of the transcripts above the coding potential cutoff (i.e the final set of mRNAs)
+
 
 **- FULL OPTIONS (FEELnc_codpot.pl --help) :**
 
 ```
-  * General:
+
+Usage:
+    FEELnc_codpot.pl -i transcripts.GTF -a known_mRNA.GTF -g genome.FA -l
+    known_lnc.GTF [options...]
+
+Options:
+  General:
       --help                Print this help
       --man                 Open man page
       --verbosity           Level of verbosity
 
-  * Mandatory arguments:
+  Mandatory arguments:
       -i,--infile=file.gtf/.fasta           Specify the .GTF or .FASTA file  (such as a cufflinks transcripts/merged .GTF or .FASTA file)
       -a,--mRNAfile=file.gtf/.fasta         Specify the annotation .GTF or .FASTA file  (file of protein coding transcripts .GTF or .FASTA file)
 
-  * Optional arguments:
-      -g,--genome=genome.fa                         genome file or directory with chr files (mandatory if input is .GTF) [ default undef ]
-      -l,--lncRNAfile=file.gtf/.fasta       specify a known set of lncRNA for training .GTF or .FASTA  [ default undef ]
-      -b,--biotype                  only consider transcripts having this(these) biotype(s) from the reference annotation (e.g : -b transcript_biotype=protein_coding,pseudogene) [default undef i.e all transcripts]
-      -n,--numtx=2000               Number of transcripts required for the training [default 2000 ]
+  Optional arguments:
+      -g,--genome=genome.fa                 Genome file or directory with chr files (mandatory if input is .GTF) [ default undef ]
+      -l,--lncRNAfile=file.gtf/.fasta       Specify a known set of lncRNA for training .GTF or .FASTA  [ default undef ]
+      -b,--biotype                          Only consider transcripts having this(these) biotype(s) from the reference annotation (e.g : -b transcript_biotype=protein_coding,pseudogene) [default undef i.e all transcripts]
+      -n,--numtx=undef                      Number of transcripts required for the training and for all transcripts in the annotation use undef [ default undef ]
       -r,--rfcut=[0-1]                      Random forest voting cutoff [ default undef i.e will compute best cutoff ]
-      -k,--kmer="2,3,4,5,6"                 Kmer size list with size separate by ',' as string [ default "2,3,4,5,6" ]
-      --keeptmp=0                           To keep the temporary files, by default don't keep it (0 value). Any other value than 0 will keep the temporary files
+      --spethres=undef                      Two specificity threshold based on the 10-fold cross-validation, first one for mRNA and the second for lncRNA, need to be in ]0,1[ on separated by a ','
+      -k,--kmer="3,6,9"                     Kmer size list with sizes separated by ',' as string [ default "3,6,9" ], the maximum value for one size is '15'
+      -o,--outname="./"                     Output filename [ default infile_name ]
+      --outdir="./"                         Output directory [ default current directory ]  
+      -s,--sizeinter=0.75                   Ratio between mRNA sequence and non-coding intergenic extracted region sizes [default 0.75 ]
+      --learnorftype=1                      Integer [0,1,2,3,4] to specify the type of longest ORF computation [ default: 1 ] for learning data set. If the CDS is annotated in the .GTF, then the CDS is considered as the longest ORF, whatever the --orftype value.
+                                                    '0': ORF with start and stop codon;
+                                                    '1': same as '0' and ORF with only a start codon, take the longest;
+                                                    '2': same as '0' and ORF with only a stop codon,  take the longest;
+                                                    '3': same as '0' and ORF with a start or a stop,  take the longest (see '1' and '2');
+                                                    '4': same as '3' but if no ORF is found, take the input sequence as ORF.
+      --testorftype=1                       Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 1 ] for test data set. See --learnortype description for more informations.
+      --ntree                               Number of trees used in random forest [ default 500 ]
 
-  *Intergenic lncrna extraction:
+  Debug arguments:
+      --keeptmp                           To keep the temporary files in a 'tmp' directory the outdir, by default don't keep it (0 value). Any other value than 0 will keep the temporary files
+      -v,--verbosity=0                         Which level of information that need to be print [ default 0 ]
+      --seed=1234                           Used to fixe the seed value for the extraction of intergenic DNA region to get lncRNA like sequences and for the random forest [ default 1234 ]
+
+  Intergenic lncrna extraction:
             -to be added
-
+            
 ```
 
 ### 3- FEELnc_classifier.pl
@@ -322,6 +362,7 @@ Can't call method "close" on an undefined value Bio/DB/SeqFeature/Store/berkeley
 
 ## Authors
 
+ - Valentin Wucher
  - Fabrice Legeai
  - Thomas Derrien
 
