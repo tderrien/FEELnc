@@ -76,7 +76,7 @@ Add FEELnc scripts and the distribution-specific binary of KmerInShort to your P
 	export PATH=$PATH:${FEELNCPATH}/scripts/
 	#for MAC
 	export PATH=$PATH:${FEELNCPATH}/bin/MAC/
-	# for UNIX
+	# for LINUX
 	export PATH=$PATH:${FEELNCPATH}/bin/LINUX/
 
 
@@ -161,11 +161,11 @@ The second step of the pipeline (FEELnc_codpot) aims at computing the CPS i.e th
 
 **- INPUT :**
 
-It makes use of the intrinsic properties of fasta sequences (ORF and mRNA sizes, k-mer frequencies...) of two training files:
+It makes use of the intrinsic properties of input sequences (ORF and mRNA sizes, k-mer frequencies...) based on 2 training files:
 
 
-	- known_mRNA.gtf   : a set of known protein_coding transcripts
-	- known_lncRNA.gtf : a set of known lncRNA transcripts
+	- known_mRNA.gtf (or .fa)   : a set of known protein_coding transcripts
+	- known_lncRNA.gtf  (or .fa): a set of known lncRNA transcripts
 
 If you have a set of known lncRNAs, you could run the module like:
 
@@ -187,7 +187,7 @@ As in the previous module, if your reference annotation file  ("*ref_annotation.
 
 
 To calculate the CPS cutoff separating coding (mRNAs) versus long non-coding RNAs (lncRNAs),
-FEELnc_codpot uses a R script that will make a 10 fold cross-validation on the input training files and finally,  extracts the CPS that maximizes sensitivity (Sn) and Specificity (Sp) (thanks to the ROCR library)
+FEELnc_codpot uses a R script that will make a 10 fold cross-validation on the input training files and finally, extracts the CPS that maximizes sensitivity (Sn) and Specificity (Sp) (thanks to the ROCR library)
 
 
 **- OUTPUT :**
@@ -195,7 +195,6 @@ FEELnc_codpot uses a R script that will make a 10 fold cross-validation on the i
 If your input file is called **INPUT**, this second module will create these output files:
 
 	 - {INPUT}_RF_learningData.txt		: FEELnc metrics scores (ORF and mRNA sizes, k-mer frequencies and labels) for the training files
-	 - {INPUT}_RF_stats.txt  : statistics for n cross validation on the training files.
 	 - {INPUT}_RF_stats.txt  : statistics for n cross validation on the training files.
 	 - {INPUT}_RF_TGROC.png  : TwoGraph ROC curve plot to select the best coding potential cutoff
 	 - {INPUT}_RF.txt	:  FEELnc metrics scores (ORF and mRNA sizes, k-mer frequencies and labels) for the testing file
