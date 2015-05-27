@@ -809,7 +809,7 @@ sub writefastafile{
 
     # cDNA
     my $seq = Bio::SeqIO ->new(-format => 'fasta', -file => '>'.$filename, -alphabet =>'dna');
-    foreach my $id (keys %{$h}){
+    foreach my $id (sort keys %{$h}){
 	my $new_seq = Bio::Seq->new(-id => $id, -seq => $h->{$id});
 	$seq->write_seq($new_seq);
     }

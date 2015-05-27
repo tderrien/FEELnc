@@ -372,6 +372,7 @@ sub mergeKmerScoreSize
     # Read mRNA size
     $flag = 0;
     open FILE, "$rnaSizeFile" or die "Error! Cannot access mRNA size file '". $rnaSizeFile . "': ".$!;
+
     while(<FILE>)
     {
 	chop;
@@ -812,11 +813,11 @@ sub rfPredToOut
 	my $noOrf  = $outDir.$outName.".noORF.fa";
 
 	print "Writing the FASTA output files\n";
-	my $multiFasta = new Bio::SeqIO(-file  => "$testFile", '-format' => 'Fasta');
-	my $lnc        = new Bio::SeqIO(-file => "> $outNon" , '-format' => 'Fasta');
-	my $rna        = new Bio::SeqIO(-file => "> $outCod" , '-format' => 'Fasta');
-	my $tuc        = new Bio::SeqIO(-file => "> $outTuc" , '-format' => 'Fasta');
-	my $noorf      = new Bio::SeqIO(-file => "> $noOrf" ,  '-format' => 'Fasta');
+	my $multiFasta = new Bio::SeqIO(-file => "$testFile", '-format' => 'Fasta');
+	my $lnc        = new Bio::SeqIO(-file => "> $outNon", '-format' => 'Fasta');
+	my $rna        = new Bio::SeqIO(-file => "> $outCod", '-format' => 'Fasta');
+	my $tuc        = new Bio::SeqIO(-file => "> $outTuc", '-format' => 'Fasta');
+	my $noorf      = new Bio::SeqIO(-file => "> $noOrf",  '-format' => 'Fasta');
 
 	my @seqTab;
 	my $seq;

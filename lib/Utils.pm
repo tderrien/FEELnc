@@ -7,7 +7,7 @@ use warnings;
 use Scalar::Util;
 use File::Basename;
 use Carp;
-
+use POSIX;
 
 $| = 1;
 
@@ -304,7 +304,7 @@ sub getFastaNbr
     my($input) = @_;
 
     # Open input file
-    my $inputFasta = new Bio::SeqIO(-file => '$input', '-format' => 'fasta');
+    my $inputFasta = new Bio::SeqIO(-file => "$input", '-format' => 'fasta');
     my $seq;
     my $cpt = 0;
 
@@ -323,35 +323,32 @@ sub divFasta
     my($input, $name1, $name2, $perc) = @_;
 
     my $nbrSeq = &getFastaNbr($input);
-    my $nbr1   = floor($perc * $nbrSeq);
+    my $nbr1   = POSIX::floor($perc * $nbrSeq);
     my $nbr2   = $nbrSeq - $nbr1;
 
     # Open input file
-    my $inputFasta = new Bio::SeqIO(-file => '$input', '-format' => 'fasta');
+    my $inputFasta = new Bio::SeqIO(-file => "$input", '-format' => 'fasta');
     my $seq;
     
     # Open output files
-    my $out1 = new Bio::SeqIO(-file => '> $name1' , '-format' => 'fasta');
-    my $out2 = new Bio::SeqIO(-file => '> $name2' , '-format' => 'fasta');
+    my $out1 = new Bio::SeqIO(-file => "> $name1" , '-format' => 'fasta');
+    my $out2 = new Bio::SeqIO(-file => "> $name2" , '-format' => 'fasta');
 
-    print "\tDividing $input file into two learning files";
-    # Write the first $nbr1 sequences into $name1
+    print "\tDividing $input file into two learning files\n";
+    # Write the first $nbr1 sequences into $out1
     for(my $i=1; $i<=$nbr1; $i++)
     {
 	$seq = $inputFasta->next_seq();
-	$name1->write_seq($seq);
-    }	
+	$out1->write_seq($seq);
+    }
     
-    # Write the laste $nbr2 sequences into $name1
+    # Write the last $nbr2 sequences into $out2
     for(my $i=1; $i<=$nbr2; $i++)
     {
 	$seq = $inputFasta->next_seq();
-	$name1->write_seq($seq);
-    }	
+	$out2->write_seq($seq);
+    }
 }
-
-
-
 
 
 1;

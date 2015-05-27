@@ -295,10 +295,10 @@ else
 #################################
 # Divide each learning file into two file: one for the kmermodel and one for the random forest
 
-my @codFileKmRf    = ($codFile."forKmerModel.fasta",    $codFile."forRandomForest.fasta");
-my @codOrfFileKmRf = ($codOrfFile."forKmerModel.fasta", $codOrfFile."forRandomForest.fasta");
-my @nonFileKmRf    = ($nonFile."forKmerModel.fasta",    $nonFile."forRandomForest.fasta");
-my @nonOrfFileKmRf = ($nonOrfFile."forKmerModel.fasta", $nonOrfFile."forRandomForest.fasta");
+my @codFileKmRf    = ($codFile.".forKmerModel.fa",    $codFile.".forRandomForest.fa");
+my @codOrfFileKmRf = ($codOrfFile.".forKmerModel.fa", $codOrfFile.".forRandomForest.fa");
+my @nonFileKmRf    = ($nonFile.".forKmerModel.fa",    $nonFile.".forRandomForest.fa");
+my @nonOrfFileKmRf = ($nonOrfFile.".forKmerModel.fa", $nonOrfFile.".forRandomForest.fa");
 
 Utils::divFasta($codFile,    $codFileKmRf[0],    $codFileKmRf[1],    $perc);
 Utils::divFasta($codOrfFile, $codOrfFileKmRf[0], $codOrfFileKmRf[1], $perc);
