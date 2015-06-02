@@ -598,6 +598,12 @@ sub CreateORFcDNAFromGTF
 	    warn "\tYour input GTF file does contain CDS information...\n" if ($countseqok < 1 && $verbosity > 5);
 	    $filterforCDS = 1; # we activate filter to get only CDS and stop codon DNA sequence
 	    my $orfseq    = ExtractFromFeature::feature2seq($refmrna->{$tr}->{'feature'}, $genome, $chr , $strand, $filterforCDS, $verbosity);
+	    # Check if the length of the orf is greater than 2*kmerMax, if not then skip it
+	    if(length($orfseq) < 2*$kmerMax)
+	    {
+		warn "Tx: $tr with a CDS smaller than 2*$kmerMax...skipping for training\n" if ($verbosity > 10);
+		next; # next if ORF is not OK
+	    }
 	    # we create an ORF hash
 	    $orfob        = Orf::orfSeq2orfOb($orfseq, $strand, $verbosity);
 	    $h_orf{$tr}   = $orfob->{'cds_seq'};
