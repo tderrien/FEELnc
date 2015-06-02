@@ -172,6 +172,8 @@ if($keepTmp!=0)
     mkdir $outTmp;
 }
 
+# Initialize the seed
+srand($seed);
 
 # If $numtx is undef, then learning on all transcripts, can be long so print a warning...
 print "You do not have specified a maximum number of transcripts for the training. Use all the annotation, can be long...\n" if(!defined $numtx);
@@ -226,11 +228,13 @@ my $rfout = $outDir.$outName."_RF.txt";
 # add a refhash that will contain the mRNA ID that passed cDNA and ORF steps
 # Will be used to checked for randomization
 my $ref_cDNA_passed;
+## VW modification
+my $refmrna;
 
 # Get cDNA and ORF for coding training file
 if($mRNAfileformat eq "gtf")      # -- if GTF
 {
-    $ref_cDNA_passed = ExtractCdnaOrf::CreateORFcDNAFromGTF($mRNAfile, $codFile, $codOrfFile, $numtx, $minnumtx, $genome, 'exon,CDS,stop_codon,start_codon', \%biotype, $orfTypeLearn, $verbosity, $kmerMax);
+    ($ref_cDNA_passed, $refmrna) = ExtractCdnaOrf::CreateORFcDNAFromGTF($mRNAfile, $codFile, $codOrfFile, $numtx, $minnumtx, $genome, 'exon,CDS,stop_codon,start_codon', \%biotype, $orfTypeLearn, $verbosity, $kmerMax);
 }
 elsif($mRNAfileformat eq "fasta") # -- if FASTA
 {
@@ -252,7 +256,7 @@ if(defined $lncRNAfile) # -- if file is defined, it means that we do not have to
 
     if ($lncRNAfileformat eq "gtf") # -- if GTF
     {
-	$ref_cDNA_passed = ExtractCdnaOrf::CreateORFcDNAFromGTF($lncRNAfile, $nonFile, $nonOrfFile, $numtx, $minnumtx, $genome, 'exon', undef, $orfTypeLearn, $verbosity, $kmerMax);
+	($ref_cDNA_passed, $refmrna) = ExtractCdnaOrf::CreateORFcDNAFromGTF($lncRNAfile, $nonFile, $nonOrfFile, $numtx, $minnumtx, $genome, 'exon', undef, $orfTypeLearn, $verbosity, $kmerMax);
     }
     elsif($lncRNAfileformat eq "fasta")
     {
@@ -266,10 +270,11 @@ if(defined $lncRNAfile) # -- if file is defined, it means that we do not have to
 else                    # -- if lncRNA training file not defined
 {
     # To get mRNA annotation
-    my $refmrna = Parser::parseGTF($mRNAfile, 'exon,CDS,stop_codon,start_codon', undef , \%biotype , $verbosity);
+    ## VW modification
+    # my $refmrna = Parser::parseGTF($mRNAfile, 'exon,CDS,stop_codon,start_codon', undef , \%biotype , $verbosity);
     # Relocated mRNA sequence in intergenic regions to be used as a training lncRNA file
     print STDERR "> The lncRNA training file is not set...will extract intergenic region for training (can take a while...)\n";
-    ExtractCdnaOrf::randomizedGTFtoFASTA($refmrna, $ref_cDNA_passed, $nonFile, $nonOrfFile, $genome, $numtx, $minnumtx, $sizecorrec, $orfTypeLearn, $maxTries, $maxN, $verbosity, $kmerMax, $seed);
+    ExtractCdnaOrf::randomizedGTFtoFASTA($refmrna, $ref_cDNA_passed, $nonFile, $nonOrfFile, $genome, $numtx, $minnumtx, $sizecorrec, $orfTypeLearn, $maxTries, $maxN, $verbosity, $kmerMax);
 }
 
 
@@ -312,7 +317,7 @@ Utils::divFasta($nonOrfFile, $nonOrfFileKmRf[0], $nonOrfFileKmRf[1], $perc);
 print STDERR "> Run random Forest on '$testFile':\n";
 if(! defined $speThres)
 {
-    # RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc);
+    # RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $keepTmpp, $seed, $proc);
     RandomForest::runRF(\@codFileKmRf, \@codOrfFileKmRf, \@nonFileKmRf, \@nonOrfFileKmRf, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc);
 }
 else

@@ -186,26 +186,29 @@ sub getKmerRatio
     #print FILE "kmer\tkmerSize_logRatio\n";
     for($i=0; $i<$nbKmer; $i++)
     {
-	# logratio = 0                      -- if the kmer is not found in any gene files
-	if($codVal[$i]==0 && $nonVal[$i]==0)
-	{
-	    $log = 0;
-	}
-	# logratio = 1                      -- if the kmer is found in coding ORFs but not in non coding genes
-	elsif($codVal[$i]>0 && $nonVal[$i]==0)
-	{
-	    $log = 1;
-	}
-	# logratio = -1                     -- if the kmer is not found in coding ORFs but found in non coding genes
-	elsif($codVal[$i]==0 && $nonVal[$i]>0)
-	{
-	    $log = -1;
-	}
-	# logratio = log( codFreq/nonFreq ) -- if the kmer is found on the two files
-	else
-	{
-	    $log = log( ($codVal[$i]/$codTot) / ($nonVal[$i]/$nonTot) );
-	}
+	## VW MODIF
+	# # logratio = 0                      -- if the kmer is not found in any gene files
+	# if($codVal[$i]==0 && $nonVal[$i]==0)
+	# {
+	#     $log = 0;
+	# }
+	# # logratio = 1                      -- if the kmer is found in coding ORFs but not in non coding genes
+	# elsif($codVal[$i]>0 && $nonVal[$i]==0)
+	# {
+	#     $log = 1;
+	# }
+	# # logratio = -1                     -- if the kmer is not found in coding ORFs but found in non coding genes
+	# elsif($codVal[$i]==0 && $nonVal[$i]>0)
+	# {
+	#     $log = -1;
+	# }
+	# # logratio = log( codFreq/nonFreq ) -- if the kmer is found on the two files
+	# else
+	# {
+	#     $log = log( ($codVal[$i]/$codTot) / ($nonVal[$i]/$nonTot) );
+	# }
+
+	$log = log( (($codVal[$i]/$codTot)+1) / (($nonVal[$i]/$nonTot)+1) );
 
 	#$logTab[$i] = $log;
 	#print FILE "$kmerTab[$i]\t$log\n";
@@ -455,6 +458,7 @@ sub getSizeFastaFile
     {
         $length = $seq->length;
         $id     = $seq->id();
+	# print "$id\t$length\n";
 	print FILE "$id\t$length\n";
     }
     close FILE;
@@ -602,7 +606,7 @@ sub runRF
 	push(@kmerRatioFileList, $kmerFile);
 
 	## VWTD: modification
-	## Make the model on the first learning files 
+	## Make the model on the first learning files
 	&getKmerRatio($REForfCodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp);
     }
 

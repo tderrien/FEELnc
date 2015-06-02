@@ -301,7 +301,7 @@ sub feature2seq{
 		my $e	= $exon->{"end"};
  		my $featseq   	=  ""; # initialize in case pb with bio::db index
  		$featseq		=  $db->seq($chr, $s => $e);
-		if ($featseq eq ""){
+		if (!defined $featseq || $featseq eq ""){
 			warn "ExtractFromFeature::feature2seq: your seq $chr:$s-$e returns an empty string!...Check 'chr' prefix between your annotation and genome files or remove your genome index file ('".$genome.".index')...\n";
 			return undef;
 		}
