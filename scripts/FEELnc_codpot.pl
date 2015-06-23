@@ -73,7 +73,7 @@ my $seed = 1234;
 my $proc = 1;
 
 # VW Add a percentage to get two learning file
-my $perc = 0.5;
+my $perc = 0.1;
 
 # Intergenic extraction:
 my $maxTries   = 10;
