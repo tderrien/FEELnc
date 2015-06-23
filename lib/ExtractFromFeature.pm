@@ -273,14 +273,14 @@ sub Tx2CDS{
 sub feature2seq{
 	my ($refarray,  $genome, $chr, $strand, $filterCDS, $verbosity)	= @_;
 	
-	$chr			||= 	undef; # since,we are at the feature level, we don't have the chromosome information (need to be defined)
-	$filterCDS		||=		0; # get only CDS and stop codon sequence
-	$verbosity		||=		0;
+	$chr       ||= undef; # since,we are at the feature level, we don't have the chromosome information (need to be defined)
+	$filterCDS ||= 0;     # get only CDS and stop codon sequence
+	$verbosity ||= 0;
 	
 	# initialize sequence string
 	my $seqstring = "";
 	
-    # Test parsing i.e empty reafarray
+	# Test parsing i.e empty reafarray
 	die "ExtractFromFeature::feature2seq => ref not defined...\n" if (not defined $refarray);
 
 	# check $chr is defined
@@ -295,6 +295,10 @@ sub feature2seq{
 	
 		# next if we only want CDS *** and STOP codon ****
 		next if ($filterCDS && $exon->{'feat_level'} !~ /(CDS|stop_codon)/i);
+
+		## VW modification
+		# next if don't want CDS ***
+		next if ((!$filterCDS) && ($exon->{'feat_level'} =~ /(CDS|stop_codon|start_codon)/i));
 		
 		# get coordinates
 		my $s	= $exon->{"start"};
