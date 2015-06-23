@@ -46,6 +46,10 @@ getKmerRatio: Get one kmer ratio from fasta training file
 
 =item .
 
+getKmerRatioSep: Get one kmer ratio between coding and non coding fasta training file
+
+=item .
+
 scoreORF: Scores ORF test file
 
 =item .
@@ -217,6 +221,129 @@ sub getKmerRatio
     }
     close FILE;
 
+    # Delete the temporary files if keepTmp != 0
+    if($keepTmp == 0)
+    {
+	unlink $codOut;
+	unlink $nonOut;
+    }
+
+    return(1);
+}
+
+
+
+# Run KmerInShort (kis) on training set and generate output model (logRatio values for each kmer depending only on the kmer)
+#	$codFile   = fasta file with the ORF of coding genes
+#	$nonFile   = fasta file with sequence of non coding genes
+#	$outFile   = file where the logRatio of kmer frequency need to be written
+#	$kmerSize  = size of the kmer
+#	$codStep   = step for the counting of kmer for the ORF coding genes
+#	$nonStep   = step for the counting of kmer for the non coding genes
+#	$proc      = number of proc to be use for KmerInShort
+#	$verbosity = value to define the verbosity
+#	$keepTmp   = keeping or not the temporary files
+#	$outTmp    = temporary file output directory
+#	Return value:
+#		Return the array of the log ratio value
+sub getKmerRatioSep
+{
+    my($codFile, $nonFile, $outFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp) = @_;
+    $codFile ||= undef;
+    $nonFile ||= undef;
+    $outFile ||= undef;
+    $codStep ||= 3;
+    $nonStep ||= 1;
+    $proc    ||= 1;
+    $keepTmp ||= 0;
+
+    if($kmerSize < $codStep)
+    {
+	$codStep = 1;
+	$nonStep = 1;
+    }
+
+    # Check if mendatory arguments have been given
+    die "Bulding model: ORF coding genes training file not defined... exiting\n" if (!defined $codFile);
+    die "Bulding model: lncRNA training file not defined... exiting\n"           if (!defined $nonFile);
+    die "Bulding model: output file for kmer model is missing... exiting\n"      if (!defined $outFile);
+
+    # emtpy
+    die "Bulding model: ORF coding genes training file '$codFile' is empty... exiting\n" unless (-s $codFile);
+    die "Bulding model: lncRNA training file '$nonFile' is empty... exiting\n"           unless (-s $nonFile);
+
+    # Path to kis
+    my $kisPath = Utils::pathProg("KmerInShort");
+    my $cmd = "";
+    # Temporary files to put kmer counting for ORF coding genes and non coding genes
+    my $codOut = $outTmp."kmerCounting_coding_".basename($codFile)."_".$kmerSize."_".$randVal.".tmp";
+    my $nonOut = $outTmp."kmerCounting_nonCoding_".basename($nonFile)."_".$kmerSize."_".$randVal.".tmp";
+
+    # Run kis on ORF for coding genes
+    print "\tRunning KmerInShort on '$codFile'.\n" if($verbosity >= 5);
+    $cmd = "$kisPath -file $codFile -nb-cores 4 -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
+    system($cmd);
+
+    # Run kis on non coding genes
+    print "\tRunning KmerInShort on '$nonFile'.\n" if($verbosity >= 5);
+    $cmd = "$kisPath -file $nonFile -nb-cores 4 -kmer-size $kmerSize -out $nonOut -dont-reverse -step $nonStep 1>/dev/null 2>/dev/null";
+    system($cmd);
+
+    # Read the two kmer files to get the kmer frequancy and write the ratio in the output file
+    my @codTab;
+    my @nonTab;
+    my $codKmer = "";
+    my $nonKmer = "";
+    my $codVal  = 0;
+    my $nonVal  = 0;
+    my $codTot  = 0;
+    my $nonTot  = 0;
+    my $ratio   = 0;
+
+    open FILECOD,   "$codOut"  or die "Error! Cannot open kmerFile '". $codOut . "': ".$!;
+    open FILENON,   "$nonOut"  or die "Error! Cannot open kmerFile '". $nonOut . "': ".$!;
+    open FILEOUT, "> $outFile" or die "Error! Cannot access output file '". $outFile . "': ".$!;
+    print "\tWrite the ratio for each kmer between coding and non coding kmer counting for a size of kmer of '$kmerSize' in '$outFile'.\n" if($verbosity >= 5);
+
+    # Read the two kmer files to get the kmer frequency
+    while(not eof FILECOD and not eof FILENON)
+    {
+	($codKmer, $codVal) = split(/\t/, <FILECOD>);
+	($nonKmer, $nonVal) = split(/\t/, <FILENON>);
+    
+	die "Error: kmer order is not the same between '$codOut' and '$nonOut' ($codKmer, $nonKmer).\nExit." if($codKmer ne $nonKmer);
+
+	push(@codTab, int($codVal));
+	push(@nonTab, int($nonVal));
+	$codTot = $codTot + $codVal;
+	$nonTot = $nonTot + $nonVal;	
+    }
+
+    # Write the output file
+    my $nbKmer = @codTab;
+    my $codR   = 0;
+    my $nonR   = 0;
+    
+    for(my $i=0; $i<$nbKmer; $i++)
+    {
+	$codR = $codTab[$i]/$codTot;
+	$nonR = $nonTab[$i]/$nonTot;
+	
+	if(($codR+$nonR) == 0)
+	{
+	    $ratio = 0.5;
+	}
+	else
+	{
+	    $ratio = ($codR) / ($codR + $nonR);
+	}
+	print FILEOUT "$ratio\n";
+
+    }
+    close FILECOD;
+    close FILENON;
+    close FILEOUT;
+    
     # Delete the temporary files if keepTmp != 0
     if($keepTmp == 0)
     {
@@ -607,7 +734,9 @@ sub runRF
 
 	## VWTD: modification
 	## Make the model on the first learning files
-	&getKmerRatio($REForfCodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp);
+	## &getKmerRatio($REForfCodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp);
+	## VW: modification of the score, now a score for each kmer depending only on the kmer counting between the coding and non coding file
+	&getKmerRatioSep($REForfCodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp);
     }
 
     # 3. Compute the kmer score for each kmer size on learning and test ORF and for each type
@@ -864,6 +993,58 @@ __END__
 =head2 getKmerRatio
 
 Run KmerInShort on learning set and generate output model (logRatio values for each kmer)
+
+=over
+
+=item $codFile
+
+fasta file with the ORF of coding genes
+
+=item $nonFile
+
+fasta file with sequence of non coding genes
+
+=item $outFile
+
+file where the logRatio of kmer frequency need to be written
+
+=item $kmerSize
+
+size of the kmer
+
+=item $codStep
+
+step for the counting of kmer for the ORF coding genes
+
+=item $nonStep
+
+step for the counting of kmer for the non coding genes
+
+=item $proc
+
+number of proc to be use for KmerInShort
+
+=item $verbosity
+
+define the verbosity of the program
+
+=item $keepTmp
+
+if the temporary files need to be kept (0: delete; !0: keep)
+
+=item $outTmp
+
+temporary file output directory
+
+=back
+
+Return value: Return the array of the log ratio value
+
+##############################################################################
+
+=head2 getKmerRatioSep
+
+Run KmerInShort on learning set and generate output model (ratio values for each kmer depending on the occurancy of each kmer between coding and non coding files)
 
 =over
 
