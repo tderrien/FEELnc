@@ -729,13 +729,13 @@ sub runRF
 
     foreach $kmerSize ( @kmerList )
     {
-	$kmerFile = $outTmp.basename($orfCodLearnFile)."_".$kmerSize."_".$randVal."_kmerRatio.tmp";
+	$kmerFile = $outTmp."kmerRatioScore_".$kmerSize."_".$randVal.".tmp";
 	push(@kmerRatioFileList, $kmerFile);
 
 	## VWTD: modification
 	## Make the model on the first learning files
 	## &getKmerRatio($REForfCodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp);
-	## VW: modification of the score, now a score for each kmer depending only on the kmer counting between the coding and non coding file
+	## VW: modification of the score
 	&getKmerRatioSep($REForfCodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp);
     }
 
