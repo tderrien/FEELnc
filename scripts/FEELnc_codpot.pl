@@ -234,6 +234,7 @@ my $refmrna;
 # Get cDNA and ORF for coding training file
 if($mRNAfileformat eq "gtf")      # -- if GTF
 {
+
     ($ref_cDNA_passed, $refmrna) = ExtractCdnaOrf::CreateORFcDNAFromGTF($mRNAfile, $codFile, $codOrfFile, $numtx, $minnumtx, $genome, 'exon,CDS,stop_codon,start_codon', \%biotype, $orfTypeLearn, $verbosity, $kmerMax);
 }
 elsif($mRNAfileformat eq "fasta") # -- if FASTA
@@ -285,7 +286,7 @@ else                    # -- if lncRNA training file not defined
 if(Utils::guess_format($infile) eq "gtf")      # -- if GTF
 {
     # Use undef for $nbtx to get all sequences and ORFs
-    ExtractCdnaOrf::CreateORFcDNAFromGTF($infile, $testFile, $testOrfFile, undef, $minnumtx, $genome, 'exon', undef, $orfTypeTest, $verbosity, $kmerMax);
+    ExtractCdnaOrf::CreateORFcDNAFromGTF($infile, $testFile, $testOrfFile, undef, $minnumtx, $genome, 'exon,CDS,stop_codon,start_codon', undef, $orfTypeTest, $verbosity, $kmerMax);
 }
 elsif(Utils::guess_format($infile) eq "fasta") # -- if FASTA
 {
