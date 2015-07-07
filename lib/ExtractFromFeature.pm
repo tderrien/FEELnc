@@ -57,8 +57,7 @@ sub checkCDS {
 	
 	foreach my $exon (@{$refarray}) {
 		if ($exon->{'feat_level'} =~ /CDS/i){
-			$hasCDS = 1;
-			last;
+			return 1;
 		}
 	}
 	return $hasCDS;
@@ -170,21 +169,28 @@ sub Tx2CDS{
 	die "ExtractFromFeature::feature2CDS => ref ORF not defined...\n" if (not defined $refORF);
 
 	# ORF inf
-	my $orf_length	= $refORF->{'end'} - $refORF->{'start'};  # for ORF/sequence, we are at 0-based coordinates
+	my $orf_length	= $refORF->{'orflength'} ;  # for ORF/sequence, we are at 0-based coordinates
+#     if ($refORF->{'check_stop'}){ 
+#         $orf_length = $orf_length - 3;
+#     }
  
 	# Tx info
 	my $strand = $tx->{"strand"};
 
 	my $frame = ".";
 	
-# 	print Dumper $refORF;
-# 	print Dumper $tx;
+#   	print Dumper $refORF;
+#  	print Dumper $tx;
 	
 	my @newfeatures = @{$tx->{"feature"}};
 	
+	# exon number
+	my $nbexons = scalar (@{$tx->{"feature"}});
+	
+	my $exonfromCDS=0;
 	# Iterate over ****SORTED**** wrt strand exons	
 	foreach my $exon (ExtractFromFeature::sortFeatures($tx->{"feature"}, $strand)) {
-		
+    
 		# Current Exon length
 		my $exon_length = $exon->{"end"} - $exon->{"start"} +1;
 
@@ -196,7 +202,7 @@ sub Tx2CDS{
 			$cdss 		= 	$exon->{"start"} + $refORF->{'start'};
 			$cdse 		= 	$cdss            + $orf_length;
 		} else {
-			$cdse 		= 	$exon->{"end"} - $refORF->{'start'};		
+			$cdse 		= 	$exon->{"end"}   - $refORF->{'start'};		
 			$cdss 		= 	$cdse            - $orf_length;	
 		}	
 		
@@ -206,52 +212,155 @@ sub Tx2CDS{
  		my $matchlength = $endmatch - $startmatch +1;
  		
  		# store features leve i.e CDS 5'UTR and 3'UTR at the moment
- 		my %CDS   = ();
- 		my %FpUTR = ();
- 		my %TpUTR = (); 		
-#   		print "$exon->{'start'}-$exon->{'end'} ($exon_length) \t $cdss-$cdse($orf_length) \t $startmatch-$endmatch ($matchlength) $refORF->{'start'}\n";
- 		
- 		# if match between exon and projected ORF
-		if ($startmatch){
+ 		my (%FpUTR, %TpUTR, %CDS, %UTR, %start_codon, %stop_codon);
+
+
+        # DEBUG
+        # main variables are :
+        #   * $startmatc
+        #   * $refORF->{'start'}
+        #   * $matchlength
+        #   * $exon_length
+        #	* $orf_length : what is the rest of ORF length after deducing
+#  		print STDERR "$nbexons : CDSEx $exonfromCDS: refORF START: ",$refORF->{'start'},"  ORFLEngth: $orf_length - ($startmatch, $endmatch) $matchlength : (",$exon->{'start'},", ",$exon->{'end'},") $exon_length :  $cdss, $cdse\n";
+ 		my $startexon   =   $exon->{'start'};
+ 		my $endexon     =   $exon->{'end'};
+ 		 		
+ 		# if match between ORFgenomic and exon => we are in CDS
+		if ($startmatch){	
+    		
+            $exonfromCDS++;
+    		    		    		
+            # PLUS STRAND
+            if ($strand  eq "+" || $strand eq "."){
+
+        		my $FpUTR_beg   =  $startexon;
+        		my $FpUTR_end   =  $startmatch -1;
+    	    	my $CDS_beg     =  $startmatch;
+    		    my $CDS_end     =  $endmatch;
+        		my $TpUTR_beg   =  $endmatch;
+        		my $TpUTR_end   =  $endexon;
+    		            
+    		    # if first exon
+	    	    if ($exonfromCDS == 1 ) {
+		    
+                    %FpUTR          = ( "start" => $FpUTR_beg   , "end" => $FpUTR_end       , "feat_level" => 'UTR', 'frame' => $frame);
+                    %start_codon    = ( "start" => $startmatch  , "end" => $startmatch +2   ,  "feat_level" => 'start_codon', 'frame' => $frame);    
+    		
+    		
+    		        if ( $refORF->{'check_start'} ) {
+            		    if ( $FpUTR_beg < $FpUTR_end ){
+                            push (@newfeatures, \%FpUTR, \%start_codon);
+
+	    	            } else {
+                            push (@newfeatures,  \%start_codon);
+		        
+		                }
+		            }
+		        }
+		    
+    		    # last exon belonging to CDS
+	    	    if ( $orf_length <= $matchlength ){
+		    
+		            # weirdly, somteimes threre is is a shift between orf length and matchlength on thel ast exons
+		            my $diff_RestORFlength  = $matchlength - $orf_length;
+    		        $CDS_end                = $CDS_end - $diff_RestORFlength; 
+		        
+		        
+#    		        $CDS_beg
+                	%TpUTR          =  ( "start" => $TpUTR_beg              , "end" => $TpUTR_end           , "feat_level" => 'UTR', 'frame' => $frame);		    		    
+	        	    %stop_codon     = ( "start"  => $CDS_end-2	        	, "end" => $CDS_end            ,  "feat_level" => 'stop_codon', 'frame' => $frame);   
+            
+    		        if ( $refORF->{'check_stop'} ) {
+    
+    		            push (@newfeatures, \%stop_codon);
+    		        
+    		            # adapt CDS coordinates with stop for + strand
+                        $CDS_end = $CDS_end - 3 ;
+        	        }
+            	
+            	    # add UTR
+                    if ( $TpUTR_beg <  $TpUTR_end ){
+                        push (@newfeatures, \%TpUTR)
+                    } 
+		        }
+		    
+		        # CDS
+                %CDS            = ( "start" => $CDS_beg	, "end" => $CDS_end    ,  "feat_level" => 'CDS', 'frame' => $frame);
+
+                push (@newfeatures,  \%CDS);
+                
+            ##############
+            # MINUS STRAND
+            ##############
+            } elsif ($strand  eq "-"){
+
+        		my $FpUTR_beg   =  $endmatch;
+        		my $FpUTR_end   =  $startmatch;
+    	    	my $CDS_beg     =  $startmatch;
+    		    my $CDS_end     =  $endmatch;
+        		my $TpUTR_beg   =  $startexon;
+        		my $TpUTR_end   =  $startmatch;
+        		            
+    		    # if first exon
+	    	    if ($exonfromCDS == 1 ) {
+		    
+                    %FpUTR          = ( "start" => $FpUTR_beg					, "end" => $FpUTR_end   , "feat_level" => 'UTR',        'frame' => $frame);
+                    %start_codon    = ( "start" => $endmatch -2	                , "end" => $endmatch    ,  "feat_level" => 'start_codon', 'frame' => $frame);    
+    		
+    		
+    		        if ( $refORF->{'check_start'} ) {
+            		    if ( $FpUTR_beg < $FpUTR_end ){
+                            push (@newfeatures, \%FpUTR, \%start_codon);
+
+	    	            } else {
+                            push (@newfeatures,  \%start_codon);
+		        
+		                }
+		            }
+		        }
+		    
+    		    # last exon belonging to CDS
+	    	    if ( $orf_length <= $matchlength ){
+		    
+		            # weirdly, somteimes threre is is a shift between orf length and matchlength on thel ast exons
+		            my $diff_RestORFlength  = $matchlength - $orf_length;
+    		        $CDS_beg                = $CDS_beg + $diff_RestORFlength; 
+		        
+		        
+#    		        $CDS_beg
+                	%TpUTR          =  ( "start" => $TpUTR_beg              , "end" => $TpUTR_end           , "feat_level" => 'UTR', 'frame' => $frame);		    		    
+	        	    %stop_codon     = ( "start"  => $CDS_beg	        	, "end" => $CDS_beg + 2           ,  "feat_level" => 'stop_codon', 'frame' => $frame);   
+            
+    		        if ( $refORF->{'check_stop'} ) {
+    
+    		            push (@newfeatures, \%stop_codon);
+    		        
+    		            # adapt CDS coordinates with stop for + strand
+                         $CDS_beg = $CDS_beg +3  ;
+        	        }
+            	
+            	    # add UTR
+                    if ( $TpUTR_beg <  $TpUTR_end ){
+                        push (@newfeatures, \%TpUTR)
+                    } 
+		        }
+		    
+		        # CDS
+                %CDS            = ( "start" => $CDS_beg	, "end" => $CDS_end    ,  "feat_level" => 'CDS', 'frame' => $frame);
+
+                push (@newfeatures,  \%CDS);
+            
+            }
+            
+#            print Dumper \@newfeatures;
 			
+			##################################################
 			# Reinitialiez ORF start and length	for next exon
-			$refORF->{'start'}	= 0;
+			$refORF->{'start'}	= 0;            # we are in a match with ORF,
 			$orf_length   		= $orf_length - $matchlength;
-						
-			# first exon with UTR
-			if ($startmatch != $exon->{'start'} && $endmatch == $exon->{'end'} ){
-				
-				%FpUTR = ( "start" => $exon->{'start'},  "end" => $startmatch - 1, "feat_level" => 'UTR', 'frame' => $frame);
-				%CDS   = ( "start" => $startmatch     ,  "end" => $endmatch      , "feat_level" => 'CDS', 'frame' => $frame);
-				push (@newfeatures, \%FpUTR, \%CDS);
-				
-				#print "$exon->{'start'}-$exon->{'end'}: start_codon => $startmatch, ",$startmatch+2,"\n";				
-				
-			# internal exons or exon without UTR
-			} elsif ($startmatch == $exon->{'start'} && $endmatch == $exon->{'end'}){
-				%CDS = ( "start" => $startmatch, "end" => $endmatch      ,  "feat_level" => 'CDS', 'frame' => $frame);
-				push (@newfeatures, \%CDS);				
-
-			# terminal exon
-			} elsif ($startmatch == $exon->{'start'} && $endmatch != $exon->{'end'}){
-				%FpUTR = ( "start" => $exon->{'start'},  "end" => $startmatch - 1, "feat_level" => 'UTR', 'frame' => $frame);
-				%CDS   = ( "start" => $startmatch     ,  "end" => $endmatch -3 -1, "feat_level" => 'CDS', 'frame' => $frame); # check if there is a stop_codon is defined in ORF object
-
-				push (@newfeatures, \%FpUTR, \%CDS);				
-	# 			print "$exon->{'start'} - $exon->{'end'}: stop_codon => ",$endmatch+1,", ",$endmatch+3,"\n";
 			
-			# CDS in the middle of monoexonic
-			} elsif ($startmatch != $exon->{'start'} && $endmatch != $exon->{'end'}){
 			
-				%FpUTR =   ( "start" => $exon->{'start'},  "end" => $startmatch - 1, "feat_level" => 'UTR', 'frame' => $frame);
-				%CDS   =   ( "start" => $startmatch     ,  "end" => $endmatch      , "feat_level" => 'CDS', 'frame' => $frame); # check if there is a stop_codon is defined in ORF object
-				%TpUTR =   ( "start" => $endmatch+1     ,  "end" => $exon->{'end'} , "feat_level" => 'UTR', 'frame' => $frame); 
-
-				push (@newfeatures, \%FpUTR, \%CDS, \%TpUTR);						
-				
-			} else {
-				warn "Tx2CDS : ORF projection on exons not anticipated....\n";
-			}
 		# UTR only	
 		} else { 		
 			%FpUTR =   ( "start" => $exon->{'start'}, "end" => $exon->{'end'}  ,  "feat_level" => 'UTR', 'frame' => $frame);
@@ -259,15 +368,20 @@ sub Tx2CDS{
 			
 			# Reinitialiez UTR size or ORF start
 			$refORF->{'start'}	= $refORF->{'start'} - $exon_length; 
-			$orf_length   		= $orf_length        - $matchlength;
+
 		}
     }
     
     # assign new feature instead of features
     @{$tx->{'feature'}} = @newfeatures;
     
+
     return $tx;
 }
+
+
+
+
 
 # Get fasta sequence from a set of features coordinates
 sub feature2seq{
