@@ -114,7 +114,7 @@ sub getOverlapping{
 		my $strand1 	= $refh1->{$tr1}->{"strand"};
 		
 		# we compute nb 
-		my $tr1nbexon 	= ExtractFromFeature::features2nbExon($refh1->{$tr1}->{"feature"}) if ($monoexonic);
+		my $tr1nbexon 	= ExtractFromFeature::features2nbExon($refh1->{$tr1}->{"feature"});
 
 		next if ($tr1nbexon == 1 && $monoexonic == 1); # keep all monoexonic if == 1
 		my %monoAS;
