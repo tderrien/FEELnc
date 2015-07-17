@@ -96,7 +96,8 @@ sub getOverlapping{
        	
    	# hash containing the matching lncRNA <=> mRNA
     my %matchingtx = ();
-
+	my %matchingtxAS;
+	
     # nb tx1 and
 	my $nb_tx1 = keys( %{$refh1} );
 	my $i = 0;
@@ -115,6 +116,7 @@ sub getOverlapping{
 		# we compute nb 
 		my $tr1nbexon 	= ExtractFromFeature::features2nbExon($refh1->{$tr1}->{"feature"}) if ($monoexonic);
 
+		next if ($tr1nbexon == 1 && $monoexonic == 1); # keep all monoexonic if == 1
 		my %monoAS;
 		
 		# 2nd tx
@@ -126,19 +128,10 @@ sub getOverlapping{
 			my $strand2 	= $refh2->{$tr2}->{"strand"};
 
 			# trick to speed  loop
-			next if ($end2		< $start1);            
-
-			
-			# if we are over the coordinates of $tr2 
-# 			print Dumper \%monoAS;
-			if ($start2	> $end1){
-				# we checked whether the tx is monoexonic and it mached in AS mRNA in %monoAS hash (see line 173)
-				if ($monoexonic == -1 && $tr1nbexon==1 && !exists $monoAS{$tr1}){
-					$matchingtx{$tr1}	=	$tr2;
-				}
-				last;
-			}
-	
+			if ($monoexonic != -1 && $tr1nbexon != 1){
+				next if ($end2		< $start1 );            
+				last if ($start2	> $end1   );
+			}		
 			# If linconly we only test overlap at the tx level (not exon)
 			if ($linconly){
 				if ( Utils::foverlap( $start1, $end1, $start2, $end2, $strand1, $strand2, $stranded) ){
@@ -153,30 +146,55 @@ sub getOverlapping{
 			my $tr1_cdna_size		= ExtractFromHash::cumulSize($refh1->{$tr1}->{"feature"});
 			
 			# Get the number  of bp overlap
-			my $cumul_overlap_size	=	0;
-			my $checksense 			=	-1; 	# if keep monoexonic all and AS,  implies to keep only Antisense,
-											# therfore we only check for antisense ($checksense = -1) overlap
+			my $cumul_overlap_size		=	0;
+			my $fractionoverexon1		=	0;
 
-			$cumul_overlap_size		=	ExtractFromFeature::intersectFeatures($refh1->{$tr1}->{'feature'}, $refh2->{$tr2}->{'feature'}, $checksense, $verbosity);
-			my $fractionoverexon1	=	$cumul_overlap_size/$tr1_cdna_size;
+									
+			# compute all sense overlapping (whether monoexonic or not)
+			$cumul_overlap_size		=	ExtractFromFeature::intersectFeatures($refh1->{$tr1}->{'feature'}, $refh2->{$tr2}->{'feature'}, '1', $verbosity);
+			$fractionoverexon1		=	$cumul_overlap_size/$tr1_cdna_size;
+
+
+			my $cumul_overlap_sizeAS	=	0;
+			my $fractionoverexon1AS		=	0;			
 			
-
-			# store monoexonic AS transcript in a specific hash
-			if ($cumul_overlap_size && $monoexonic == -1 && $tr1nbexon==1){
-				$monoAS{$tr1} = $tr2;
+			# compute antisense overlapping for monoexonic
+			if ($monoexonic == -1 && $tr1nbexon == 1){
+				$cumul_overlap_sizeAS		=	ExtractFromFeature::intersectFeatures($refh1->{$tr1}->{'feature'}, $refh2->{$tr2}->{'feature'}, '-1', $verbosity);
+				$fractionoverexon1AS		=	$cumul_overlap_sizeAS/$tr1_cdna_size;			
 			}
+			
 			
 			# intersectFeatures returns > 0 if there is an ANTISENSE OVERLAP (otherwise it is  0 for sense or if strand is ".")
 			# if no AS match or uncertainty with either lncRNA or mRNA strand we remove the lncRNA
 # 			print STDERR "$cumul_overlap_size ==> $tr1: $start1 - $end1 $strand1 -- $tr2 : $start2 - $end2 - $strand2\n";
 # 			print STDERR "===> $fractionoverexon1  = ($cumul_overlap_size/$tr1_cdna_size) <= $fraction --- $monoexonic == -1 && $tr1nbexon ==1\n";
-			if ($cumul_overlap_size == 0 || $fractionoverexon1 < $fraction){
-				$matchingtx{$tr1}	=	$tr2;
+# 			
+# 			print "$tr1 $tr2 $cumul_overlap_size - $cumul_overlap_sizeAS\n";
+
+			# If Sense Overlap
+			if ($cumul_overlap_size > 0 && $fractionoverexon1 > $fraction){
+				$matchingtx{$tr1}	=	$tr2  ;	
 				last;
+			} else {
+				# If NO AS overlap
+				if ($cumul_overlap_sizeAS == 0 ){
+				
+					# if monoexonic, we remove it
+					if ($tr1nbexon == 1 && $monoexonic == -1){ 
+						$matchingtx{$tr1}	=	$tr1."_woAS"  ;
+						last if ($start2	> $end1   );
+					}
+				# if AS overlap with a mRNA, we exclude it from the remove list :)
+				} else {
+				
+					delete $matchingtx{$tr1};
+				}	
 			}
 		}
 
 	}
+# 	print Dumper \%matchingtx;
 	return %matchingtx;
 }
 

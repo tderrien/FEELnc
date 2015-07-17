@@ -90,39 +90,48 @@ print STDERR "Filtered transcripts will be available in file: '$outputlog'\n";
 my $splitchr	= 0;
 my $reflnc		= Parser::parseGTF($infile, 'exon',  $splitchr , undef	, $verbosity);
 
+# print Dumper $reflnc;
  
 
+# counters
 my ($ctminsize, $ctmonoexonic, $ctdubious) = (0,0,0);
+
 # Filtering steps
 foreach my $tx (keys %{$reflnc}){
 
     my $txfeatures  =   $reflnc->{$tx}->{'feature'};
-    
+
     # size
     my $size = ExtractFromFeature::features2size($txfeatures, 0);
     if ($size <$minsize){
         print LOG "Filter Size ($minsize): $tx = $size nt...\n";
         $ctminsize++;
         delete $reflnc->{$tx};
+        next;
     }
     
     # nb exon
     my $nbexon = ExtractFromFeature::features2nbExon($txfeatures, 0);
-    if (!$monoexonic && $nbexon == 1){ # if 0: removed all monoexonic tx
-		print LOG "Filter monoexonic ($monoexonic): $tx =  $nbexon exon...\n";
-        $ctmonoexonic++;
-        delete $reflnc->{$tx};    
-    }
+    if ($nbexon == 1){ 
+    	
+    	# if 0  					=> we remove all monoexonic tx
+    	# if -1 and strand is "." 	=> we also remove the transcript (not strans information)
+    	if ($monoexonic == 0 || ($monoexonic == -1 &&  ($reflnc->{$tx}->{'strand'} eq "."))) {
+			print LOG "Filter monoexonic (option $monoexonic): $tx =  $nbexon exon (with strand ",$reflnc->{$tx}->{'strand'},")...\n";
+    	    $ctmonoexonic++;
+        	delete $reflnc->{$tx};    
+        	next;
+		}
+	}
     
     # dubious biexonic
     my $dubious = ExtractFromFeature::features2dubExon($txfeatures, $biexonicsize, 0);
     if ($dubious && $nbexon == 2){
 		print LOG "Filter biexonic ($biexonicsize): $tx =  $nbexon exon...\n";
         $ctdubious++;
-        delete $reflnc->{$tx};     
+        delete $reflnc->{$tx};
+        next;
     }
-    
-    
 }
 
 print STDERR "> Filter size ($minsize): $ctminsize\n";
