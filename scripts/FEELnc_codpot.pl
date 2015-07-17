@@ -60,7 +60,7 @@ my $orfTypeLearn = 1;
 my $orfTypeTest  = 1;
 
 # VW Add an option to specify the output directory, default current directoryand an out name
-my $outDir  = "./";
+my $outDir  = "./feelnc_codpot_out";
 my $outName = "";
 
 # VW Add an option to change the number of trees use in random forest
@@ -403,7 +403,7 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
   --spethres=undef			Two specificity threshold based on the 10-fold cross-validation, first one for mRNA and the second for lncRNA, need to be in ]0,1[ on separated by a ','
   -k,--kmer="3,6,9"			Kmer size list with size separate by ',' as string [ default "3,6,9" ], the maximum value for one size is '15'
   -o,--outname="./"			Output filename [ default infile_name ]
-  --outdir="./"				Output directory [ default current directory ]  
+  --outdir="feelnc_codpot_out/"				Output directory [ default "./feelnc_codpot_out/" ]  
   -s,--sizeinter=0.75			Ratio between mRNA sequence lengths and non coding intergenic region sequence lengths as, by default, ncInter = mRNA * 0.75
   --learnorftype=1			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 1 ] for learning data set.
 					If the CDS is annotated in the .GTF, then the CDS is considered as the longest ORF, whatever the --orftype value.
