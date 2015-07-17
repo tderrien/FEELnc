@@ -25,20 +25,18 @@ sub chooseORF{
 
     die "Orf::chooseORF : Cannot read sequence '$seq'\n..." unless ($seq =~/[actg]/gi);
 
-    my $orfstrict_object	=	longestORF($seq,".",0,0);
-    my $orfrelaxe_object	=	longestORF($seq,".",1,1);
-
-    my $orf_selected;
-    my $orfstrict_object_size		= $orfstrict_object->{'end'}-$orfstrict_object->{'start'};
-    my $orfrelaxe_object_size		= $orfrelaxe_object->{'end'}-$orfrelaxe_object->{'start'};
-
-    #  force ORF to be strict if size > 90% of ORF relaxed
-    if (  $orfrelaxe_object && ($orfstrict_object_size/$orfrelaxe_object > $cutoff) ) {
-	$orf_selected = $orfstrict_object;
-    }else {
-	$orf_selected = $orfrelaxe_object;
-    }
-
+    my $ostrict		=	longestORF2($seq,".",0,0);
+    my $orelaxed	=	longestORF2($seq,".",1,1);
+	
+    my $orf_selected = $orelaxed;
+    
+    # if exists a strict orf
+	if ($ostrict){
+    	#  force ORF to be strict if size > cutoff% of ORF relaxed
+	   if ( ($ostrict->{'orflength'}/$orelaxed->{'orflength'})  > $cutoff ) {
+			$orf_selected = $ostrict;
+		}
+	}
     return $orf_selected;
 
 }

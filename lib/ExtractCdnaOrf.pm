@@ -19,6 +19,7 @@ use ExtractFromFeature;
 use Intersect;
 use Utils;
 use Orf;
+use List::Util 'shuffle';
 
 
 # Compare length of two or three orf objects and return the longest
@@ -555,7 +556,8 @@ sub CreateORFcDNAFromGTF
     my $filterforCDS   = 0; # get only line with CDS level
     my $orfFlag        = 0; # get the result of getTypeOrf
 
-    for my $tr (sort keys(%{$refmrna}))  # for reproducibility
+    # for my $tr (sort keys(%{$refmrna}))  # for reproducibility
+    for my $tr ( shuffle( sort( keys(%{$refmrna}) ) ) ) # sort before shuffle to get the same shuffle at each run
     {
 	# shortcut for feature2seq sub
 	my $chr    = $refmrna->{$tr}->{'chr'};
@@ -564,7 +566,11 @@ sub CreateORFcDNAFromGTF
 	# get cDNA sequence for transcript tr
 	$filterforCDS = 0; # do we filter seq for CDS
 	my $cdnaseq   = ExtractFromFeature::feature2seq($refmrna->{$tr}->{'feature'}, $genome, $chr , $strand, $filterforCDS, $verbosity);
-	die "ERROR: Tx '$tr' returns an empty sequence...\n" if (!defined $cdnaseq);
+	if (!defined $cdnaseq)
+	{
+	    warn "ERROR: Tx '$tr' returns an empty sequence... Skipping this transcripts\n";
+	    next;
+	}
 
 	### Get ORF
 	my $containCDS = ExtractFromFeature::checkCDS($refmrna->{$tr}->{'feature'});
@@ -592,6 +598,12 @@ sub CreateORFcDNAFromGTF
 	    warn "\tYour input GTF file does contain CDS information...\n" if ($countseqok < 1 && $verbosity > 5);
 	    $filterforCDS = 1; # we activate filter to get only CDS and stop codon DNA sequence
 	    my $orfseq    = ExtractFromFeature::feature2seq($refmrna->{$tr}->{'feature'}, $genome, $chr , $strand, $filterforCDS, $verbosity);
+	    # Check if the length of the orf is greater than 2*kmerMax, if not then skip it
+	    if(length($orfseq) < 2*$kmerMax)
+	    {
+		warn "Tx: $tr with a CDS smaller than 2*$kmerMax...skipping for training\n" if ($verbosity > 10);
+		next; # next if ORF is not OK
+	    }
 	    # we create an ORF hash
 	    $orfob        = Orf::orfSeq2orfOb($orfseq, $strand, $verbosity);
 	    $h_orf{$tr}   = $orfob->{'cds_seq'};
@@ -611,10 +623,12 @@ sub CreateORFcDNAFromGTF
     die "The number of complete ORF found with computeORF mode is *$sizehorf* transcripts... That's not enough to train the program\n" if (defined $nbtx && $sizehorf < $minnumtx);
 
     # Write fasta file
-    &writefastafile(\%h_orf,  $orfFile, $verbosity);
-    &writefastafile(\%h_cdna, $cdnaFile, $verbosity);
+    # VW modif
+    # &writefastafile(\%h_orf,  $orfFile, $verbosity);
+    # &writefastafile(\%h_cdna, $cdnaFile, $verbosity);
+    &write2fastafile(\%h_cdna, $cdnaFile, \%h_orf,  $orfFile, $verbosity);
 
-    return \%h_cdna;
+    return (\%h_cdna, $refmrna);
 }
 
 # sub OldCreateORFcDNAFromGTF{
@@ -719,8 +733,10 @@ sub CreateORFcDNAFromFASTA
     my $sizehorf = keys(%h_orf);
     die "The number of complete ORF found with computeORF mode is *$sizehorf* ... That's not enough to train the program\n" if (defined $nbtx && $sizehorf < $minnumtx);
 
-    &writefastafile(\%h_orf,  $orfFile, $verbosity);
-    &writefastafile(\%h_cdna, $cdnaFile, $verbosity);
+    # VW modif
+    # &writefastafile(\%h_orf,  $orfFile, $verbosity);
+    # &writefastafile(\%h_cdna, $cdnaFile, $verbosity);
+    &write2fastafile(\%h_cdna, $cdnaFile, \%h_orf,  $orfFile, $verbosity);
 }
 
 # sub OldCreateORFcDNAFromFASTA{
@@ -802,23 +818,45 @@ sub CreateORFcDNAFromFASTA
 
 
 sub writefastafile{
-
     my ($h, $filename, $verbosity) = @_;
 
     print STDERR "\tWriting FASTA file '$filename'\n" if ($verbosity > 5);
 
     # cDNA
     my $seq = Bio::SeqIO ->new(-format => 'fasta', -file => '>'.$filename, -alphabet =>'dna');
-    foreach my $id (keys %{$h}){
+    # foreach my $id (sort keys %{$h}){
+    foreach my $id ( sort( keys(%{$h}) ) ){
 	my $new_seq = Bio::Seq->new(-id => $id, -seq => $h->{$id});
 	$seq->write_seq($new_seq);
     }
 
 }
 
+sub write2fastafile{
+    my ($h1, $filename1, $h2, $filename2, $verbosity) = @_;
+
+    print STDERR "\tWriting FASTA file '$filename1'\n" if ($verbosity > 5);
+    print STDERR "\tWriting FASTA file '$filename2'\n" if ($verbosity > 5);
+
+    # cDNA
+    my $seq1 = Bio::SeqIO ->new(-format => 'fasta', -file => '>'.$filename1, -alphabet =>'dna');
+    # ORF
+    my $seq2 = Bio::SeqIO ->new(-format => 'fasta', -file => '>'.$filename2, -alphabet =>'dna');
+    # foreach my $id (sort keys %{$h}){
+    foreach my $id ( shuffle( sort( keys(%{$h1}) ) ) )
+    {
+	my $new_seq1 = Bio::Seq->new(-id => $id, -seq => $h1->{$id});
+	$seq1->write_seq($new_seq1);
+
+	my $new_seq2 = Bio::Seq->new(-id => $id, -seq => $h2->{$id});
+	$seq2->write_seq($new_seq2);
+    }
+
+}
+
 sub randomizedGTFtoFASTA{
 
-    my ($h, $ref_cDNA_passed, $cdnafile, $orffile, $genome, $nbtx, $minnumtx, $sizecorrec, $orfType, $maxTries, $maxN, $verbosity, $kmerMax, $seed) = @_;
+    my ($h, $ref_cDNA_passed, $cdnafile, $orffile, $genome, $nbtx, $minnumtx, $sizecorrec, $orfType, $maxTries, $maxN, $verbosity, $kmerMax) = @_;
 
     $nbtx      ||= 1000; # number of random tx required
     $maxTries  ||= 10;   # max tries to for computing both overlap and N
@@ -851,13 +889,12 @@ sub randomizedGTFtoFASTA{
     my $orfFlag = 0; # to get the type of ORF
     my $cptok   = 0; # to get the number of extracted sequence
 
-    srand($seed); # the seed is initiated to have reproducibility
 
   TX:
-    foreach my $tx (sort keys %{$refannotsize}){ # sort for reproducibility
-
+    # foreach my $tx (sort keys %{$refannotsize}){ # sort for reproducibility
+    foreach my $tx ( shuffle( sort( keys(%{$refannotsize}) ) ) ) # sort before shuffle to get the same shuffle at each run
+    {
 	next if ( ! exists $ref_cDNA_passed->{$tx}); # only keep mRNA tx that are in the cDNA fasat file for sorting CPAT :  for reproducibility
-
 
 	my $overlap    = 1; # Initialize variable for iterative search for selfoverlap
 	my $includeN   = 1; # Initialize variable for iterative search for N
@@ -938,8 +975,11 @@ sub randomizedGTFtoFASTA{
 
     my $sizeh = keys(%h_cdna_rdm);
     die "The number of RANDOMLY relocated cDNA sequences =  *$sizeh* transcripts... That's not enough to train the program\n" if ($sizeh < $minnumtx);
-    &writefastafile(\%h_cdna_rdm, $cdnafile, $verbosity);
-    &writefastafile(\%h_orf,      $orffile,  $verbosity);
+
+    # VW modif
+    # &writefastafile(\%h_cdna_rdm, $cdnafile, $verbosity);
+    # &writefastafile(\%h_orf,      $orffile,  $verbosity);
+    &write2fastafile(\%h_orf, $orffile, \%h_cdna_rdm, $cdnafile, $verbosity);
 }
 
 
