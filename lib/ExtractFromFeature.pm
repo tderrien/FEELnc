@@ -407,8 +407,9 @@ sub feature2seq{
 	
 	foreach my $exon (@{$refarray}) {
 	
-		# next if we only want CDS *** and STOP codon ****
-		next if ($filterCDS && $exon->{'feat_level'} !~ /(CDS|stop_codon)/i);
+        ## VW modification
+        # next if don't want CDS ***
+        next if ((!$filterCDS) && ($exon->{'feat_level'} =~ /(CDS|stop_codon|start_codon)/i));
 		
 		# get coordinates
 		my $s	= $exon->{"start"};
