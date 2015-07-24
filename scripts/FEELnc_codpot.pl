@@ -160,7 +160,8 @@ if (-d $outDir ){
 }elsif (-r $outDir){
 	die "Error: Output directory '$outDir' is a file... aborting!\n";
 } else{
-	mkdir $outDir;
+	my $cmdline="mkdir -p $outDir";
+	system($cmdline);
 }
 $outDir = $outDir."/"; # add "/" at the end in case it is forgotten in pasting outdir and outname
 
@@ -433,6 +434,12 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
 
 =over 4
 
+
+=item *
+
+Valentin Wucher <vwucher@univ-rennes1.fr>
+
+
 =item *
 
 Thomas DERRIEN <tderrien@univ-rennes1.fr>
@@ -440,6 +447,7 @@ Thomas DERRIEN <tderrien@univ-rennes1.fr>
 =item *
 
 Fabrice LEGEAI <fabrice.legeai@inria.fr>
+
 
 =back
 

@@ -25,6 +25,7 @@ numberT   <- as.numeric(args[5])
 seed      <- as.numeric(args[6])
 thresSpeM <- as.numeric(args[7])
 thresSpeL <- as.numeric(args[8])
+outSummary <- paste(file_path_sans_ext(outFile), "_summary.txt", sep="")
 outVar    <- paste(file_path_sans_ext(outFile), "_varImpPlot.png", sep="")
 outROC    <- paste(file_path_sans_ext(outFile), "_TGROC.png", sep="")
 outStats  <- paste(file_path_sans_ext(outFile), "_stats.txt", sep="")
@@ -208,7 +209,7 @@ ymin=0.5
 ymax=1
 plot(S,col="blue",lty=3,ylab="Specificity",xlab="Coding Probability Cutoff",ylim=c(ymin,ymax),cex.axis=1.2,cex.label=1.2, main="Two-Graph ROC curves")
 plot(S,lwd=2,avg="vertical",add=TRUE,col="blue")
-plot(P,col="red",lty=3, add=TRUE,)
+plot(P,col="red",lty=3, add=TRUE)
 plot(P,lwd=2,avg="vertical",add=TRUE,col="red")
 
 ## Specificity line (red: mRNA; blue: lncRNA)
@@ -245,12 +246,28 @@ dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree
 dat.rf.test.votes                                   <- predict(dat.rf, testMat[,test.featID], type="vote")
 dat.rf.test                                         <- rep(-1, length.out=nrow(testMat))
 dat.rf.test[dat.rf.test.votes[,2]>=cutoffThresSpeM] <- 1
-dat.rf.test[dat.rf.test.votes[,2]<=cutoffThresSpeL] <- 0
+dat.rf.test[dat.rf.test.votes[,2]<cutoffThresSpeL]  <- 0
 
 
 ## Write the output
 cat("\tWrite the coding label for '", basename(testFile), "' in '", outFile, "'.\n", sep="")
 write.table(x=cbind(testMat, coding_potential=dat.rf.test.votes[,2], label=dat.rf.test), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
+
+## Write the summary file
+## If there is only one cutoff
+if(cutoffThresSpeM==cutoffThresSpeM)
+{
+	nbtuc	=	0
+	nblnc	=	table(dat.rf.test)[1]
+	nbmrna	=	table(dat.rf.test)[2]
+} else {
+	nbtuc	=	table(dat.rf.test)[1]
+	nblnc	=	table(dat.rf.test)[2]
+	nbmrna	=	table(dat.rf.test)[3]
+}
+cat("# Summary file:\n-With_mRNA_cutoff:\t",cutoffThresSpeM,"\n-With_lncRNA_cutoff:\t",cutoffThresSpeL," \n-Nb_TUCPs:\t",nbtuc,"\n-Nb_lncRNAs:\t",nblnc,"\n-Nb_mRNAs:\t",nbmrna,"\n", file=outSummary, sep = "")
+
+
 
 ## Write the plot for variable importance
 cat("\tPlot the variable importance as measured by random forest in '", outStats, "'.\n", sep="")

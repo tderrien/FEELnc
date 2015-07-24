@@ -56,11 +56,14 @@ if(all(dim(cont) == c(2,2)))
         quit()
     }
 
-sen <- round((tp / (tp+fn)), digits=2)
-spe <- round((tn / (fp+tn)), digits=2)
-pre <- round((tp / (tp+fp)), digits=2)
-acc <- round(((tp+tn) / contS), digits=2)
+
+sen  <- round( (tp / (tp+fn)), digits=3)
+spe  <- round( (tn / (fp+tn)), digits=3)
+pre  <- round( (tp / (tp+fp)), digits=3)
+acc  <- round( ((tp+tn) / contS), digits=3)
+fsc  <- round( (2*tp) / (2*tp+fp+fn), digits=3)
+mcc  <- round( ((tp*tn)-(fp*fn)) / ( sqrt(tp+fp) * sqrt(tp+fn) * sqrt(tn+fp) * sqrt(tn+fn)  ), digits=3)
 
 cat("Contingency (-1: TUCp; 0: lncRNA; 1: mRNA):\n")
 print(cont)
-cat("Stats (on mRNA):\nsensibility\t", sen, "\nspecificity\t", spe, "\nprecision\t", pre, "\naccuracy\t", acc, "\n", sep="")
+cat("Stats (on mRNA):\nsensibility\t", sen, "\nspecificity\t", spe, "\nprecision\t", pre, "\naccuracy\t", acc, "\nf1-score\t", fsc, "\n", sep="")

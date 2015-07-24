@@ -568,7 +568,7 @@ sub CreateORFcDNAFromGTF
 	my $cdnaseq   = ExtractFromFeature::feature2seq($refmrna->{$tr}->{'feature'}, $genome, $chr , $strand, $filterforCDS, $verbosity);
 	if (!defined $cdnaseq)
 	{
-	    warn "ERROR: Tx '$tr' returns an empty sequence... Skipping this transcripts\n";
+	    warn "ERROR: Tx '$tr' returns an empty sequence... Skipping this transcripts\n" if ($verbosity > 5);
 	    next;
 	}
 
@@ -584,8 +584,9 @@ sub CreateORFcDNAFromGTF
 	    {
 		# Get the sequence only if an ORF is found
 		$h_cdna{$tr} = $cdnaseq;
-		print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$nbtx...\r"                 if( defined $nbtx);
-		print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/".keys(%{$refmrna})."...\r" if(!defined $nbtx);
+		$countseqok++;
+		print STDERR "\tExtracting ORFs&cDNAs ", $countseqok,"/$nbtx...\r"                 if( defined $nbtx) ;
+		print STDERR "\tExtracting ORFs&cDNAs ", $countseqok,"/".keys(%{$refmrna})."...\r" if(!defined $nbtx);
 	    }
 	    else
 	    {
@@ -608,8 +609,9 @@ sub CreateORFcDNAFromGTF
 	    $orfob        = Orf::orfSeq2orfOb($orfseq, $strand, $verbosity);
 	    $h_orf{$tr}   = $orfob->{'cds_seq'};
 	    $h_cdna{$tr}  = $cdnaseq;
-	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$nbtx...\r"                 if( defined $nbtx);
-	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/".keys(%{$refmrna})."...\r" if(!defined $nbtx);
+		$countseqok++;
+	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok,"/$nbtx...\r"                 if( defined $nbtx );
+	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok,"/".keys(%{$refmrna})."...\r" if(!defined $nbtx );
 	}
 
 	if (defined $nbtx && $countseqok == $nbtx) # Check for transcript extraction limit
@@ -712,8 +714,9 @@ sub CreateORFcDNAFromFASTA
 	{
 	    # Add cDNA only if an ORF is found
 	    $h_cdna{$tr} = $seq->seq();
-	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$nbtx...\r"  if( defined $nbtx);
-	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok++,"/$nbseq...\r" if(!defined $nbtx);
+		$countseqok++;	    
+	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok,"/$nbtx...\r"  if( defined $nbtx);
+	    print STDERR "\tExtracting ORFs&cDNAs ", $countseqok,"/$nbseq...\r" if(!defined $nbtx);
 	}
 	else
 	{
@@ -867,7 +870,7 @@ sub randomizedGTFtoFASTA{
     my $hlightforover = Parser::GTF2GTFgnlight ($h, $split, $verbosity);
 
     # Get genome sequences size
-    print STDERR "- Get chromosome sizes \n" if ($verbosity > 0);
+    print STDERR "- Get chromosome sizes \n" if ($verbosity > 5);
     my $db = Bio::DB::Fasta->new($genome);
     my $refgenomesize;
     foreach my $id ( $db->ids){
@@ -963,8 +966,9 @@ sub randomizedGTFtoFASTA{
 	# Write New random sequence
 	$h_cdna_rdm{$id} = $seq;
 	$h_orf{$id}      = $seqORF;
-	print STDERR "\tExtracting ORFs&cDNAs with random coordinate ", $cptok++,"/$nbtx...\r"                      if( defined  $nbtx);
-	print STDERR "\tExtracting ORFs&cDNAs with random coordinate ", $cptok++,"/".keys(%{$refannotsize})."...\r" if( !defined $nbtx);
+	$cptok++;
+	print STDERR "\tExtracting ORFs&cDNAs with random coordinate ", $cptok,"/$nbtx...\r"                      if( defined  $nbtx);
+	print STDERR "\tExtracting ORFs&cDNAs with random coordinate ", $cptok,"/".keys(%{$refannotsize})."...\r" if( !defined $nbtx);
 
 	# verbosity
 	$i++;

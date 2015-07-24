@@ -19,9 +19,11 @@ testFile <- args[3]
 outFile  <- args[4]
 numberT  <- as.numeric(args[5])
 seed     <- as.numeric(args[6])
+
 outVar   <- paste(file_path_sans_ext(outFile), "_varImpPlot.png", sep="")
 outROC   <- paste(file_path_sans_ext(outFile), "_TGROC.png", sep="")
 outStats <- paste(file_path_sans_ext(outFile), "_stats.txt", sep="")
+outSummary <- paste(file_path_sans_ext(outFile), "_summary.txt", sep="")
 list.of.packages <- c("ROCR","randomForest")
 
 ## If number of argument == 5 then the threshold is not set, need to run 10-cross fold-validation
@@ -136,15 +138,25 @@ pred <- prediction(allRes, allLab)
 S <- performance(pred,measure="sens")
 P <- performance(pred,measure="spec")
 
+# New Performance measure =F or F1 or F-measure or F-score 2TP/(2TP+FP+FN) : performance(pred,measure="f") 
+# MCC = Matthews or Phi correlation coefficient. Yields a number between -1 and 1, with 1 indicating a perfect prediction, 0 indicating a random prediction. Values below 0 indicate a worse than random prediction.
+perf.measure <- performance(pred,measure="mat")
+
+
 ## Apply a function to get the mean on the 10 cutoffs that maximize the sens and spec (or minimize absolute difference : Thanks Oliver Sander)
-mean_cutoff <- mean(sapply(1:length(pred@predictions), function(i) { S@x.values[[i]][which.min(abs(S@y.values[[i]]-P@y.values[[i]]))] } ))
-mean_Sn     <- mean(sapply(1:length(pred@predictions), function(i) { P@y.values[[i]][which.min(abs(S@y.values[[i]]-P@y.values[[i]]))] } ))
+#mean_cutoff <- mean(sapply(1:length(pred@predictions), function(i) { S@x.values[[i]][which.min(abs(S@y.values[[i]]-P@y.values[[i]]))] } ))
+#mean_Sn     <- mean(sapply(1:length(pred@predictions), function(i) { P@y.values[[i]][which.min(abs(S@y.values[[i]]-P@y.values[[i]]))] } ))
+
+#bestind=which.max( slot(F, "y.values")[[i]] )
+mean_cutoff <- mean(sapply(1:length(pred@predictions), function(i) { slot(perf.measure, "x.values")[[i]][ which.max( slot(perf.measure, "y.values")[[i]] ) ]} ))
+mean_perf     <- mean(sapply(1:length(pred@predictions), function(i) { slot(perf.measure, "y.values")[[i]][ which.max( slot(perf.measure, "y.values")[[i]] ) ]} )) 
+
 
 ## If no threshold, set the best one found with 10-fold cross-validation
 if(is.null(thres))
     {
         thres    <- mean_cutoff
-        meanSens <- mean_Sn
+        meanSens <- mean_perf
         cat("\t10-fold cross-validation step is finish. Best threshold found: '", thres, "'.\n", sep="")
     }
 
@@ -192,7 +204,7 @@ ymin=0.5
 ymax=1
 plot(S,col="blue",lty=3,ylab="Performance",xlab="Coding Probability Cutoff",ylim=c(ymin,ymax),cex.axis=1.2,cex.label=1.2, main="Two-Graph ROC curves")
 plot(S,lwd=2,avg="vertical",add=TRUE,col="blue")
-plot(P,col="red",lty=3, add=TRUE,)
+plot(P,col="red",lty=3, add=TRUE)
 plot(P,lwd=2,avg="vertical",add=TRUE,col="red")
 
 ## Sn
@@ -226,6 +238,14 @@ dat.rf.test[dat.rf.test.votes[,2]>=thres] <- 1
 ## Write the output
 cat("\tWrite the coding label for '", basename(testFile), "' in '", outFile, "'.\n", sep="")
 write.table(x=cbind(testMat, coding_potential=dat.rf.test.votes[,2], label=dat.rf.test), file=outFile, quote=FALSE, sep="\t", row.names=FALSE)
+
+
+## Write the summary file
+nblnc	=	table(dat.rf.test)[1]
+nbmrna	=	table(dat.rf.test)[2]
+cat("# Summary file:\n-With_cutoff:\t",thres , "\n-Nb_lncRNAs:\t",nblnc,"\n-Nb_mRNAs:\t",nbmrna,"\n", file=outSummary, sep = "")
+
+
 
 ## Write the plot for variable importance
 cat("\tPlot the variable importance as measured by random forest in '", outStats, "'.\n", sep="")

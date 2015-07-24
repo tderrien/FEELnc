@@ -99,7 +99,7 @@ sub getKmerRatio
     $outFile ||= undef;
     $codStep ||= 3;
     $nonStep ||= 1;
-    $proc    ||= 1;
+    $proc    ||= 2;
     $keepTmp ||= 0;
 
     if($kmerSize < $codStep)
@@ -126,12 +126,12 @@ sub getKmerRatio
 
     # Run kis on ORF for coding genes
     print "\tRunning KmerInShort on '$codFile'.\n" if($verbosity >= 5);
-    $cmd = "$kisPath -file $codFile -nb-cores 4 -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
+    $cmd = "$kisPath -file $codFile -nb-cores $proc -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
     system($cmd);
-
+    #warn "$cmd"
     # Run kis on non coding genes
     print "\tRunning KmerInShort on '$nonFile'.\n" if($verbosity >= 5);
-    $cmd = "$kisPath -file $nonFile -nb-cores 4 -kmer-size $kmerSize -out $nonOut -dont-reverse -step $nonStep 1>/dev/null 2>/dev/null";
+    $cmd = "$kisPath -file $nonFile -nb-cores $proc -kmer-size $kmerSize -out $nonOut -dont-reverse -step $nonStep 1>/dev/null 2>/dev/null";
     system($cmd);
 
     # Read the two kmer files and put value in a table and get the total number of kmer to comput frequency
@@ -281,12 +281,12 @@ sub getKmerRatioSep
 
     # Run kis on ORF for coding genes
     print "\tRunning KmerInShort on '$codFile'.\n" if($verbosity >= 5);
-    $cmd = "$kisPath -file $codFile -nb-cores 4 -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
+    $cmd = "$kisPath -file $codFile -nb-cores $proc -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
     system($cmd);
 
     # Run kis on non coding genes
     print "\tRunning KmerInShort on '$nonFile'.\n" if($verbosity >= 5);
-    $cmd = "$kisPath -file $nonFile -nb-cores 4 -kmer-size $kmerSize -out $nonOut -dont-reverse -step $nonStep 1>/dev/null 2>/dev/null";
+    $cmd = "$kisPath -file $nonFile -nb-cores $proc -kmer-size $kmerSize -out $nonOut -dont-reverse -step $nonStep 1>/dev/null 2>/dev/null";
     system($cmd);
 
     # Read the two kmer files to get the kmer frequancy and write the ratio in the output file
@@ -397,7 +397,7 @@ sub scoreORF
     close FILE;
 
     # Run KmerInShort
-    my $cmd = "$kisPath -file $orfFile -kval $modFile -nb-cores 4 -kmer-size $kmerSize -dont-reverse -step $step 1>> $outFile 2>/dev/null";
+    my $cmd = "$kisPath -file $orfFile -kval $modFile -nb-cores $proc -kmer-size $kmerSize -dont-reverse -step $step 1>> $outFile 2>/dev/null";
     system($cmd);
 
     # To add the header to the $outFile
@@ -631,6 +631,7 @@ sub getRunModel
 	# If no threshold given, run codpot_randomforest.r without threshold (6 arguments)
 	print "\tThe threshold for the voting in random forest is not defined. Use 10-fold cross-validation to determine the best threshold.\n";
 	$cmd = "$rprogpath $codLearnFile $nonLearnFile $testFile $outFile $nTree $seed";
+	#warn $cmd;
     }
     # Second check if there is one threshold or two
     else
