@@ -165,20 +165,22 @@ if (-d $outDir ){
 }
 $outDir = $outDir."/"; # add "/" at the end in case it is forgotten in pasting outdir and outname
 
-# Create the directory for temporary files
+
+# Create the directory for temporary files with the job id ($$) and the temporary name
 my $outTmp = "/tmp/";
 if($keepTmp!=0)
 {
-    $outTmp = $outDir."tmp/";
+    $outTmp = $outDir."/tmp/";
     mkdir $outTmp;
 }
+my $nameTmp = $outTmp."/".$$."_".$outName;
+
 
 # Initialize the seed
 srand($seed);
 
 # If $numtx is undef, then learning on all transcripts, can be long so print a warning...
 print "You do not have specified a maximum number of transcripts for the training. Use all the annotation, can be long...\n" if(!defined $numtx);
-
 
 
 #############################################################
@@ -197,27 +199,15 @@ my $mRNAfileformat = Utils::guess_format($mRNAfile);
 pod2usage ("- Error: Cannot train the program if lncRNA training file (-l option) is not defined and mRNA file (-a option) is in FASTA format!\nPlease, provide the mRNA/annotation file in .GTF format so that I could extract intergenic sequences for training...\n") if (!defined $lncRNAfile && $mRNAfileformat eq "fasta");
 
 
-warn "> Preparing files for random forest...\n";
+print "> Preparing files for random forest...\n";
 
-# Define training file names
-my $codFile    = $outTmp.Utils::renamefile($mRNAfile, ".codingTrain.fa");
-my $codOrfFile = $outTmp.Utils::renamefile($mRNAfile, ".codingOrfTrain.fa");
-my $nonFile;
-my $nonOrfFile;
-if(defined $lncRNAfile)
-{
-    $nonFile    = $outTmp.Utils::renamefile($lncRNAfile, ".nonCodingTrain.fa");
-    $nonOrfFile = $outTmp.Utils::renamefile($lncRNAfile, ".nonCodingOrfTrain.fa");
-}
-else
-{
-    $nonFile    = $outTmp.Utils::renamefile($mRNAfile, ".nonCodingTrain.fa");
-    $nonOrfFile = $outTmp.Utils::renamefile($mRNAfile, ".nonCodingOrfTrain.fa");
-}
-
-# Define test file names
-my $testFile    = $outTmp.Utils::renamefile($infile, ".test.fa");
-my $testOrfFile = $outTmp.Utils::renamefile($infile, ".testOrf.fa");
+# Define fasta file names
+my $codFile    = $nameTmp.".coding_rna.fa";
+my $codOrfFile = $nameTmp.".coding_orf.fa";
+my $nonFile    = $nameTmp.".noncoding_rna.fa";
+my $nonOrfFile = $nameTmp.".noncoding_orf.fa";
+my $testFile    = $nameTmp.".test_rna.fa";
+my $testOrfFile = $nameTmp.".test_orf.fa";
 
 # Define output name
 my $rfout = $outDir.$outName."_RF.txt";
@@ -319,13 +309,11 @@ Utils::divFasta($nonOrfFile, $nonOrfFileKmRf[0], $nonOrfFileKmRf[1], $perc);
 print STDERR "> Run random Forest on '$testFile':\n";
 if(! defined $speThres)
 {
-    # RandomForest::runRF($codFile, $codOrfFile, $nonFile, $nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $keepTmpp, $seed, $proc);
-    RandomForest::runRF(\@codFileKmRf, \@codOrfFileKmRf, \@nonFileKmRf, \@nonOrfFileKmRf, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc);
+    RandomForest::runRF(\@codFileKmRf, \@codOrfFileKmRf, \@nonFileKmRf, \@nonOrfFileKmRf, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $nameTmp, $keepTmp, $seed, $proc);
 }
 else
 {
-    # RandomForest::runRF($codFile, codOrfFile, nonFile, nonOrfFile, $testFile, $testOrfFile, $rfout, $kmerList, $speThres, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc);
-    RandomForest::runRF(\@codFileKmRf, \@codOrfFileKmRf, \@nonFileKmRf, \@nonOrfFileKmRf, $testFile, $testOrfFile, $rfout, $kmerList, $speThres, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc);
+    RandomForest::runRF(\@codFileKmRf, \@codOrfFileKmRf, \@nonFileKmRf, \@nonOrfFileKmRf, $testFile, $testOrfFile, $rfout, $kmerList, $speThres, $nTree, $outDir, $verbosity, $nameTmp, $keepTmp, $seed, $proc);
 }
 
 # Parse RF result

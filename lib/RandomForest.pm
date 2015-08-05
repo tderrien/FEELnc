@@ -30,9 +30,6 @@ use Intersect;
 use Utils;
 use Orf;
 
-# Define a random value for the tmp file
-my $randVal = int(rand(1000));
-
 
 =encoding UTF-8
 
@@ -87,13 +84,13 @@ rfPredToOut: With a .gtf and a result file from a random forest, write 2 .gtf fi
 #	$nonStep   = step for the counting of kmer for the non coding genes
 #	$proc      = number of proc to be use for KmerInShort
 #	$verbosity = value to define the verbosity
+#       $nameTmp   = absolute path and prefix for the temporary files
 #	$keepTmp   = keeping or not the temporary files
-#	$outTmp    = temporary file output directory
 #	Return value:
 #		Return the array of the log ratio value
 sub getKmerRatio
 {
-    my($codFile, $nonFile, $outFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp) = @_;
+    my($codFile, $nonFile, $outFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $nameTmp, $keepTmp) = @_;
     $codFile ||= undef;
     $nonFile ||= undef;
     $outFile ||= undef;
@@ -121,9 +118,9 @@ sub getKmerRatio
     my $kisPath = Utils::pathProg("KmerInShort");
     my $cmd = "";
     # Temporary files to put kmer counting for ORF coding genes and non coding genes
-    my $codOut = $outTmp."kmerCounting_coding_".basename($codFile)."_".$kmerSize."_".$randVal.".tmp";
-    my $nonOut = $outTmp."kmerCounting_nonCoding_".basename($nonFile)."_".$kmerSize."_".$randVal.".tmp";
-
+    my $codOut = $nameTmp.".coding_size".$kmerSize."_kmerCounting.tmp";
+    my $nonOut = $nameTmp.".noncoding_size".$kmerSize."_kmerCounting.tmp";
+    
     # Run kis on ORF for coding genes
     print "\tRunning KmerInShort on '$codFile'.\n" if($verbosity >= 5);
     $cmd = "$kisPath -file $codFile -nb-cores $proc -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
@@ -242,13 +239,13 @@ sub getKmerRatio
 #	$nonStep   = step for the counting of kmer for the non coding genes
 #	$proc      = number of proc to be use for KmerInShort
 #	$verbosity = value to define the verbosity
+#       $nameTmp   = absolute path and prefix for the temporary files
 #	$keepTmp   = keeping or not the temporary files
-#	$outTmp    = temporary file output directory
 #	Return value:
 #		Return the array of the log ratio value
 sub getKmerRatioSep
 {
-    my($codFile, $nonFile, $outFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp) = @_;
+    my($codFile, $nonFile, $outFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $nameTmp, $keepTmp) = @_;
     $codFile ||= undef;
     $nonFile ||= undef;
     $outFile ||= undef;
@@ -276,9 +273,9 @@ sub getKmerRatioSep
     my $kisPath = Utils::pathProg("KmerInShort");
     my $cmd = "";
     # Temporary files to put kmer counting for ORF coding genes and non coding genes
-    my $codOut = $outTmp."kmerCounting_coding_".basename($codFile)."_".$kmerSize."_".$randVal.".tmp";
-    my $nonOut = $outTmp."kmerCounting_nonCoding_".basename($nonFile)."_".$kmerSize."_".$randVal.".tmp";
-
+    my $codOut = $nameTmp.".coding_size".$kmerSize."_kmerCounting.tmp";
+    my $nonOut = $nameTmp.".noncoding_size".$kmerSize."_kmerCounting.tmp";
+    
     # Run kis on ORF for coding genes
     print "\tRunning KmerInShort on '$codFile'.\n" if($verbosity >= 5);
     $cmd = "$kisPath -file $codFile -nb-cores $proc -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
@@ -424,6 +421,7 @@ sub scoreORF
 #	$orfSizeFile  = file with the size of the ORF as name\tORFSize
 #	$rnaSizeFile  = file with the size of the mRNA as name\tmRNASize
 #	$outFile      = file to write the merge of all kmer scores and ORF and mRNA size
+#       $nameTmp      = absolute path and prefix for the temporary files
 #	$keepTmp      = keep or not temporary files
 sub mergeKmerScoreSize
 {
@@ -680,10 +678,11 @@ sub getRunModel
 #	$thres           = the threshold for the random forest, if it is not defined then it is set using a 10-fold cross-validation on learning data
 #	$nTree           = number of trees used in random forest
 #	$verbosity       = value for level of verbosity
+#       $nameTmp         = absolute path and prefix for the temporary files
 #	$keepTmp         = keep or not the temporary files
 sub runRF
 {
-    my ($REFcodLearnFile, $REForfCodLearnFile, $REFnonLearnFile, $REForfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $nTree, $outDir, $verbosity, $keepTmp, $seed, $proc) = @_;
+    my ($REFcodLearnFile, $REForfCodLearnFile, $REFnonLearnFile, $REForfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $nTree, $outDir, $verbosity, $nameTmp, $keepTmp, $seed, $proc) = @_;
     $kmerListString ||= "3,6,9";
     $verbosity      ||= 0;
     $proc           ||= 1;
@@ -694,23 +693,17 @@ sub runRF
     my $nonLearnFile    = $REFnonLearnFile->[1];
     my $orfNonLearnFile = $REForfNonLearnFile->[1];
 
-    # Make a variable to keep temporay file in the outdir if --keeptmp is specify
-    my $outTmp = "/tmp/";
-    if($keepTmp!=0)
-    {
-	$outTmp = $outDir."tmp/";
-	mkdir $outTmp;
-    }
-
     # 1. Compute the size of each sequence and ORF
     print "1. Compute the size of each sequence and ORF\n";
-    my $sizeCodLearnFile    = $outTmp.basename($codLearnFile)."_mRNASize".$randVal.".tmp";
-    my $sizeOrfCodLearnFile = $outTmp.basename($orfCodLearnFile)."_ORFSize".$randVal.".tmp";
-    my $sizeNonLearnFile    = $outTmp.basename($nonLearnFile)."_mRNASize".$randVal.".tmp";
-    my $sizeOrfNonLearnFile = $outTmp.basename($orfNonLearnFile)."_ORFSize".$randVal.".tmp";
-    my $sizeTestFile        = $outTmp.basename($testFile)."_mRNASize".$randVal.".tmp";
-    my $sizeOrfTestFile     = $outTmp.basename($orfTestFile)."_ORFSize".$randVal.".tmp";
+    my $sizeCodLearnFile    = $nameTmp.".coding_rnaSize.tmp";
+    my $sizeOrfCodLearnFile = $nameTmp.".coding_orfSize.tmp";
+    my $sizeNonLearnFile    = $nameTmp.".noncoding_rnaSize.tmp";
+    my $sizeOrfNonLearnFile = $nameTmp.".noncoding_orfSize.tmp";
+    my $sizeTestFile        = $nameTmp.".test_rnaSize.tmp";
+    my $sizeOrfTestFile     = $nameTmp.".test_orfSize.tmp";
 
+
+    
     # Learning
     ## Coding
     &getSizeFastaFile($codLearnFile,    $sizeCodLearnFile,    "mRNA_size");
@@ -738,14 +731,11 @@ sub runRF
 
     foreach $kmerSize ( @kmerList )
     {
-	$kmerFile = $outTmp."kmerRatioScore_".$kmerSize."_".$randVal.".tmp";
+	$kmerFile = $nameTmp.".kmerScoreValues_size$kmerSize.tmp";
 	push(@kmerRatioFileList, $kmerFile);
 
-	## VWTD: modification
-	## Make the model on the first learning files
-	## &getKmerRatio($REForfCodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp);
 	## VW: modification of the score
-	&getKmerRatioSep($REForfCodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $keepTmp, $outTmp);
+	&getKmerRatioSep($REForfCodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $nameTmp, $keepTmp);
     }
 
     # 3. Compute the kmer score for each kmer size on learning and test ORF and for each type
@@ -756,30 +746,27 @@ sub runRF
 	print "\t- kmer size: $kmerList[$i]\n";
 	# Learning
 	## Coding
-	$kmerFile = $outTmp.basename($orfCodLearnFile)."_".$kmerList[$i]."_".$randVal."_kmerScoreCodLearn.tmp";
+	$kmerFile = $nameTmp.".coding_sequencesKmerScoreValues.tmp";
 	push(@kmerScoreCodLearnFileList, $kmerFile);
-	#scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp, $outTmp);
 	scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
 
 	## Non coding
-	$kmerFile = $outTmp.basename($orfNonLearnFile)."_".$kmerList[$i]."_".$randVal."_kmerScoreNonLearn.tmp";
+	$kmerFile = $nameTmp.".noncoding_sequencesKmerScoreValues.tmp";
 	push(@kmerScoreNonLearnFileList, $kmerFile);
-	#scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp, $outTmp);
 	scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
 
 	# Test
-	$kmerFile = $outTmp.basename($orfTestFile)."_".$kmerList[$i]."_".$randVal."_kmerScoreTest.tmp";
+	$kmerFile = $nameTmp.".test_sequencesKmerScoreValues.tmp";
 	push(@kmerScoreTestFileList, $kmerFile);
-	#scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity, $keepTmp, $outTmp);
 	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
     }
 
 
     # 4. Merge the score and size files into one file for each type (learning coding and non coding and test)
     print "4. Merge the score and size files into one file for each type\n";
-    my $outModCodLearn = $outTmp.basename("$outFile").".modelCoding.out";
-    my $outModNonLearn = $outTmp.basename("$outFile").".modelNonCoding.out";
-    my $outModTest     = $outTmp.basename("$outFile").".modelTest.out";
+    my $outModCodLearn = $nameTmp.".modelCoding.out";
+    my $outModNonLearn = $nameTmp.".modelNonCoding.out";
+    my $outModTest     = $nameTmp.".modelTest.out";
 
     # Learning
     ## Coding
@@ -1037,13 +1024,13 @@ number of proc to be use for KmerInShort
 
 define the verbosity of the program
 
+=item $nameTmp
+
+absolute path and prefix for the temporary files
+
 =item $keepTmp
 
 if the temporary files need to be kept (0: delete; !0: keep)
-
-=item $outTmp
-
-temporary file output directory
 
 =back
 
@@ -1089,13 +1076,13 @@ number of proc to be use for KmerInShort
 
 define the verbosity of the program
 
+=item $nameTmp
+
+absolute path and prefix for the temporary files
+
 =item $keepTmp
 
 if the temporary files need to be kept (0: delete; !0: keep)
-
-=item $outTmp
-
-temporary file output directory
 
 =back
 
@@ -1184,6 +1171,10 @@ file with the mRNA size as name\tmRNASize
 =item $outFile
 
 file to write the merge of all kmer scores and ORF/mRNA size
+
+=item $nameTmp
+
+absolute path and prefix for the temporary files
 
 =item $keepTmp
 
@@ -1281,6 +1272,10 @@ output directory
 =item $verbosity
 
 define the verbosity of the program
+
+=item $nameTmp
+
+absolute path and prefix for the temporary files
 
 =item $keepTmp
 
