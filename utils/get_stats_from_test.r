@@ -66,4 +66,4 @@ mcc  <- round( ((tp*tn)-(fp*fn)) / ( sqrt(tp+fp) * sqrt(tp+fn) * sqrt(tn+fp) * s
 
 cat("Contingency (-1: TUCp; 0: lncRNA; 1: mRNA):\n")
 print(cont)
-cat("Stats (on mRNA):\nsensibility\t", sen, "\nspecificity\t", spe, "\nprecision\t", pre, "\naccuracy\t", acc, "\nf1-score\t", fsc, "\n", phi-mcc\t", mcc, "\n",sep="")
+cat("Stats (on mRNA):\nsensibility\t", sen, "\nspecificity\t", spe, "\nprecision\t", pre, "\naccuracy\t", acc, "\nf1-score\t", fsc, "\n", "phi_matcoef\t", mcc, "\n",sep="")
