@@ -331,6 +331,35 @@ else
 # Parse RF result
 RandomForest::rfPredToOut($infile, $rfout, $outDir, $outName);
 
+
+# Check if a TUCp file exists, if there is one so write this message
+if( -e $outDir.$outName.".TUCp.gtf" )
+{
+    print "\nTranscripts of Unknown Coding Potential (TUCps) found: check file '".$outDir.$outName.".TUCp.gtf'.\n";
+    print "\tThese transcripts correspond to transcripts with a coding potential between the mRNA and the lncRNA specificity threshold.\n";
+}
+if( -e $outDir.$outName.".TUCp.fa" )
+{
+    print "\nTranscripts of Unknown Coding Potential (TUCps) found: check file '".$outDir.$outName.".TUCp.fa'.\n";
+    print "\tThese transcripts correspond to transcripts with a coding potential between the mRNA and the lncRNA specificity threshold.\n";
+}
+
+# Check if a noORF file exists, if there is one so write this message
+if( -e $outDir.$outName.".noORF.gtf" )
+{
+    print "\nTranscripts without ORF found: check file '".$outDir.$outName.".noORF.gtf'.\n";
+    print "\tThese transcripts correspond probably to lncRNAs since no ORF was found. You might also want to change the --testorftype option.\n";
+}
+if( -e $outDir.$outName.".noORF.fa" )
+{
+    print "\nTranscripts without ORF found: check file '".$outDir.$outName.".noORF.fa'.\n";
+    print "\tThese transcripts correspond probably to lncRNAs since no ORF was found. You might also want to change the --testorftype option.\n";
+}
+
+
+
+
+
 # Cleaning temporary files
 if($keepTmp==0)
 {
