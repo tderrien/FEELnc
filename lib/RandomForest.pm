@@ -120,7 +120,7 @@ sub getKmerRatio
     # Temporary files to put kmer counting for ORF coding genes and non coding genes
     my $codOut = $nameTmp.".coding_size".$kmerSize."_kmerCounting.tmp";
     my $nonOut = $nameTmp.".noncoding_size".$kmerSize."_kmerCounting.tmp";
-    
+
     # Run kis on ORF for coding genes
     print "\tRunning KmerInShort on '$codFile'.\n" if($verbosity >= 5);
     $cmd = "$kisPath -file $codFile -nb-cores $proc -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
@@ -275,7 +275,7 @@ sub getKmerRatioSep
     # Temporary files to put kmer counting for ORF coding genes and non coding genes
     my $codOut = $nameTmp.".coding_size".$kmerSize."_kmerCounting.tmp";
     my $nonOut = $nameTmp.".noncoding_size".$kmerSize."_kmerCounting.tmp";
-    
+
     # Run kis on ORF for coding genes
     print "\tRunning KmerInShort on '$codFile'.\n" if($verbosity >= 5);
     $cmd = "$kisPath -file $codFile -nb-cores $proc -kmer-size $kmerSize -out $codOut -dont-reverse -step $codStep 1>/dev/null 2>/dev/null";
@@ -284,7 +284,7 @@ sub getKmerRatioSep
     {
         die "\nFailed to run KmerInShort: check your KmerInShort PATH (LINUX/MAC). Command line:\n$cmd\n";
     }
-    
+
     # Run kis on non coding genes
     print "\tRunning KmerInShort on '$nonFile'.\n" if($verbosity >= 5);
     $cmd = "$kisPath -file $nonFile -nb-cores $proc -kmer-size $kmerSize -out $nonOut -dont-reverse -step $nonStep 1>/dev/null 2>/dev/null";
@@ -315,25 +315,25 @@ sub getKmerRatioSep
     {
 	($codKmer, $codVal) = split(/\t/, <FILECOD>);
 	($nonKmer, $nonVal) = split(/\t/, <FILENON>);
-    
+
 	die "Error: kmer order is not the same between '$codOut' and '$nonOut' ($codKmer, $nonKmer).\nExit." if($codKmer ne $nonKmer);
 
 	push(@codTab, int($codVal));
 	push(@nonTab, int($nonVal));
 	$codTot = $codTot + $codVal;
-	$nonTot = $nonTot + $nonVal;	
+	$nonTot = $nonTot + $nonVal;
     }
 
     # Write the output file
     my $nbKmer = @codTab;
     my $codR   = 0;
     my $nonR   = 0;
-    
+
     for(my $i=0; $i<$nbKmer; $i++)
     {
 	$codR = $codTab[$i]/$codTot;
 	$nonR = $nonTab[$i]/$nonTot;
-	
+
 	if(($codR+$nonR) == 0)
 	{
 	    $ratio = 0.5;
@@ -348,7 +348,7 @@ sub getKmerRatioSep
     close FILECOD;
     close FILENON;
     close FILEOUT;
-    
+
     # Delete the temporary files if keepTmp != 0
     if($keepTmp == 0)
     {
@@ -543,7 +543,7 @@ sub mergeKmerScoreSize
     print FILE join("\t", @head), "\n";
 
     # Write the values
-    foreach $seqId (keys(%seq))
+    foreach $seqId (sort(keys(%seq)))
     {
 	print FILE "$seqId\t";
 	print FILE join("\t", @{$seq{$seqId}}), "\n";
@@ -701,7 +701,7 @@ sub runRF
     my $sizeOrfTestFile     = $nameTmp.".test_orfSize.tmp";
 
 
-    
+
     # Learning
     ## Coding
     &getSizeFastaFile($codLearnFile,    $sizeCodLearnFile,    "mRNA_size");
