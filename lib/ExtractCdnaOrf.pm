@@ -622,7 +622,7 @@ sub CreateORFcDNAFromGTF
     }
 
     my $sizehorf = keys(%h_orf);
-    die "The number of complete ORF found with computeORF mode is *$sizehorf* transcripts... That's not enough to train the program\n" if (defined $nbtx && $sizehorf < $minnumtx);
+    die "The number of complete ORF found with computeORF mode is *$sizehorf* transcripts... That's not enough to train the program\n" if ($sizehorf < $minnumtx);
 
     # Write fasta file
     # VW modif
