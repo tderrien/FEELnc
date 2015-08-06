@@ -538,8 +538,6 @@ sub mergeKmerScoreSize
     open FILE, "> $outFile" or die "Error! Cannot access to the output file '". $outFile . "': ".$!;
     my $seqId;
 
-    #print Dumper @head;
-
     # Write the header
     print FILE "name\t";
     print FILE join("\t", @head), "\n";
@@ -746,17 +744,17 @@ sub runRF
 	print "\t- kmer size: $kmerList[$i]\n";
 	# Learning
 	## Coding
-	$kmerFile = $nameTmp.".coding_sequencesKmerScoreValues.tmp";
+	$kmerFile = $nameTmp.".coding_sequencesKmer_".$kmerList[$i]."_ScoreValues.tmp";
 	push(@kmerScoreCodLearnFileList, $kmerFile);
 	scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
 
 	## Non coding
-	$kmerFile = $nameTmp.".noncoding_sequencesKmerScoreValues.tmp";
+	$kmerFile = $nameTmp.".noncoding_sequencesKmer_".$kmerList[$i]."_ScoreValues.tmp";
 	push(@kmerScoreNonLearnFileList, $kmerFile);
 	scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
 
 	# Test
-	$kmerFile = $nameTmp.".test_sequencesKmerScoreValues.tmp";
+	$kmerFile = $nameTmp.".test_sequencesKmer_".$kmerList[$i]."_ScoreValues.tmp";
 	push(@kmerScoreTestFileList, $kmerFile);
 	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
     }
