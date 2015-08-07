@@ -255,7 +255,7 @@ write.table(x=cbind(testMat, coding_potential=dat.rf.test.votes[,2], label=dat.r
 
 ## Write the summary file
 ## If there is only one cutoff
-if(cutoffThresSpeM==cutoffThresSpeM)
+if(cutoffThresSpeM==cutoffThresSpeL)
 {
 	nbtuc	=	0
 	nblnc	=	table(dat.rf.test)[1]
