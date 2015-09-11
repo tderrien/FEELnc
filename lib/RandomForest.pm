@@ -96,7 +96,7 @@ sub getKmerRatio
     $outFile ||= undef;
     $codStep ||= 3;
     $nonStep ||= 1;
-    $proc    ||= 2;
+    $proc    ||= 0;
     $keepTmp ||= 0;
 
     if($kmerSize < $codStep)
@@ -251,7 +251,7 @@ sub getKmerRatioSep
     $outFile ||= undef;
     $codStep ||= 3;
     $nonStep ||= 1;
-    $proc    ||= 1;
+    $proc    ||= 0;
     $keepTmp ||= 0;
 
     if($kmerSize < $codStep)
@@ -376,7 +376,7 @@ sub scoreORF
     $outFile  ||= undef;
     $kmerSize ||= 6;
     $step     ||= 3;
-    $proc     ||= 1;
+    $proc     ||= 0;
 
     if($kmerSize < $step)
     {
@@ -722,7 +722,9 @@ sub runRF
     my @kmerScoreTestFileList;
     my $kmerFile;
     my $kmerSize;
-    my $codStep       = 3;
+    # my $codStep       = 3;
+    ## VW: modification use step=1 for all sequences and do it on RNA not only ORF
+    my $codStep       = 1;
     my $nonStep       = 1;
     my $lenKmerList   = @kmerList;
     my $i             = 0;
@@ -733,7 +735,8 @@ sub runRF
 	push(@kmerRatioFileList, $kmerFile);
 
 	## VW: modification of the score
-	&getKmerRatioSep($REForfCodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $nameTmp, $keepTmp);
+	## VW: modification of the learning step, now do it on RNA not only on ORF
+	&getKmerRatioSep($REFcodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $nameTmp, $keepTmp);
     }
 
     # 3. Compute the kmer score for each kmer size on learning and test ORF and for each type
@@ -741,22 +744,23 @@ sub runRF
     $kmerFile = "";
     for($i=0; $i<$lenKmerList; $i++)
     {
+	## VW: modification, now make a kmer score on the RNA not only on the ORF
 	print "\t- kmer size: $kmerList[$i]\n";
 	# Learning
 	## Coding
 	$kmerFile = $nameTmp.".coding_sequencesKmer_".$kmerList[$i]."_ScoreValues.tmp";
 	push(@kmerScoreCodLearnFileList, $kmerFile);
-	scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
+	scoreORF($codLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
 
 	## Non coding
 	$kmerFile = $nameTmp.".noncoding_sequencesKmer_".$kmerList[$i]."_ScoreValues.tmp";
 	push(@kmerScoreNonLearnFileList, $kmerFile);
-	scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
+	scoreORF($nonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
 
 	# Test
 	$kmerFile = $nameTmp.".test_sequencesKmer_".$kmerList[$i]."_ScoreValues.tmp";
 	push(@kmerScoreTestFileList, $kmerFile);
-	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
+	scoreORF($testFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
     }
 
 
