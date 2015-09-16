@@ -416,6 +416,53 @@ sub scoreORF
 }
 
 
+# Function to compute the scoring function of a multifasta file of sequence in a specific frame
+#	$orfFile   = multi fasta file with the ORF of the genes to be scored
+#	$modFile   = file with the log ratio score compute on learning files
+#	$outFile   = file where the logRatio of kmer frequency need to be written
+#	$kmerSize  = size of the kmer
+#	$step      = step for the counting of kmer
+#	$proc      = number of proc to be use for kis
+#	$verbosity = value to define the verbosity
+sub scoreFrame
+{
+    my($orfFile, $modFile, $outFile, $kmerSize, $step, $offset, $proc, $verbosity) = @_;
+    $orfFile  ||= undef;
+    $modFile  ||= undef;
+    $outFile  ||= undef;
+    $kmerSize ||= 6;
+    $step     ||= 3;
+    $proc     ||= 1;
+    
+    if($kmerSize < $step)
+    {
+	$step = 1;
+    }
+
+    # Check if mendatory arguments have been given
+    die "Scoring sequence file: sequence file for scoring sequences is not defined... exiting\n"                     if(!defined $orfFile);
+    die "Scoring sequence file: model of log ratio score file is not defined... exiting\n"                      if(!defined $modFile);
+    die "Scoring sequence file: output file to write kmer score for test sequences is not defined... exiting\n" if(!defined $outFile);
+
+    # emtpy
+    die "Scoring sequence file: sequence file for scoring sequences '$orfFile' is empty... exiting\n" unless (-s $orfFile);
+    die "Scoring sequence file: model of log ratio score file '$modFile' is empty... exiting\n"  unless (-s $modFile);
+
+    # Path to kis
+    my $kisPath = Utils::pathProg("KmerInShort");
+
+    print "\tRun KmerInShort on '$orfFile' and '$modFile' to '$outFile'" if($verbosity >= 5);
+    # Print header
+    open FILE, "> $outFile";
+    print FILE "name\tkmerScore_".$kmerSize."mer\n";
+    close FILE;
+
+    # Run KmerInShort
+    my $cmd = "$kisPath -file $orfFile -kval $modFile -nb-cores $proc -kmer-size $kmerSize -offset $offset -dont-reverse -step $step 1>> $outFile 2>/dev/null";
+    system($cmd);
+}
+
+
 # Fusion of the kmerScore files for a list of kmer size
 #	@kmerFileList = list of path to each kmer score files
 #	$orfSizeFile  = file with the size of the ORF as name\tORFSize
@@ -478,6 +525,133 @@ sub mergeKmerScoreSize
 	close FILE;
 	unlink $file unless($keepTmp != 0);
     }
+
+    # Read ORF size
+    $flag = 0;
+    open FILE, "$orfSizeFile" or die "Error! Cannot access ORF size file '". $orfSizeFile . "': ".$!;
+    while(<FILE>)
+    {
+	chop;
+	my($name, $orfSize) = split(/\t/);
+
+	if($flag != 0)
+	{
+	    if(!exists $seq{$name})
+	    {
+		die "Error at merge ORF size step! '$name' is not in the kmer score files: ".$!;
+	    }
+
+	    push(@{$seq{$name}}, $orfSize);
+	}
+	else
+	{
+	    push(@head, $orfSize);
+	    $flag = 1;
+	}
+    }
+    close FILE;
+    unlink $orfSizeFile unless($keepTmp != 0);
+
+    # Read mRNA size
+    $flag = 0;
+    open FILE, "$rnaSizeFile" or die "Error! Cannot access mRNA size file '". $rnaSizeFile . "': ".$!;
+
+    while(<FILE>)
+    {
+	chop;
+	my($name, $rnaSize) = split(/\t/);
+
+	if($flag != 0)
+	{
+	    if(!exists $seq{$name})
+	    {
+		warn "The sequence id $name didn't have an ORF with a start and stop codon. Skip this sequence...\n";
+		next;
+		#die "Error at merge mRNA size step! $name is not in the kmer score files: ".$!;
+	    }
+
+	    push(@{$seq{$name}}, $rnaSize);
+	}
+	else
+	{
+	    push(@head, $rnaSize);
+	    $flag = 1;
+	}
+    }
+    close FILE;
+    unlink $rnaSizeFile unless($keepTmp != 0);
+
+    # Write the output file
+    open FILE, "> $outFile" or die "Error! Cannot access to the output file '". $outFile . "': ".$!;
+    my $seqId;
+
+    # Write the header
+    print FILE "name\t";
+    print FILE join("\t", @head), "\n";
+
+    # Write the values
+    foreach $seqId (sort(keys(%seq)))
+    {
+	print FILE "$seqId\t";
+	print FILE join("\t", @{$seq{$seqId}}), "\n";
+    }
+    close FILE;
+}
+
+# Fusion of the kmerScore files for a list of kmer size
+#	$kmerFile = a file with all the kmer scores for a sequence
+#	$orfSizeFile  = file with the size of the ORF as name\tORFSize
+#	$rnaSizeFile  = file with the size of the mRNA as name\tmRNASize
+#	$outFile      = file to write the merge of all kmer scores and ORF and mRNA size
+#       $nameTmp      = absolute path and prefix for the temporary files
+#	$keepTmp      = keep or not temporary files
+sub mergeKmerScoreSize2
+{
+    my ($kmerFile, $orfSizeFile, $rnaSizeFile, $outFile, $keepTmp) = @_;
+    $kmerFile    ||= undef;
+    $orfSizeFile ||= undef;
+    $rnaSizeFile ||= undef;
+    $outFile     ||= undef;
+
+    # Check if mendatory arguments have been given
+    die "Merging kmer scores and size files: kmer scores file is not defined... exiting\n"            if(!defined $kmerFile);
+    die "Merging kmer scores and size files: ORF size file is not defined... exiting\n"               if(!defined $orfSizeFile);
+    die "Merging kmer scores and size files: mRNA size file is not defined... exiting\n"              if(!defined $rnaSizeFile);
+    die "Merging kmer scores and size files: output file for the merging is not defined... exiting\n" if(!defined $outFile);
+
+    # empty
+    die "Merging kmer scores and size files: ORF size file '$orfSizeFile' is empty... exiting\n"  unless(-s $orfSizeFile);
+    die "Merging kmer scores and size files: mRNA size file '$rnaSizeFile' is empty... exiting\n" unless(-s $rnaSizeFile);
+
+
+    # Get a hash to stock score values for each sequences and a tab for the header
+    my %seq;
+    my @head;
+    my $flag = 0;
+    my $file;
+    
+    # Read kmer score file
+    $flag = 0;
+    open FILE, "$kmerFile" or die "Error! Cannot access kmer score file '". $kmerFile . "': ".$!;
+    while(<FILE>)
+    {
+	chop;
+	my @tmp  = split(/\t/);
+	my $name = $tmp[0];
+	my @val  = $tmp[-0];
+	
+	if($flag != 0)
+	{
+		$seq{$name} = $val;
+	}
+	else
+	{
+	    push(@head, @val);
+	    $flag = 1;
+	}
+    }
+    close FILE;
+    unlink $file unless($keepTmp != 0);
 
     # Read ORF size
     $flag = 0;
@@ -664,6 +838,159 @@ sub getRunModel
 }
 
 
+
+sub bestFrame
+{
+    my ($REFfileFrame0, $REFfileFrame1, $REFfileFrame2, $outFile) = @_;
+    my $flag = 0;
+    my $name = "";
+    my $val  = 0;
+    my $val0 = 0;
+    my $val1 = 0;
+    my $val2 = 0;
+    my %frame0;
+    my %frame1;
+    my %frame2;
+    my @header;
+    
+    print "\tGet the frame with the best kmer score for each sequence.\n" if($verbosity >= 5);
+
+    # Read each kmer scores files for the frame 0
+    foreach $file (@{$REFfileFrame0})
+    {
+	$flag = 0;
+	open FILE, "$file" or die "Error! Cannot access kmer score file '". $file . "': ".$!;
+	while(<FILE>)
+	{
+	    chop;
+	    my ($name, $val) = split(/\t/);
+
+	    if($flag==0)
+	    {
+		push(@header, $val);
+		$flag = 1;
+	    }
+	    
+	    if(!exists $frame0{$name})
+	    {
+		$frame0{$name} = [$val, $val];
+	    }
+	    else
+	    {
+		# Add the score to the tab
+		push(@{$frame0{$name}}, $val);
+		# And multiple the score with the previous one
+		$frame0{$name}[0] = $frame0{$name}[0]*$val;
+	    }
+	}
+    }
+
+    # Read each kmer scores files for the frame 1
+    foreach $file (@{$REFfileFrame1})
+    {
+	$flag = 0;
+	open FILE, "$file" or die "Error! Cannot access kmer score file '". $file . "': ".$!;
+	while(<FILE>)
+	{
+	    chop;
+	    my ($name, $val) = split(/\t/);
+
+	    if($flag==0)
+	    {
+		push(@header, $val);
+		$flag = 1;
+	    }
+	    
+	    if(!exists $frame1{$name})
+	    {
+		$frame1{$name} = [$val, $val];
+	    }
+	    else
+	    {
+		# Add the score to the tab
+		push(@{$frame1{$name}}, $val);
+		# And multiple the score with the previous one
+		$frame1{$name}[0] = $frame1{$name}[0]*$val;
+	    }
+	}
+    }
+
+    # Read each kmer scores files for the frame 1
+    foreach $file (@{$REFfileFrame2})
+    {
+	$flag = 0;
+	open FILE, "$file" or die "Error! Cannot access kmer score file '". $file . "': ".$!;
+	while(<FILE>)
+	{
+	    chop;
+	    my ($name, $val) = split(/\t/);
+
+	    if($flag==0)
+	    {
+		push(@header, $val);
+		$flag = 1;
+	    }
+	    
+	    if(!exists $frame2{$name})
+	    {
+		$frame2{$name} = [$val, $val];
+	    }
+	    else
+	    {
+		# Add the score to the tab
+		push(@{$frame2{$name}}, $val);
+		# And multiple the score with the previous one
+		$frame2{$name}[0] = $frame2{$name}[0]*$val;
+	    }
+	}
+    }
+
+
+    # Get the best frame and write the corresponding kmer scores
+    open FILEOUT, "> $outFile"  or die "Error! Cannot access output file '"  . $outFile    . "': ".$!;
+    # Write the header
+    print FILEOUT "name\t";
+    print FILEOUT join("\t", @head), "\n";
+
+    foreach $name (keys $frame0)
+    {
+	print FILEOUT $name;
+	
+	$val0 = $frame0{$name}[0];
+	$val1 = $frame1{$name}[0];
+	$val2 = $frame2{$name}[0];
+	
+	if($val0 > $val1 && $val0 > $val2)
+	{
+	    for($i=1; $i<$frame0{$name}; $i++)
+	    {
+		print FILEOUT "\t".$frame0{$name}[$i];
+	    }
+	    print FILEOUT "\n";
+	}
+	elsif($val1 > $val0 && $val1 > $val2)
+	{
+	    for($i=1; $i<$frame1{$name}; $i++)
+	    {
+		print FILEOUT "\t".$frame1{$name}[$i];
+	    }
+	    print FILEOUT "\n";
+	}
+	else
+	{
+	    for($i=1; $i<$frame1{$name}; $i++)
+	    {
+		print FILEOUT "\t".$frame1{$name}[$i];
+	    }
+	    print FILEOUT "\n";
+	}
+    }
+}
+
+
+
+
+
 # Run all the process using ORF from coding sequences, fasta from coding and non coding sequences, ORF and fasta from test sequences, a list of kmer size and a threshold (if defined)
 #	$codLearnFile    = fasta file of the learning coding sequences
 #	$orfCodLearnFile = fasta file of the ORF learning coding sequences
@@ -715,18 +1042,26 @@ sub runRF
 
     # 2. Compute the kmer ratio for each kmer and put the output file name in a list
     print "2. Compute the kmer ratio for each kmer and put the output file name in a list\n";
+    # VW: modif now use a step of 1 for the model and 3 for the scoring between frame
+    # VW: modif add three tables to get the kmer scores files for each frame
     my @kmerList = split(/,/, $kmerListString);
     my @kmerRatioFileList;
     my @kmerScoreCodLearnFileList;
     my @kmerScoreNonLearnFileList;
     my @kmerScoreTestFileList;
-    my $kmerFile;
+    my @kmerFrameCod;
+    my @kmerFrameNon;
+    my @kmerFrameTest;
+    my $kmerFileCod;
+    my $kmerFileNon;
+    my $kmerFileTest;
     my $kmerSize;
-    my $codStep       = 3;
-    # VW: modification of the step for lnc, now use step=3 on the ORF
-    my $nonStep       = 3;
-    my $lenKmerList   = @kmerList;
-    my $i             = 0;
+    my $codStepModel = 1;
+    my $nonStepModel = 1;
+    my $stepScore    = 3;
+    my $frame        = 0;
+    my $lenKmerList  = @kmerList;
+    my $i            = 0;
 
     foreach $kmerSize ( @kmerList )
     {
@@ -735,33 +1070,53 @@ sub runRF
 
 	## VW: modification of the score
 	## VW: modification, learn model on lnc ORF, not all the sequence and with a step of 3
-	&getKmerRatioSep($REForfCodLearnFile->[0], $REForfNonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $nameTmp, $keepTmp);
+	&getKmerRatioSep($REFcodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStepModel, $nonStepModel, $proc, $verbosity, $nameTmp, $keepTmp);
     }
 
-    # 3. Compute the kmer score for each kmer size on learning and test ORF and for each type
-    print "3. Compute the kmer score for each kmer size on learning and test ORF\n";
+    
+    # 3. Compute the kmer score for each kmer size on learning and test sequence for each type and for each frame
+    print "3. Compute the kmer score for each kmer size on each frame on learning and test sequence\n";
     $kmerFile = "";
-    for($i=0; $i<$lenKmerList; $i++)
+    
+    for($frame=0; $frame<=2; $frame++)
     {
-	print "\t- kmer size: $kmerList[$i]\n";
-	# Learning
-	## Coding
-	$kmerFile = $nameTmp.".coding_sequencesKmer_".$kmerList[$i]."_ScoreValues.tmp";
-	push(@kmerScoreCodLearnFileList, $kmerFile);
-	scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
+	print "\t- frame: $frame\n";	
+	for($i=0; $i<$lenKmerList; $i++)
+	{
+	    print "\t\t- kmer size: $kmerList[$i]\n";
+	    # Learning
+	    ## Coding
+	    $kmerFile = $nameTmp.".coding_sequencesKmer_".$kmerList[$i]."_ScoreValues_frame".$frame.".tmp";
+	    push(@kmerFrameCod[$frame], $kmerFile);
+	    scoreFrame($codLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $stepScore, $frame, $proc, $verbosity);
 
-	## Non coding
-	$kmerFile = $nameTmp.".noncoding_sequencesKmer_".$kmerList[$i]."_ScoreValues.tmp";
-	push(@kmerScoreNonLearnFileList, $kmerFile);
-	scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
+	    ## Non coding
+	    $kmerFile = $nameTmp.".noncoding_sequencesKmer_".$kmerList[$i]."_ScoreValues_frame".$frame.".tmp";
+	    push(@kmerFrameNon[$frame], $kmerFile);
+	    scoreFrame($nonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $stepScore, $frame, $proc, $verbosity);
 
-	# Test
-	$kmerFile = $nameTmp.".test_sequencesKmer_".$kmerList[$i]."_ScoreValues.tmp";
-	push(@kmerScoreTestFileList, $kmerFile);
-	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
+	    # Test
+	    $kmerFile = $nameTmp.".test_sequencesKmer_".$kmerList[$i]."_ScoreValues_frame".$frame.".tmp";
+	    push(@kmerFrameTest[$frame], $kmerFile);
+	    scoreFrame($testFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $stepScore, $frame, $proc, $verbosity);
+	}
     }
 
 
+    # Get the best frame for each sequences
+    ## Coding
+    $kmerFile = $nameTmp.".coding_sequencesKmer_ScoreValues.tmp";
+    &bestFrame(\@kmerFrameCod[0], \@kmerFrameCod[1], \@kmerFrameCod[2], $kmerFileCod);
+    
+    ## Non coding
+    $kmerFile = $nameTmp.".noncoding_sequencesKmer_ScoreValues.tmp";
+    &bestFrame(\@kmerFrameNon[0], \@kmerFrameNon[1], \@kmerFrameNon[2], $kmerFileNon);
+    
+    # Test
+    $kmerFile = $nameTmp.".test_sequencesKmer_ScoreValues.tmp";
+    &bestFrame(\@kmerFrameTest[0], \@kmerFrameTest[1], \@kmerFrameTest[2], $kmerFileTest);
+    
+    
     # 4. Merge the score and size files into one file for each type (learning coding and non coding and test)
     print "4. Merge the score and size files into one file for each type\n";
     my $outModCodLearn = $nameTmp.".modelCoding.out";
@@ -770,11 +1125,11 @@ sub runRF
 
     # Learning
     ## Coding
-    &mergeKmerScoreSize(\@kmerScoreCodLearnFileList, $sizeOrfCodLearnFile, $sizeCodLearnFile, $outModCodLearn, $keepTmp);
+    &mergeKmerScoreSize2($kmerFileCod,  $sizeOrfCodLearnFile, $sizeCodLearnFile, $outModCodLearn, $keepTmp);
     ## Non coding
-    &mergeKmerScoreSize(\@kmerScoreNonLearnFileList, $sizeOrfNonLearnFile, $sizeNonLearnFile, $outModNonLearn, $keepTmp);
+    &mergeKmerScoreSize2($kmerFileNon,  $sizeOrfNonLearnFile, $sizeNonLearnFile, $outModNonLearn, $keepTmp);
     # Test
-    &mergeKmerScoreSize(\@kmerScoreTestFileList,     $sizeOrfTestFile,     $sizeTestFile,     $outModTest,     $keepTmp);
+    &mergeKmerScoreSize2($kmerFileTest, $sizeOrfTestFile,     $sizeTestFile,     $outModTest,     $keepTmp);
 
 
     # 5. Make the model on learning sequences and apply it on test sequences
