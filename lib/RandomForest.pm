@@ -637,22 +637,21 @@ sub mergeKmerScoreSize2
     {
 	chop;
 	my @tmp  = split(/\t/);
-	my $name = $tmp[0];
-	my @val  = $tmp[-0];
+	my $name = shift @tmp;
 	
 	if($flag != 0)
 	{
-		$seq{$name} = $val;
+	    @{$seq{$name}} = @tmp;
 	}
 	else
 	{
-	    push(@head, @val);
+	    push(@head, @tmp);
 	    $flag = 1;
 	}
     }
     close FILE;
     unlink $file unless($keepTmp != 0);
-
+    
     # Read ORF size
     $flag = 0;
     open FILE, "$orfSizeFile" or die "Error! Cannot access ORF size file '". $orfSizeFile . "': ".$!;
@@ -667,7 +666,6 @@ sub mergeKmerScoreSize2
 	    {
 		die "Error at merge ORF size step! '$name' is not in the kmer score files: ".$!;
 	    }
-
 	    push(@{$seq{$name}}, $orfSize);
 	}
 	else
@@ -848,13 +846,12 @@ sub bestFrame
     my $val0 = 0;
     my $val1 = 0;
     my $val2 = 0;
+    my $file;
     my %frame0;
     my %frame1;
     my %frame2;
     my @header;
     
-    print "\tGet the frame with the best kmer score for each sequence.\n" if($verbosity >= 5);
-
     # Read each kmer scores files for the frame 0
     foreach $file (@{$REFfileFrame0})
     {
@@ -870,17 +867,19 @@ sub bestFrame
 		push(@header, $val);
 		$flag = 1;
 	    }
-	    
-	    if(!exists $frame0{$name})
-	    {
-		$frame0{$name} = [$val, $val];
-	    }
 	    else
 	    {
-		# Add the score to the tab
-		push(@{$frame0{$name}}, $val);
-		# And multiple the score with the previous one
-		$frame0{$name}[0] = $frame0{$name}[0]*$val;
+		if(!exists $frame0{$name})
+		{
+		    $frame0{$name} = [$val, $val];
+		}
+		else
+		{
+		    # Add the score to the tab
+		    push(@{$frame0{$name}}, $val);
+		    # And multiple the score with the previous one
+		    $frame0{$name}[0] = $frame0{$name}[0]+$val;
+		}
 	    }
 	}
     }
@@ -897,25 +896,26 @@ sub bestFrame
 
 	    if($flag==0)
 	    {
-		push(@header, $val);
 		$flag = 1;
-	    }
-	    
-	    if(!exists $frame1{$name})
-	    {
-		$frame1{$name} = [$val, $val];
 	    }
 	    else
 	    {
-		# Add the score to the tab
-		push(@{$frame1{$name}}, $val);
-		# And multiple the score with the previous one
-		$frame1{$name}[0] = $frame1{$name}[0]*$val;
+		if(!exists $frame1{$name})
+		{
+		    $frame1{$name} = [$val, $val];
+		}
+		else
+		{
+		    # Add the score to the tab
+		    push(@{$frame1{$name}}, $val);
+		    # And multiple the score with the previous one
+		    $frame1{$name}[0] = $frame1{$name}[0]+$val;
+		}
 	    }
 	}
     }
 
-    # Read each kmer scores files for the frame 1
+    # Read each kmer scores files for the frame 2
     foreach $file (@{$REFfileFrame2})
     {
 	$flag = 0;
@@ -927,42 +927,43 @@ sub bestFrame
 
 	    if($flag==0)
 	    {
-		push(@header, $val);
 		$flag = 1;
-	    }
-	    
-	    if(!exists $frame2{$name})
-	    {
-		$frame2{$name} = [$val, $val];
 	    }
 	    else
 	    {
-		# Add the score to the tab
-		push(@{$frame2{$name}}, $val);
-		# And multiple the score with the previous one
-		$frame2{$name}[0] = $frame2{$name}[0]*$val;
+		if(!exists $frame2{$name})
+		{
+		    $frame2{$name} = [$val, $val];
+		}
+		else
+		{
+		    # Add the score to the tab
+		    push(@{$frame2{$name}}, $val);
+		    # And multiple the score with the previous one
+		    $frame2{$name}[0] = $frame2{$name}[0]+$val;
+		}
 	    }
 	}
     }
 
 
     # Get the best frame and write the corresponding kmer scores
-    open FILEOUT, "> $outFile"  or die "Error! Cannot access output file '"  . $outFile    . "': ".$!;
+    open FILEOUT, "> $outFile"  or die "Error! Cannot access output file '".$outFile."': ".$!;
     # Write the header
     print FILEOUT "name\t";
-    print FILEOUT join("\t", @head), "\n";
+    print FILEOUT join("\t", @header), "\n";
 
-    foreach $name (keys $frame0)
+    foreach $name (keys %frame0)
     {
 	print FILEOUT $name;
 	
 	$val0 = $frame0{$name}[0];
 	$val1 = $frame1{$name}[0];
 	$val2 = $frame2{$name}[0];
-	
+
 	if($val0 > $val1 && $val0 > $val2)
 	{
-	    for($i=1; $i<$frame0{$name}; $i++)
+	    for(my $i=1; $i<(scalar(@{$frame0{$name}})); $i++)
 	    {
 		print FILEOUT "\t".$frame0{$name}[$i];
 	    }
@@ -970,7 +971,7 @@ sub bestFrame
 	}
 	elsif($val1 > $val0 && $val1 > $val2)
 	{
-	    for($i=1; $i<$frame1{$name}; $i++)
+	    for(my $i=1; $i<(scalar(@{$frame1{$name}})); $i++)
 	    {
 		print FILEOUT "\t".$frame1{$name}[$i];
 	    }
@@ -978,13 +979,14 @@ sub bestFrame
 	}
 	else
 	{
-	    for($i=1; $i<$frame1{$name}; $i++)
+	    for(my $i=1; $i<(scalar(@{$frame2{$name}})); $i++)
 	    {
-		print FILEOUT "\t".$frame1{$name}[$i];
+		print FILEOUT "\t".$frame2{$name}[$i];
 	    }
 	    print FILEOUT "\n";
 	}
     }
+    close FILEOUT;
 }
 
 
@@ -1055,9 +1057,10 @@ sub runRF
     my $kmerFileCod;
     my $kmerFileNon;
     my $kmerFileTest;
+    my $kmerFile;
     my $kmerSize;
-    my $codStepModel = 1;
-    my $nonStepModel = 1;
+    my $codStepModel = 3;
+    my $nonStepModel = 3;
     my $stepScore    = 3;
     my $frame        = 0;
     my $lenKmerList  = @kmerList;
@@ -1070,7 +1073,7 @@ sub runRF
 
 	## VW: modification of the score
 	## VW: modification, learn model on lnc ORF, not all the sequence and with a step of 3
-	&getKmerRatioSep($REFcodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStepModel, $nonStepModel, $proc, $verbosity, $nameTmp, $keepTmp);
+	&getKmerRatioSep($REForfCodLearnFile->[0], $REForfNonLearnFile->[0], $kmerFile, $kmerSize, $codStepModel, $nonStepModel, $proc, $verbosity, $nameTmp, $keepTmp);
     }
 
     
@@ -1087,17 +1090,17 @@ sub runRF
 	    # Learning
 	    ## Coding
 	    $kmerFile = $nameTmp.".coding_sequencesKmer_".$kmerList[$i]."_ScoreValues_frame".$frame.".tmp";
-	    push(@kmerFrameCod[$frame], $kmerFile);
+	    push( @{$kmerFrameCod[$frame]}, $kmerFile );
 	    scoreFrame($codLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $stepScore, $frame, $proc, $verbosity);
 
 	    ## Non coding
 	    $kmerFile = $nameTmp.".noncoding_sequencesKmer_".$kmerList[$i]."_ScoreValues_frame".$frame.".tmp";
-	    push(@kmerFrameNon[$frame], $kmerFile);
+	    push( @{$kmerFrameNon[$frame]}, $kmerFile );
 	    scoreFrame($nonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $stepScore, $frame, $proc, $verbosity);
 
 	    # Test
 	    $kmerFile = $nameTmp.".test_sequencesKmer_".$kmerList[$i]."_ScoreValues_frame".$frame.".tmp";
-	    push(@kmerFrameTest[$frame], $kmerFile);
+	    push( @{$kmerFrameTest[$frame]}, $kmerFile );
 	    scoreFrame($testFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $stepScore, $frame, $proc, $verbosity);
 	}
     }
@@ -1105,16 +1108,16 @@ sub runRF
 
     # Get the best frame for each sequences
     ## Coding
-    $kmerFile = $nameTmp.".coding_sequencesKmer_ScoreValues.tmp";
-    &bestFrame(\@kmerFrameCod[0], \@kmerFrameCod[1], \@kmerFrameCod[2], $kmerFileCod);
+    $kmerFileCod = $nameTmp.".coding_sequencesKmer_ScoreValues.tmp";
+    &bestFrame($kmerFrameCod[0], $kmerFrameCod[1], $kmerFrameCod[2], $kmerFileCod);
     
     ## Non coding
-    $kmerFile = $nameTmp.".noncoding_sequencesKmer_ScoreValues.tmp";
-    &bestFrame(\@kmerFrameNon[0], \@kmerFrameNon[1], \@kmerFrameNon[2], $kmerFileNon);
+    $kmerFileNon = $nameTmp.".noncoding_sequencesKmer_ScoreValues.tmp";
+    &bestFrame($kmerFrameNon[0], $kmerFrameNon[1], $kmerFrameNon[2], $kmerFileNon);
     
     # Test
-    $kmerFile = $nameTmp.".test_sequencesKmer_ScoreValues.tmp";
-    &bestFrame(\@kmerFrameTest[0], \@kmerFrameTest[1], \@kmerFrameTest[2], $kmerFileTest);
+    $kmerFileTest = $nameTmp.".test_sequencesKmer_ScoreValues.tmp";
+    &bestFrame($kmerFrameTest[0], $kmerFrameTest[1], $kmerFrameTest[2], $kmerFileTest);
     
     
     # 4. Merge the score and size files into one file for each type (learning coding and non coding and test)
