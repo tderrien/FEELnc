@@ -324,11 +324,11 @@ else                    # -- if lncRNA training file not defined
 if(Utils::guess_format($infile) eq "gtf")      # -- if GTF
 {
     # Use undef for $nbtx/$numtx to get all sequences and ORFs
-    ExtractCdnaOrf::CreateORFcDNAFromGTF($infile, $testFile, $testOrfFile, undef, $minnumtx, $genome, 'exon,CDS,stop_codon,start_codon', undef, $orfTypeTest, $verbosity, $kmerMax);
+    ExtractCdnaOrf::CreateORFcDNAFromGTF($infile, $testFile, $testOrfFile, undef, undef, $genome, 'exon,CDS,stop_codon,start_codon', undef, $orfTypeTest, $verbosity, $kmerMax);
 }
 elsif(Utils::guess_format($infile) eq "fasta") # -- if FASTA
 {
-    ExtractCdnaOrf::CreateORFcDNAFromFASTA($infile, $testFile, $testOrfFile, undef, $minnumtx, $orfTypeTest, $verbosity, $kmerMax);
+    ExtractCdnaOrf::CreateORFcDNAFromFASTA($infile, $testFile, $testOrfFile, undef, undef, $orfTypeTest, $verbosity, $kmerMax);
 }
 else
 {
