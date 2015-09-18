@@ -250,7 +250,7 @@ sub getKmerRatioSep
     $nonFile ||= undef;
     $outFile ||= undef;
     $codStep ||= 3;
-    $nonStep ||= 1;
+    $nonStep ||= 3;
     $proc    ||= 1;
     $keepTmp ||= 0;
 
@@ -285,7 +285,7 @@ sub getKmerRatioSep
         die "\nFailed to run KmerInShort: check your KmerInShort PATH (LINUX/MAC). Command line:\n$cmd\n";
     }
 
-    # Run kis on non coding genes
+    # Run kis on ORF non coding genes
     print "\tRunning KmerInShort on '$nonFile'.\n" if($verbosity >= 5);
     $cmd = "$kisPath -file $nonFile -nb-cores $proc -kmer-size $kmerSize -out $nonOut -dont-reverse -step $nonStep 1>/dev/null 2>/dev/null";
     system($cmd);
@@ -294,7 +294,7 @@ sub getKmerRatioSep
         die "\nFailed to run KmerInShort: check your KmerInShort PATH (LINUX/MAC). Command line:\n$cmd\n";
     }
 
-    # Read the two kmer files to get the kmer frequancy and write the ratio in the output file
+    # Read the two kmer files to get the kmer frequency and write the ratio in the output file
     my @codTab;
     my @nonTab;
     my $codKmer = "";
