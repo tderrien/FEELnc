@@ -546,7 +546,7 @@ sub CreateORFcDNAFromGTF
     my $sizeh = keys(%{$refmrna});
 
     # Die if not enough transcript for training
-    die "Your input mRNA file '", basename($gtfFile),"' contains only *$sizeh* transcripts.\nNot enough to train the program with the '--nbtx|n $nbtx' option (default option == 3000)\n" if (defined $nbtx && $sizeh < $minnumtx);
+    die "Your input mRNA file '", basename($gtfFile),"' contains only *$sizeh* transcripts.\nNot enough to train the program with the '--nbtx|n $nbtx' option (default option == 3000)\n" if (defined $nbtx && defined $minnumtx && $sizeh < $minnumtx);
     print STDERR "\tYour input training file '", basename($gtfFile),"' contains *$sizeh* transcripts\n" if ($verbosity > 0 );
 
     my $orfob;
@@ -697,7 +697,7 @@ sub CreateORFcDNAFromFASTA
     # count the nb of sequences
     my $nbseq = 0;
     $nbseq++ while( my $seq = $seqin->next_seq());
-    die "Your input FASTA '$fastaFile' contains only *$nbseq* sequences.\nNot enough to train the program (default option --ntx|-n)\n" if ($nbseq < $minnumtx);
+    die "Your input FASTA '$fastaFile' contains only *$nbseq* sequences.\nNot enough to train the program (default option --ntx|-n)\n" if (defined $minnumtx && $nbseq < $minnumtx);
 
     # weird have to recreate a seqio object
     $seqin = Bio::SeqIO->new(-file => $fastaFile, -format => "fasta");
