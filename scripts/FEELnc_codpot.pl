@@ -501,7 +501,7 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
 
 =item *
 
-Valentin Wucher <vwucher@univ-rennes1.fr>
+Valentin WUCHER <vwucher@univ-rennes1.fr>
 
 
 =item *

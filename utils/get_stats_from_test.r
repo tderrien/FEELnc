@@ -23,11 +23,11 @@ rfFile   <- args[2]
 matTest <- read.table(file=testFile, header=TRUE, sep="\t")
 matRf   <- read.table(file=rfFile,   header=TRUE, sep="\t")
 
-rownames(matTest) <- matTest[,1]
-rownames(matRf)   <- matRf[,1]
+rownames(matTest) <- toupper(matTest[,1])
+rownames(matRf)   <- toupper(matRf[,1])
 
-test.namesSort <- sort(as.character(matTest[,1]))
-rf.namesSort   <- sort(as.character(matRf[,1]))
+test.namesSort <- sort(as.character(toupper(matTest[,1])))
+rf.namesSort   <- sort(as.character(toupper(matRf[,1])))
 
 matTest <- matTest[test.namesSort,]
 matRf   <- matRf[rf.namesSort,]

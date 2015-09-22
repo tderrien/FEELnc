@@ -17,7 +17,7 @@ use Bio::SeqFeature::InteractionCollection;
 my $lncrna_file		="";
 my $mrna_file		="";
 my $window			= 10000; # 10kb
-my $maxwindow; 
+my $maxwindow		= 100000; # 100kb 
 my $help			= 0;
 my $man				= 0;
 
@@ -114,17 +114,20 @@ The last step if the pipeline (FEELnc_classifier) consists in classifying new ln
 
 =head2 Filtering arguments
 
-  -w,--window=200		Size of the window around the lncRNA to compute interactions/classification [default 10000]
-  -m, --maxwindow=10000 Maximal size of the window during the expansion process [default 10000]
+  -w,--window=10000		Size of the window around the lncRNA to compute interactions/classification [default 10000]
+  -m, --maxwindow=100000	Maximal size of the window during the expansion process [default 10000]
 
 =head1 AUTHORS
 
 =over 4
 
-=item -
-Thomas DERRIEN <tderrien@univ-rennes1.fr>
-
 =item - 
+Valentin Wucher <vwucher@univ-rennes1.fr>
+
+=item 
+Thomas Derrien <tderrien@univ-rennes1.fr>
+
+=item  
 Fabrice Legeai <fabrice.legeai@inria.fr>
 
 =back

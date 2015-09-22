@@ -282,6 +282,10 @@ overlapping in sense exons of the reference annotation.
 
 =over 4
 
+=item *
+
+Valentin WUCHER <vwucher@univ-rennes1.fr>
+
 =item -
 Thomas DERRIEN <tderrien@univ-rennes1.fr>
 
