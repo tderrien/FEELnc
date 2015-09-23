@@ -27,7 +27,7 @@ GetOptions(
 	"window|w=i"	=> \$window,
     "lncrna|i=s"	=> \$lncrna_file,
     "mrna|a=s"		=> \$mrna_file,
-    "max_window|m=i" => \$maxwindow,
+    "maxwindow|m=i" => \$maxwindow,
     "help|?"		=> \$help,
 	"man"		=> \$man,    
     ) or pod2usage(2);
