@@ -138,18 +138,23 @@ pred <- prediction(allRes, allLab)
 S <- performance(pred,measure="sens")
 P <- performance(pred,measure="spec")
 
+
+ ##### OLD WHEN other OPTIMIZATION #####
 # New Performance measure =F or F1 or F-measure or F-score 2TP/(2TP+FP+FN) : performance(pred,measure="f")
 # MCC = Matthews or Phi correlation coefficient. Yields a number between -1 and 1, with 1 indicating a perfect prediction, 0 indicating a random prediction. Values below 0 indicate a worse than random prediction.
 # perf.measure <- performance(pred,measure="mat")
+#bestind=which.max( slot(F, "y.values")[[i]] )
+#mean_cutoff <- mean(sapply(1:length(pred@predictions), function(i) { slot(perf.measure, "x.values")[[i]][ which.max( slot(perf.measure, "y.values")[[i]] ) ]} ))
+#mean_perf     <- mean(sapply(1:length(pred@predictions), function(i) { slot(perf.measure, "y.values")[[i]][ which.max( slot(perf.measure, "y.values")[[i]] ) ]} ))
+ ##### END OLD #####
 
 
+
+#### Sn == Sp optimization ############
 ## Apply a function to get the mean on the 10 cutoffs that maximize the sens and spec (or minimize absolute difference : Thanks Oliver Sander)
 mean_cutoff <- mean(sapply(1:length(pred@predictions), function(i) { S@x.values[[i]][which.min(abs(S@y.values[[i]]-P@y.values[[i]]))] } ))
 mean_perf     <- mean(sapply(1:length(pred@predictions), function(i) { P@y.values[[i]][which.min(abs(S@y.values[[i]]-P@y.values[[i]]))] } ))
 
-#bestind=which.max( slot(F, "y.values")[[i]] )
-#mean_cutoff <- mean(sapply(1:length(pred@predictions), function(i) { slot(perf.measure, "x.values")[[i]][ which.max( slot(perf.measure, "y.values")[[i]] ) ]} ))
-#mean_perf     <- mean(sapply(1:length(pred@predictions), function(i) { slot(perf.measure, "y.values")[[i]][ which.max( slot(perf.measure, "y.values")[[i]] ) ]} ))
 
 
 ## If no threshold, set the best one found with 10-fold cross-validation
@@ -159,6 +164,8 @@ if(is.null(thres))
         meanSens <- mean_perf
         cat("\t10-fold cross-validation step is finish. Best threshold found: '", thres, "'.\n", sep="")
     }
+
+
 
 ## Print in outStats the sensitivity, specificity, accuracy and precision
 cat("\tPrinting stats found with the 10-fold cross-validation in '", outStats, "'.\n", sep="")
