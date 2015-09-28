@@ -119,10 +119,24 @@ sub isUpstream{
 	}
 	my $object = $self->object();
 	my $subject = $self->subject();
-	if ($object->start() > $subject->end()){
+	
+	# Obj = lncRNA
+	#print STDERR "obj : ", $object->get_tag_values("transcript_id"), "\n";
+	
+	if ($subject->strand == 1) {
+		if ($object->start() > $subject->end()){
+			return 0; #is downstream
+		}
 		return 1; #is upstream
 	}
-	return 0; #is not upstream
+	
+	if ($subject->strand == -1) {
+		if ($object->start() > $subject->end()){
+			return 1; #is upstream
+		}
+		return 0; #is  downstream
+	}
+	
 }
 
 # private method : _get_subtype
@@ -186,7 +200,7 @@ sub _set_subtype{
 # oppposite :  is amont
 sub isDownstream{
 	my $self = shift;
-	my $resp = $self->is_upstream();
+	my $resp = $self->isUpstream();
 	if ($resp == 1){
 		return 0;
 	}else{
@@ -216,7 +230,7 @@ sub isDivergent{
 		my $object = $self->object();
 		my $subject = $self->subject();
 		
-		if ( ($object->strand() ==1 && $self->subtype() == 0 ) || ($object->strand() == -1 && $self->subtype() == 1 ) ) {
+		if ( ($object->strand() ==1 &&  $self->isUpstream()) || ($object->strand() == -1 && $self->isDownstream() == 1 ) ) {
 			return 0;	# convergent ; we're already known that it's in anti sens ( [1;-1] or [-1;1])
 		}
 		return 1;
