@@ -537,7 +537,13 @@ sub CreateORFcDNAFromGTF
 {
     my ($gtfFile, $cdnaFile, $orfFile, $nbtx, $minnumtx, $genome, $lineType, $refBiotype, $orfType, $verbosity, $kmerMax) = @_;
     # Note if $nbtx is undefined, we extract all ORF and cDNA
-
+	
+	# TD : add default value for minnumtx otherwise error when launchin without option numtx :
+	#  ORFs&cDExtracting ORFs&cDNAs 2945/3007...
+	# Use of uninitialized value $minnumtx in numeric lt (<) at /home/genouest/umr6061/recomgen/tderrien/bin/perl/FEELnc/lib/ExtractCdnaOrf.pm line 625.
+	# > Run random Forest on 'resultsLearnNONCODE//tmp//46706_candidate_lncRNA_with_monoAS.gtf.test_rna.fa':
+	$minnumtx	||= 100;
+	
     # die if genome not specified
     pod2usage("Error: Cannot read your genome file '$genome' (-g option)...\nFor help, run with --help option\n") if (! -r $genome && !-d $genome);
 
@@ -546,7 +552,10 @@ sub CreateORFcDNAFromGTF
     my $sizeh = keys(%{$refmrna});
 
     # Die if not enough transcript for training
-    die "Your input mRNA file '", basename($gtfFile),"' contains only *$sizeh* transcripts.\nNot enough to train the program with the '--nbtx|n $nbtx' option (default option == 3000)\n" if (defined $nbtx && defined $minnumtx && $sizeh < $minnumtx);
+	die "Not enough to train the program with the '--nbtx|n $nbtx' option (minimum == 100)...\n" if ( defined $nbtx && ($nbtx <  $minnumtx) );
+    die "Your input mRNA file '", basename($gtfFile),"' contains only *$sizeh* transcripts !\n Not enough to train the program (minimum == 100)...\n " if ( $sizeh < $minnumtx);
+    
+    
     print STDERR "\tYour input training file '", basename($gtfFile),"' contains *$sizeh* transcripts\n" if ($verbosity > 0 );
 
     my $orfob;
