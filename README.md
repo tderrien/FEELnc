@@ -1,5 +1,5 @@
 # FEELnc
- Fast and Effective Extraction of Long non-coding RNAs
+ FlExible Extraction of Long non-coding RNAs
 
 *Version (26/05/2015) : Major update includes the use of RandomForest for FEELnc_codpot*
 
