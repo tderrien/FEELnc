@@ -809,6 +809,29 @@ sub maxEndFromRefArray{
 
 
 # Get Transcripts with a number of exon ge $min and le $max
+sub getMonoExonicFromGtfHash{
+
+    # parsing a hash in sub need dereference in shift
+    my %h			=       %{shift()};
+
+    # Test parsing i.e empty hash
+    die " Error! Parsing getMinMaxExonFromGtfHash return empty hash...\nCheck that your infile contains 'exon' levels\n" unless (scalar(keys(%h))>0);
+
+    for my $tr (keys %h){
+		if (scalar (@{$h{$tr}->{"feature"}}) != 1){
+	    	delete $h{$tr};
+    	}
+    }
+    # Test parsing i.e empty hash
+#     die " Error! getMinMaxExonFromGtfHash return empty hash...\nCheck that min ='$min' and max='$max' nb exons are valid\n" unless (scalar(keys(%h))>0);
+
+    # Return %h
+    return %h;
+}
+
+
+
+# Get Transcripts with a number of exon ge $min and le $max
 sub getMinMaxExonFromGtfHash{
 
     # parsing a hash in sub need dereference in shift
@@ -834,7 +857,7 @@ sub getMinMaxExonFromGtfHash{
 	}
     }
     # Test parsing i.e empty hash
-    die " Error! getMinMaxExonFromGtfHash return empty hash...\nCheck that min ='$min' and max='$max' nb exons are valid\n" unless (scalar(keys(%h))>0);
+#     die " Error! getMinMaxExonFromGtfHash return empty hash...\nCheck that min ='$min' and max='$max' nb exons are valid\n" unless (scalar(keys(%h))>0);
 
     # Return %h
     return %h;

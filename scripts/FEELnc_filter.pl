@@ -177,13 +177,16 @@ foreach my $chrlnc (keys %{$reflncchr} ) {
 
 	my %lnctorm; # hash tmp storing tx IDs to remove, the correct hash is : $refhchild
 	
-	# if user wants monoexonic antisense and the lncRNA chr does not belong to the annotation, we remove all the lncRNA associated-chr
-	if (! exists $refmRNAchr->{$chrlnc} && $monoexonic == -1) {
-
-		my @idstorm =  keys %{$reflncchr->{$chrlnc}};
-		print LOG "Filter overlap ($minfrac_over-$monoexonic-$linconly): $_   not antisense...\n" for (@idstorm);
-    	delete @{$reflnc}{@idstorm};
-    	
+	if (! exists $refmRNAchr->{$chrlnc} ) {
+		
+		# if user wants monoexonic antisense and the lncRNA chr does not belong to the annotation, we remove all monoexonic the lncRNA associated-chr
+		if ($monoexonic == -1){
+			my %h_mono = ExtractFromHash::getMonoExonicFromGtfHash( $reflncchr->{$chrlnc});
+# 			print Dumper \%h_mono;
+			my @idstorm =  keys %h_mono;
+			print LOG "Filter overlap ($minfrac_over-$monoexonic-$linconly): $_   not antisense...\n" for (@idstorm);
+    		delete @{$reflnc}{@idstorm};
+    	}
 	} elsif (exists $refmRNAchr->{$chrlnc}) { # else we check for overlap
 		
 		print STDERR "$chrlnc\n";
@@ -282,15 +285,11 @@ overlapping in sense exons of the reference annotation.
 
 =over 4
 
-=item *
+=item - Valentin WUCHER <vwucher@univ-rennes1.fr>
 
-Valentin WUCHER <vwucher@univ-rennes1.fr>
+=item - Thomas DERRIEN <tderrien@univ-rennes1.fr>
 
-=item -
-Thomas DERRIEN <tderrien@univ-rennes1.fr>
-
-=item - 
-Fabrice Legeai <>
+=item - Fabrice Legeai <fabrice.legeai@inria.fr>
 
 =back
 
