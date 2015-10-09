@@ -183,11 +183,11 @@ sub isIntronic {
 	
 	my @introns_mRNA= _getIntrons($mrna);
 	
-	
+
 	#print "intronic call \n";
 	# VW: put the line in commentary because it causes a case where monoexonic mRNA in intron of lncRNA are classed as none instead of containing->intron
 	#if (scalar(@introns_mRNA) == 0) {return 0}
-	
+
 	
 	foreach my $lncrna_exon (@exons_lncRNA) {
 		next if ($lncrna_exon->end() < $mrna->start());
