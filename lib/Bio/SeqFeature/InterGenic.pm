@@ -230,7 +230,9 @@ sub isDivergent{
 		my $object = $self->object();
 		my $subject = $self->subject();
 		
-		if ( ($object->strand() ==1 &&  $self->isUpstream()) || ($object->strand() == -1 && $self->isDownstream() == 1 ) ) {
+		#		if ( ($object->strand() ==1 &&  $self->isUpstream()) || ($object->strand() == -1 && $self->isDownstream() == 1 ) ) {
+		# VW: modification of the condition
+		if ( $self->isDownstream() == 1 ) {
 			return 0;	# convergent ; we're already known that it's in anti sens ( [1;-1] or [-1;1])
 		}
 		return 1;
