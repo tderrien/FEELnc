@@ -203,6 +203,8 @@ If your input file is called **INPUT**, this second module will create these out
 	 - {INPUT}.lncRNA.gtf || {INPUT}.lncRNA.FA	:  a .GTF/.FA file of the transcripts below the CPS (i.e the final set of lncRNAs)
 	 - {INPUT}.mRNA.gtf || {INPUT}.mRNA.FA	:  a .GTF/.FA file of the transcripts above the coding potential cutoff (i.e the final set of mRNAs)
 
+An example of an {INPUT}_RF_TGROC.png graphic obtained using automatic threshold, i.e. sensibility equal to specificity on 10-fold cross-validation:
+![ScreenShot](./image/FEELnc_codpot_performance.png)
 
 **- FULL OPTIONS (FEELnc_codpot.pl --help) :**
 
