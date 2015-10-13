@@ -250,8 +250,8 @@ sub guess_format {
 	my ($filename) = @_;
 	
    return 'fasta'	if ( $filename =~ /\.fasta$/i || $filename =~ /\.fa$/i);
-   return 'gff'     if $filename =~ /\.gff3?$/i;
-   return 'gtf'     if $filename =~ /\.gtf$/i;
+   return 'gff'     if ($filename =~ /\.gff3?$/i || $filename =~ /\.gff?$/i);
+   return 'gtf'     if ( $filename =~ /\.gtf$/i  || $filename =~ /\.gff2?$/i);
    return 'bed'     if $filename =~ /\.bed$/i;
 
    return 'gtf'; #the default

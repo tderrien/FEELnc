@@ -41,7 +41,8 @@ my $progname=basename($0);
 pod2usage("Error: Cannot read your input lncRNA GTF file '$lncrna_file'...\nFor help, see:\n$progname --help\n") unless( -r $lncrna_file);
 pod2usage("Error: Cannot read your input annotation file '$mrna_file'...\nFor help, see:\n$progname --help\n") unless( -r $mrna_file);
 
-unless (defined $maxwindow) {$maxwindow=$window}
+
+unless (defined $maxwindow) {$maxwindow=$window};
 
 my $collection =  Bio::SeqFeature::LncRNAs_Factory->DoItForMe($window,$lncrna_file,$mrna_file,$maxwindow);
  

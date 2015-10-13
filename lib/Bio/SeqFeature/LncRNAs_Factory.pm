@@ -28,6 +28,7 @@ use Bio::SeqFeature::Genic;
 use Bio::SeqFeature::InterGenic;
 use Bio::SeqFeature::Empty;
 
+use Utils; # guess_format
 
 use Carp;
 
@@ -152,9 +153,32 @@ sub DoItForMe{
 	print STDERR "window : $window - max window : $max_window - lncrna : $lncrna_file - mrna : $mrna_file\n";
 	my $db_lnc = Bio::SeqFeature::database_part->new();
 	my $db_mrna = Bio::SeqFeature::database_part->new();
+
+
+	# test input lnc format
+	my $lncformat;
+	if (Utils::guess_format($lncrna_file) eq 'gtf'){
+		$lncformat = 2;
+	} elsif (Utils::guess_format($lncrna_file) eq 'gff'){
+		$lncformat = 3;
+	} else {
+		die "Cannot recognize lncRNA input format '$lncrna_file' \n(supported extensions are : gtf, gff, gff2, gff3)\n";
+	}
 	
-	my $nblnc = $db_lnc->load_merge_gtf_into_db($lncrna_file,2, 'lncRNA');
-	my $nb_mrna = $db_mrna->load_merge_gtf_into_db($mrna_file, 2,'mRNA');
+	# test input mrna format
+	my $mrnaformat;
+	if (Utils::guess_format($mrna_file) eq 'gtf'){
+		$mrnaformat = 2;
+	} elsif (Utils::guess_format($mrna_file) eq 'gff'){
+		$mrnaformat = 3;
+	} else {
+		die "Cannot recognize mrna input format '$mrna_file' \n(supported extensions are : gtf, gff, gff2, gff3)\n";
+	}
+
+		
+	# load files 
+	my $nblnc = $db_lnc->load_merge_gtf_into_db($lncrna_file,$lncformat, 'lncRNA');
+	my $nb_mrna = $db_mrna->load_merge_gtf_into_db($mrna_file, $mrnaformat,'mRNA');
 	
 
 	my $prec = 0;
