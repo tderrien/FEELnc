@@ -299,6 +299,9 @@ The classes are defined as in Derrien et al, Genome Research. 2012, and can be p
     - antisense : lncRNA intron overlaps antisense mRNA
     - sense : lncRNA intron overlaps sense mRNA exons
 
+Illustration of the classification:
+![ScreenShot](./image/FEELnc_lncRNA_classification_intergenic.png)
+![ScreenShot](./image/FEELnc_lncRNA_classification_genic.png)
 
 Example:
 
