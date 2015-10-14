@@ -11,7 +11,7 @@ Currently, FEELnc is composed of 3 modules (See *Launch FEELnc 3-step pipeline* 
 
 	* FEELnc_filter.pl	: Extract, filter candidate transcripts
 	* FEELnc_codpot.pl	: Compute the coding potential of candidate transcripts
-	* FEELnc_classifier.pl: Classify lncRNAs based on their genomic localization wrt mRNAs
+	* FEELnc_classifier.pl: Classify lncRNAs based on their genomic localization wrt others transcripts
 
 
 To get help on each module, you can type :
@@ -254,7 +254,7 @@ Options:
 
 ### 3- FEELnc_classifier.pl
 
-The last step of the pipeline consists in classifying new lncRNAs w.r.t to the localisation and the direction of transcription of proximal mRNAs.
+The last step of the pipeline consists in classifying new lncRNAs w.r.t to the localisation and the direction of transcription of proximal RNA transcripts
 
 Indeed, classifying lncRNAs with mRNA could help to predict functions for lncRNAs.
 For all newly identified lncRNAs transcripts, a sliding window strategy is used to check for possible overlap with transcripts in the reference annotation.
@@ -265,8 +265,8 @@ Then, subclasses are defined according the features and direction of overlap (Se
 
 Foreach lncRNA interaction, a best lncRNA:mRNA interaction is identified in the output file by a line starting with '*' and defined as followed:
 
- - for **INTERGNIC** : the best mRNA partner is the closest to the lincRNA
- - for **GENIC**	: the best mRNA partner is by rule of priority (exonic then the fraction of exonicof overlap) then intronic then containing.
+ - for **INTERGNIC** : the best RNA partner is the closest to the lincRNA
+ - for **GENIC**	: the best RNA partner is by rule of priority (exonic then the fraction of exonicof overlap) then intronic then containing.
 
 
 ```
@@ -282,50 +282,50 @@ A summary of the number of the input parameters and numbers of interactions is g
 The classes are defined as in Derrien et al, Genome Research. 2012, and can be prioritized according to :
 
 - **Intergenic lncRNAs** (i.e lincRNAs)
- - *divergent*  : when the lincRNA is transcribed in an opposite direction (head to head) w.r.t to the closest mRNA
- - *convergent*: when the lincRNA is transcribed in a convergent direction w.r.t to the closest mRNAs.
- - *same_strand*: when the lincRNA is transcribed in a same starnd w.r.t to the closest mRNA
+ - *divergent*  : when the lincRNA is transcribed in an opposite direction (head to head) w.r.t to the closest RNA partner (depending on distance, they could share a bi-directional promoter).
+ - *convergent*: when the lincRNA is transcribed in a convergent direction w.r.t to the closest RNA partner.
+ - *same_strand*: when the lincRNA is transcribed in a same starnd w.r.t to the closest RNA partner
 
-- **Genic lncRNAs** (lncRNAs overlapping mRNAs)
+- **Genic lncRNAs** (lncRNAs overlapping an annotated RNA)
  - *Exonic* :
-    - antisense : at least one lncRNA exon overlaps in antisense an mRNA exon
-    - sense : there should not be since there are filtered in the first step
+    - antisense : at least one lncRNA exon overlaps in antisense an RNA exon
+    - sense :  should correspond to lncRNAs overlapping non protein-coding transcripts (depending on the Filter option) and most probably lncRNAs host transcripts for small ncRNAs (snoRNAs, snRNAs, miRNAs...)
  - *Intronic* :
-    - antisense : lncRNA exon overlaps in antisense mRNA introns (but none exons)
-    - sense : lncRNA exon overlaps in sense mRNA introns (but none exons)
+    - antisense : lncRNA exon overlaps in antisense RNA introns (but none exons)
+    - sense : lncRNA exon overlaps in sense RNA introns (but none exons)
  - *containing*:
-    - antisense : lncRNA intron overlaps antisense mRNA
-    - sense : lncRNA intron overlaps sense mRNA exons
+    - antisense : lncRNA intron overlaps antisense RNA
+    - sense : lncRNA intron overlaps sense RNA exons
 
 
 Example:
 
 ```
 #FEELnc Classification
-#lncRNA file :  lncrna : candidate_lncRNA.gtf.lncRNA.gtf
-#mRNA file : REF_ANNOTATION.gtf
-#Minimal window size : 10000
-#Maximal window size : 10000
-#Number of lncRNA : 3027
-#Number of mRNA : 17954
-#Number of interaction : 2132
-#Number of lncRNA without interaction : 1819
-#List of lncRNA without interaction : (...)
+#lncRNA file :  lncrna : lncRNA_34.gtf 
+#mRNA file : 34.gtf
+#Minimal window size : 1000
+#Maximal window size : 1000
+#Number of lncRNA : 462 
+#Number of mRNA : 374
+#Number of interaction : 180 
+#Number of lncRNA without interaction : 369
+#List of lncRNA without interaction : TCONS_00162422 TCONS_00163593 TCONS_00160948 TCONS_00162636 TCONS_00161917 TCONS_00161884 TCONS_00162654 TCONS_00164153 TCONS_00162630 TCONS_00161117 TCONS_00163030 TCONS_00162985 TCONS_00162306 TCONS_00162438 
 #INTERACTIONS
-*lncRNA        TCONS_00018990  mRNA         ENS00000029020            sense        genic                            0      Status=containing   Subtype=none
-lncRNA         TCONS_00018990  mRNA         ENS00000001947            antisense    intergenic                       5441   Status=divergent    Subtype=downstream
-*lncRNA        TCONS_00027880  mRNA         ENS00000007999            antisense    genic                            0      Status=overlapping  Subtype=exonic
-*lncRNA        TCONS_00011066  mRNA         ENS00000002091            antisense    intergenic                       9386   Status=convergent   Subtype=upstream
+*lncRNA  XLOC_053965  TCONS_00160885  RNA_partner  ENSCAFG00000025966  ENSCAFT00000040249  antisense  genic       0    Status=containing   Subtype=intronic
+lncRNA   XLOC_053965  TCONS_00160885  RNA_partner  ENSCAFG00000008990  ENSCAFT00000014276  antisense  intergenic  217  Status=divergent    Subtype=upstream
+lncRNA   XLOC_053965  TCONS_00160885  RNA_partner  ENSCAFG00000008997  ENSCAFT00000014283  antisense  intergenic  979  Status=convergent   Subtype=downstream
+lncRNA   XLOC_053965  TCONS_00160885  RNA_partner  ENSCAFG00000008997  ENSCAFT00000014282  antisense  intergenic  979  Status=convergent   Subtype=downstream
+*lncRNA  XLOC_055197  TCONS_00163966  RNA_partner  ENSCAFG00000014726  ENSCAFT00000046107  antisense  genic       0    Status=nested       Subtype=exonic
+lncRNA   XLOC_055197  TCONS_00163966  RNA_partner  ENSCAFG00000014726  ENSCAFT00000023388  antisense  genic       0    Status=overlapping  Subtype=exonic
+*lncRNA  XLOC_054505  TCONS_00162285  RNA_partner  ENSCAFG00000022834  ENSCAFT00000034941  sense      genic       0    Status=containing   Subtype=intronic
+lncRNA   XLOC_054505  TCONS_00162285  RNA_partner  ENSCAFG00000014605  ENSCAFT00000023189  antisense  genic       0    Status=containing   Subtype=intronic
+*lncRNA  XLOC_054288  TCONS_00161746  RNA_partner  ENSCAFG00000013503  ENSCAFT00000043054  antisense  genic       0    Status=overlapping  Subtype=intronic
+lncRNA   XLOC_054288  TCONS_00161746  RNA_partner  ENSCAFG00000032221  ENSCAFT00000046514  sense      genic       0    Status=containing   Subtype=intronic
 ```
 
-Here is showed 4 interactions concerning 3 lncRNAs (TCONS_00018990, TCONS_00027880 and TCONS_00011066) where one lncRNA (TCONS_00018990) has 2 interactions with a window size of 10,000 nt.
+Here is showed 4 interactions concerning 3 lncRNAs (TCONS_00160885, TCONS_00161746, TCONS_00162285 and TCONS_00163966) where one lncRNA (TTCONS_00160885) has 4 interactions with a window size of 1,000 nt.
 (The best interactions are marked as ***lncRNA**)
-
-The 3 best interactions are of classes and sub-classes:
-
-	- genic      -> containing -> sense       : TCONS_00018990::ENS00000029020
-	- genic      -> exonic     -> antrisense  : TCONS_00027880::ENS00000007999
-	- intergenic -> convergent -> upstream    : TCONS_00011066::ENS00000002091 (  with a distance between the lncRNA and the mRNA of 9,386bp.)
 
 \* **Note1**: At the moment, the interactions are computed with the reference file (-a option).
 Therefore, the possibly newly identified mRNAs in the previous step are not included by default (but you could include them by (cuff)merging with you reference annotation).
@@ -344,8 +344,8 @@ Depending on your filtering options, this may correspond to a non-protein-coding
       --verbosity           Level of verbosity
 
     Mandatory arguments:
-      -i,--lncrna=file.gtf Specify the lncRNA GTF file
-      -a,--mrna=file.gtf    Specify the annotation GTF file (file of protein coding annotaion)
+      -i,--lncrna=file.(gtf/gff) Specify the lncRNA GTF/GFF file
+      -a,--mrna=file.(gtf/gff)    Specify the annotation GTF/GFF file (file of protein coding annotaion)
 
     Filtering arguments:
       -w,--window=200               Size of the window around the lncRNA to compute interactins/classification [default 10000]
