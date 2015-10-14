@@ -191,8 +191,12 @@ sub load_merge_gtf_into_db {
 		if ($format == 2) {
 			next unless ($feature->primary_tag eq 'exon');	
  			($cle) 		= $feature->get_tag_values("transcript_id"); # nom du transcrit	
-#  			($gene_id)	= $feature->get_tag_values("gene_id"); # gene name
-# 			$feature->add_tag_value('gene_id', $gene_id);	 			 
+ 			
+ 			# if some line does not have gene_id (bedtools converter tx VW:)
+ 			# put gene_id == transcript_id
+ 			if ( ! $feature->has_tag("gene_id") ){
+ 				$feature->add_tag_value('gene_id', $cle);
+ 			}
 		}
 		if ($format == 3) {
 		
