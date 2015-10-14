@@ -401,7 +401,8 @@ sub printer_mini {
 	my $best = shift;
 	
 	if (defined $best) {print '*'}
-	print 	join ("\t", $self->object()->primary_tag(),  $self->object()->get_tag_values("gene_id"),  $self->object()->get_tag_values("transcript_id"),  $self->subject()->primary_tag(), $self->subject()->get_tag_values("gene_id"), $self->subject()->get_tag_values("transcript_id"),  _conversion_direction($self->direction()), _conversion_type($self->type()), $self->distance());
+#	print 	join ("\t", $self->object()->primary_tag(),  $self->object()->get_tag_values("gene_id"),  $self->object()->get_tag_values("transcript_id"),  $self->subject()->primary_tag(), $self->subject()->get_tag_values("gene_id"), $self->subject()->get_tag_values("transcript_id"),  _conversion_direction($self->direction()), _conversion_type($self->type()), $self->distance());
+	print 	join ("\t", $self->object()->primary_tag(),  $self->object()->get_tag_values("gene_id"),  $self->object()->get_tag_values("transcript_id"),  "RNA_partner", $self->subject()->get_tag_values("gene_id"), $self->subject()->get_tag_values("transcript_id"),  _conversion_direction($self->direction()), _conversion_type($self->type()), $self->distance());
 }
 
 

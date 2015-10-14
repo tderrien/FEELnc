@@ -107,7 +107,7 @@ sub create_interaction{
 		
 		# create an genic interaction
 		$interaction = Bio::SeqFeature::Genic->new('-object' => $object, '-subject' => $subject);
-		$interaction->warning();
+		#$interaction->warning();
 	}elsif ($type == 0){ 
 		
 		# create an interaction intergenic interaction
