@@ -52,6 +52,10 @@ for(pack in list.of.packages)
         suppressMessages(library(pack, quietly=TRUE, verbose=FALSE, character.only=TRUE))
     }
 
+
+## Fix seed
+set.seed(seed)
+
 ###########################
 ##### CODE START HERE #####
 ###########################
@@ -73,7 +77,6 @@ outDat <- paste(file_path_sans_ext(outFile), "_learningData.txt", sep="")
 write.table(x=dat, file=outDat, sep="\t", quote=FALSE, row.names=FALSE, col.names=TRUE)
 
 ## Random ordering of input matrix (fixe by seed)
-set.seed(seed)
 randomOrder  <- sample(nrow(codMat)+nrow(nonMat))
 dat          <- dat[randomOrder,]
 dat.nameID   <- 1
@@ -82,18 +85,19 @@ dat.labelID  <- ncol(dat)
 test.nameID  <- 1
 test.featID  <- (2:ncol(testMat))
 
-
 ## variables counting
 number_row   <- nrow(dat)
 chunk        <- list()
 output       <- list()
 models       <- list()
 nb_cross_val <- 10
+models.votes <- list()
 
 ## Progress bar
 cat("\tRunning ", nb_cross_val, "-fold cross-validation on learning:\n", sep="")
 progress <- txtProgressBar(0, nb_cross_val, style=3)
 setTxtProgressBar(progress, 0)
+
 
 ## Split in 'nb_cross_val' fold cross validation
 for (n in 1:nb_cross_val)
@@ -101,14 +105,17 @@ for (n in 1:nb_cross_val)
         ## split the dat in 'nb_cross_val' chunks
         chunk[[n]] <-  seq(as.integer((n-1)*number_row/nb_cross_val)+1,as.integer(n*number_row/nb_cross_val))
 
-        set.seed(seed)
+        ## Get the minimum number of non coding and coding values
+        minVal <- min(table(as.factor(dat[-chunk[[n]], dat.labelID])))
+
         ## Train the random forest model with (nb_cross_val-1) chunks and predict the value for the test dat set
-        models[[n]] <- randomForest(    x=dat[-chunk[[n]], dat.featID],    y=as.factor(dat[-chunk[[n]], dat.labelID]),
-                                    xtest=dat[chunk[[n]], dat.featID], ytest=as.factor(dat[chunk[[n]], dat.labelID]),
-                                    ntree=numberT)
+        ## with an equal number of lncRNAs and mRNAs in each tree
+        models[[n]] <- randomForest(    x=dat[-chunk[[n]], dat.featID], y=as.factor(dat[-chunk[[n]], dat.labelID]),
+                                    ntree=numberT, sampsize=c("0"=(minVal), "1"=(minVal)))
+        models.votes[[n]] <- predict(models[[n]], dat[chunk[[n]], dat.featID], type="vote")
 
         ## Output results in list output
-        output[[n]] <- as.data.frame(cbind(dat[chunk[[n]], dat.featID], "Label"=dat[chunk[[n]], dat.labelID], "Prob"=models[[n]]$test$votes[,2], "Pred"=models[[n]]$test$predicted))
+        output[[n]] <- as.data.frame(cbind(dat[chunk[[n]], dat.featID], "Label"=dat[chunk[[n]], dat.labelID], "Prob"=models.votes[[n]][,2]))
 
         setTxtProgressBar(progress, n)
     }
@@ -164,9 +171,9 @@ cat("\tPrinting stats found with the 10-fold cross-validation in '", outStats, "
 res <- matrix(0, ncol=10, nrow=(nb_cross_val+1), dimnames=list(c((1:nb_cross_val),"mean"),c("sen","spe","pre","acc","tp","tn","fp","fn","TUCp_mRNA","TUCp_lncRNA")))
 for(i in 1:nb_cross_val)
     {
-        mod.lab                                              <- rep(-1, length.out=nrow(dat[chunk[[i]],]))
-        mod.lab[models[[i]]$test$votes[,2]>=cutoffThresSpeM] <- 1
-        mod.lab[models[[i]]$test$votes[,2]<=cutoffThresSpeL] <- 0
+        mod.lab                                         <- rep(-1, length.out=nrow(dat[chunk[[i]],]))
+        mod.lab[models.votes[[i]][,2]>=cutoffThresSpeM] <- 1
+        mod.lab[models.votes[[i]][,2]<=cutoffThresSpeL] <- 0
 
         cont2 <- table(dat[chunk[[i]],dat.labelID], mod.lab)
         if(all(dim(cont2) == c(2,2)))
@@ -179,6 +186,11 @@ for(i in 1:nb_cross_val)
                 tm    <- cont2[2,1]
                 tl    <- cont2[1,1]
             }
+
+        print(cont2)
+        print(cont)
+
+
         tp <- cont[2,2]
         fp <- cont[1,2]
         tn <- cont[1,1]
@@ -207,7 +219,7 @@ par(cex.axis=1.2, cex.lab=1.2)
 
 ymin=0.5
 ymax=1
-plot(S,col="blue",lty=3,ylab="Specificity",xlab="Coding Probability Cutoff",ylim=c(ymin,ymax),cex.axis=1.2,cex.label=1.2, main="Two-Graph ROC curves")
+plot(S,col="blue",lty=3,ylab="Performance",xlab="Coding Probability Cutoff",ylim=c(ymin,ymax),cex.axis=1.2,cex.label=1.2, main="Two-Graph ROC curves")
 plot(S,lwd=2,avg="vertical",add=TRUE,col="blue")
 plot(P,col="red",lty=3, add=TRUE)
 plot(P,lwd=2,avg="vertical",add=TRUE,col="red")
@@ -225,8 +237,7 @@ text(x=cutoffThresSpeM, y = ymin, labels = round(cutoffThresSpeM, digits = 3), c
 text(x=cutoffThresSpeL, y = ymin, labels = round(cutoffThresSpeL, digits = 3), cex=1.5, pos=2, col="blue")
 
 ## Legend
-#legend("right",col=c("blue","red"),lwd=2,legend=c("Sensitivity","Specificity"))
-legend("right",col=c("red","blue"),lwd=2,legend=c("mRNA specificity","lncRNA specificity"))
+legend("right",col=c("blue","red"),lwd=2,legend=c("mRNA sensitivity","mRNA specificity"))
 
 tt <- dev.off()
 
@@ -238,9 +249,10 @@ tt <- dev.off()
 ## Make the random forest model
 cat("\tMaking random forest model on '", basename(codFile), "' and '", basename(nonFile), "' and apply it to '", basename(testFile), "'.\n", sep="")
 
+## Get the minimum number of non coding and coding values
+minVal <- min(table(as.factor(dat[, dat.labelID])))
 ## RF model
-set.seed(seed)
-dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=numberT)
+dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=numberT, sampsize=c("0"=(minVal), "1"=(minVal)))
 
 ## Prediction on test data
 dat.rf.test.votes                                   <- predict(dat.rf, testMat[,test.featID], type="vote")

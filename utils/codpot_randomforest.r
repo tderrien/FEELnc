@@ -91,16 +91,13 @@ dat.labelID  <- ncol(dat)
 test.nameID  <- 1
 test.featID  <- (2:ncol(testMat))
 
-
 ## variables counting
 number_row   <- nrow(dat)
 chunk        <- list()
 output       <- list()
 models       <- list()
 nb_cross_val <- 10
-### TEST ###
 models.votes <- list()
-### TEST ###
 
 ## Progress bar
 cat("\tRunning ", nb_cross_val, "-fold cross-validation on learning:\n", sep="")
@@ -114,11 +111,14 @@ for (n in 1:nb_cross_val)
         ## split the dat in 'nb_cross_val' chunks
         chunk[[n]] <-  seq(as.integer((n-1)*number_row/nb_cross_val)+1,as.integer(n*number_row/nb_cross_val))
 
-        ## Train the random forest model with (nb_cross_val-1) chunks and predict the value for the test dat set
-        models[[n]]        <- randomForest(    x=dat[-chunk[[n]], dat.featID], y=as.factor(dat[-chunk[[n]], dat.labelID]),
-                                           ntree=numberT)
-        models.votes[[n]]  <- predict(models[[n]], dat[chunk[[n]], dat.featID], type="vote")
+        ## Get the minimum number of non coding and coding values
+        minVal <- min(table(as.factor(dat[-chunk[[n]], dat.labelID])))
 
+        ## Train the random forest model with (nb_cross_val-1) chunks and predict the value for the test dat set
+        ## with an equal number of lncRNAs and mRNAs in each tree
+        models[[n]] <- randomForest(    x=dat[-chunk[[n]], dat.featID], y=as.factor(dat[-chunk[[n]], dat.labelID]),
+                                    ntree=numberT, sampsize=c("0"=(minVal), "1"=(minVal)))
+        models.votes[[n]] <- predict(models[[n]], dat[chunk[[n]], dat.featID], type="vote")
 
         ## Output results in list output
         output[[n]] <- as.data.frame(cbind(dat[chunk[[n]], dat.featID], "Label"=dat[chunk[[n]], dat.labelID], "Prob"=models.votes[[n]][,2]))
@@ -223,7 +223,7 @@ abline(v=thres,lty="dashed",lwd=1.5)
 text(x=thres, y = ymin, labels = round(thres, digits = 3), cex=1.5)
 
 ## Legend
-legend("right",col=c("blue","red"),lwd=2,legend=c("Sensitivity","Specificity"))
+legend("right",col=c("blue","red"),lwd=2,legend=c("mRNA sensitivity","mRNA specificity"))
 
 tt <- dev.off()
 
@@ -234,8 +234,10 @@ tt <- dev.off()
 ## Make the random forest model
 cat("\tMaking random forest model on '", basename(codFile), "' and '", basename(nonFile), "' and apply it to '", basename(testFile), "'.\n", sep="")
 
+## Get the minimum number of non coding and coding values
+minVal <- min(table(as.factor(dat[, dat.labelID])))
 ## RF model
-dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=numberT)
+dat.rf <- randomForest(x=dat[,dat.featID], y=as.factor(dat[,dat.labelID]), ntree=numberT, sampsize=c("0"=(minVal), "1"=(minVal)))
 
 ## Prediction on test data
 dat.rf.test.votes                         <- predict(dat.rf, testMat[,test.featID], type="vote")
