@@ -78,7 +78,7 @@ my $perc = 0.1;
 # Intergenic extraction:
 my $maxTries   = 10;
 my $maxN       = 5;
-my $sizecorrec = 1; # a float value between 0 and 1
+my $sizecorrec = 0.75; # a float value between 0 and 1
 
 ## Parse options and print usage if there is a syntax error,
 ## or if usage was explicitly requested.
