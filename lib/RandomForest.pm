@@ -704,13 +704,13 @@ sub runRF
 
     # Learning
     ## Coding
-    &getSizeFastaFile($codLearnFile,    $sizeCodLearnFile,    "mRNA_size");
+    &getSizeFastaFile($codLearnFile,    $sizeCodLearnFile,    "RNA_size");
     &getSizeFastaFile($orfCodLearnFile, $sizeOrfCodLearnFile, "ORF_size");
     ## Non coding
-    &getSizeFastaFile($nonLearnFile,    $sizeNonLearnFile,    "mRNA_size");
+    &getSizeFastaFile($nonLearnFile,    $sizeNonLearnFile,    "RNA_size");
     &getSizeFastaFile($orfNonLearnFile, $sizeOrfNonLearnFile, "ORF_size");
     # Test
-    &getSizeFastaFile($testFile,    $sizeTestFile,    "mRNA_size");
+    &getSizeFastaFile($testFile,    $sizeTestFile,    "RNA_size");
     &getSizeFastaFile($orfTestFile, $sizeOrfTestFile, "ORF_size");
 
     # 2. Compute the kmer ratio for each kmer and put the output file name in a list
