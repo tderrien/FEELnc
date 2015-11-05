@@ -870,7 +870,7 @@ sub randomizedGTFtoFASTA{
 
     my ($h, $ref_cDNA_passed, $cdnafile, $orffile, $genome, $nbtx, $minnumtx, $sizecorrec, $orfType, $maxTries, $maxN, $verbosity, $kmerMax) = @_;
 
-    $nbtx      ||= 1000; # number of random tx required
+    # $nbtx      ||= 1000; # number of random tx required
     $maxTries  ||= 10;   # max tries to for computing both overlap and N
     $maxN      ||= 5;    # Proportion (in 100%) of N's authorized in new random sequence
     $verbosity ||= 0;
