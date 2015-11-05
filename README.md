@@ -1,7 +1,7 @@
 # FEELnc
  FlExible Extraction of Long non-coding RNAs
 
-*Version (05/11/2015): Major update, replace ORF length features by ORF coverage features (ORF length divided by RNA length)*
+*Version (05/11/2015): Major update, replace ORF length feature by ORF coverage feature (ORF length divided by RNA length)*
 
 *Version (26/05/2015): Major update includes the use of RandomForest for FEELnc_codpot*
 
