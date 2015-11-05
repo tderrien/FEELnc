@@ -55,6 +55,10 @@ getSizeFastaFile: Get the size of each element of a multi fasta and write it in 
 
 =item .
 
+getOrfCoverage: Get ORF coverage from the RNA size and the ORF file
+
+=item .
+
 mergeKmerScoreSize: Merge a list of kmer score file, a file with the size of ORF and a file with the size of mRNA
 
 =item .
@@ -556,6 +560,8 @@ sub mergeKmerScoreSize
 #	$inFile  = multifasta file from which the size need to be write
 #	$outFile = output file
 #	$header  = header to print after the name
+#       Return value:
+#             Return the hash reference with the size for each sequences
 sub getSizeFastaFile
 {
     my ($inFile, $outFile, $header) = @_;
@@ -583,17 +589,70 @@ sub getSizeFastaFile
     open FILE, "> $outFile" or die "Error! Cannot access to the output file '". $outFile . "': ".$!;
     my $length;
     my $id;
+    my %hashSize;
+    
+    print FILE "name\t$header\n";
+    foreach my $seq ( @seq_array )
+    {
+        $length        = $seq->length;
+        $id            = $seq->id();
+	$hashSize{$id} = $length;
+	# print "rnaSize  ". $id."     ".$hashSize{$id}."\n";
+	print FILE "$id\t$length\n";
+    }
+    close FILE;
 
+    return(\%hashSize)
+}
+
+
+# Get ORF coverage from the RNA size and the ORF file
+#	$inFile  = multifasta file with the ORFs
+#	$outFile = output file for ORF coverage
+#	$header  = header to print after the name
+#       %rnaSize = hash with the size of each sequence
+sub getOrfCoverage
+{
+    my ($inFile, $outFile, $header, $rnaSize) = @_;
+    $inFile  ||= undef;
+    $outFile ||= undef;
+    $header  ||= "size";
+
+    # Check if mendatory arguments have been given
+    die "Get size: the input file is not defined... exiting\n"    if(!defined $inFile);
+    die "Get size: the ouput file is not defined... exiting\n"    if(!defined $outFile);
+    die "Get size: the RNA size hash is not defined... exiting\n" if(!defined $rnaSize);
+
+    # empty
+    die "Get size: input file '$inFile' is empty... exiting\n" unless(-s $inFile);
+    
+    # Put all input sequence in array
+    my $multiFasta = new Bio::SeqIO(-file  => $inFile);
+    my @seq_array;
+    my $seq;
+    while( $seq = $multiFasta->next_seq() )
+    {
+	push(@seq_array, $seq);
+    }
+
+    # Get length for each sequence and print it
+    open FILE, "> $outFile" or die "Error! Cannot access to the output file '". $outFile . "': ".$!;
+    my $length;
+    my $id;
+    my $cover;
+    
     print FILE "name\t$header\n";
     foreach my $seq ( @seq_array )
     {
         $length = $seq->length;
         $id     = $seq->id();
-	# print "$id\t$length\n";
-	print FILE "$id\t$length\n";
+	# print "rnaSize  ". $id."     ".$rnaSize->{$id}."\n";
+	$cover  = $length/($rnaSize->{$id});
+	print FILE "$id\t$cover\n";
     }
     close FILE;
 }
+
 
 # Run the R script RSCRIPT_RF.R to comput the random forest model on learning data and apply it the test data
 #	$codLearnFile = file where the kmerscores, mRNA and ORF size are put for learning coding sequences
@@ -693,25 +752,27 @@ sub runRF
 
     # 1. Compute the size of each sequence and ORF
     print "1. Compute the size of each sequence and ORF\n";
-    my $sizeCodLearnFile    = $nameTmp.".coding_rnaSize.tmp";
-    my $sizeOrfCodLearnFile = $nameTmp.".coding_orfSize.tmp";
-    my $sizeNonLearnFile    = $nameTmp.".noncoding_rnaSize.tmp";
-    my $sizeOrfNonLearnFile = $nameTmp.".noncoding_orfSize.tmp";
-    my $sizeTestFile        = $nameTmp.".test_rnaSize.tmp";
-    my $sizeOrfTestFile     = $nameTmp.".test_orfSize.tmp";
-
-
+    my $sizeCodLearnFile     = $nameTmp.".coding_rnaSize.tmp";
+    my $coverOrfCodLearnFile = $nameTmp.".coding_orfCover.tmp";
+    my $sizeNonLearnFile     = $nameTmp.".noncoding_rnaSize.tmp";
+    my $coverOrfNonLearnFile = $nameTmp.".noncoding_orfCover.tmp";
+    my $sizeTestFile         = $nameTmp.".test_rnaSize.tmp";
+    my $coverOrfTestFile     = $nameTmp.".test_orfCover.tmp";
+    my $rnaSizeRef;
 
     # Learning
     ## Coding
-    &getSizeFastaFile($codLearnFile,    $sizeCodLearnFile,    "RNA_size");
-    &getSizeFastaFile($orfCodLearnFile, $sizeOrfCodLearnFile, "ORF_size");
+    $rnaSizeRef = &getSizeFastaFile($codLearnFile,    $sizeCodLearnFile,    "RNA_size");
+    &getOrfCoverage($orfCodLearnFile, $coverOrfCodLearnFile, "ORF_cover", $rnaSizeRef);
+    #&getSizeFastaFile($orfCodLearnFile, $sizeOrfCodLearnFile, "ORF_size");
     ## Non coding
-    &getSizeFastaFile($nonLearnFile,    $sizeNonLearnFile,    "RNA_size");
-    &getSizeFastaFile($orfNonLearnFile, $sizeOrfNonLearnFile, "ORF_size");
+    $rnaSizeRef = &getSizeFastaFile($nonLearnFile,    $sizeNonLearnFile,    "RNA_size");
+    &getOrfCoverage($orfNonLearnFile, $coverOrfNonLearnFile, "ORF_cover", $rnaSizeRef);
+    #&getSizeFastaFile($orfNonLearnFile, $sizeOrfNonLearnFile, "ORF_size");
     # Test
-    &getSizeFastaFile($testFile,    $sizeTestFile,    "RNA_size");
-    &getSizeFastaFile($orfTestFile, $sizeOrfTestFile, "ORF_size");
+    $rnaSizeRef = &getSizeFastaFile($testFile,    $sizeTestFile,    "RNA_size");
+    &getOrfCoverage($orfTestFile, $coverOrfTestFile, "ORF_cover", $rnaSizeRef);
+    #&getSizeFastaFile($orfTestFile, $sizeOrfTestFile, "ORF_size");
 
     # 2. Compute the kmer ratio for each kmer and put the output file name in a list
     print "2. Compute the kmer ratio for each kmer and put the output file name in a list\n";
@@ -768,11 +829,11 @@ sub runRF
 
     # Learning
     ## Coding
-    &mergeKmerScoreSize(\@kmerScoreCodLearnFileList, $sizeOrfCodLearnFile, $sizeCodLearnFile, $outModCodLearn, $keepTmp);
+    &mergeKmerScoreSize(\@kmerScoreCodLearnFileList, $coverOrfCodLearnFile, $sizeCodLearnFile, $outModCodLearn, $keepTmp);
     ## Non coding
-    &mergeKmerScoreSize(\@kmerScoreNonLearnFileList, $sizeOrfNonLearnFile, $sizeNonLearnFile, $outModNonLearn, $keepTmp);
+    &mergeKmerScoreSize(\@kmerScoreNonLearnFileList, $coverOrfNonLearnFile, $sizeNonLearnFile, $outModNonLearn, $keepTmp);
     # Test
-    &mergeKmerScoreSize(\@kmerScoreTestFileList,     $sizeOrfTestFile,     $sizeTestFile,     $outModTest,     $keepTmp);
+    &mergeKmerScoreSize(\@kmerScoreTestFileList,     $coverOrfTestFile,     $sizeTestFile,     $outModTest,     $keepTmp);
 
 
     # 5. Make the model on learning sequences and apply it on test sequences
@@ -785,11 +846,11 @@ sub runRF
     {
 	my $file = "";
 	unlink $sizeCodLearnFile;
-	unlink $sizeOrfCodLearnFile;
+	unlink $coverOrfCodLearnFile;
 	unlink $sizeNonLearnFile;
-	unlink $sizeOrfNonLearnFile;
+	unlink $coverOrfNonLearnFile;
 	unlink $sizeTestFile;
-	unlink $sizeOrfTestFile;
+	unlink $coverOrfTestFile;
 	foreach $file (@kmerRatioFileList)
 	{
 	    unlink $file;
@@ -1143,6 +1204,34 @@ output file
 =item $header
 
 header to print after the name
+
+=back
+
+Return value: Return the hash reference with the size for each sequences
+
+##############################################################################
+
+=head2 getOrfCoverage
+
+Get ORF coverage from the RNA size and the ORF file
+
+=over
+
+=item $inFile
+
+multifasta file with the ORFs
+
+=item $outFile
+
+output file for ORF coverage
+
+=item $header
+
+header to print after the name
+
+=item %rnaSize
+
+hash with the size of each sequence
 
 =back
 

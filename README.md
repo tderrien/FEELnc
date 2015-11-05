@@ -1,7 +1,9 @@
 # FEELnc
  FlExible Extraction of Long non-coding RNAs
 
-*Version (26/05/2015) : Major update includes the use of RandomForest for FEELnc_codpot*
+*Version (05/11/2015): Major update, replace ORF length features by ORF coverage features (ORF length divided by RNA length)*
+
+*Version (26/05/2015): Major update includes the use of RandomForest for FEELnc_codpot*
 
 ## Introduction
 
@@ -161,7 +163,7 @@ The second step of the pipeline (FEELnc_codpot) aims at computing the CPS i.e th
 
 **- INPUT :**
 
-It makes use of the intrinsic properties of input sequences (ORF and mRNA sizes, k-mer frequencies...) based on 2 training files:
+It makes use of the intrinsic properties of input sequences (ORF coverage and mRNA sizes, k-mer frequencies...) based on 2 training files:
 
 
 	- known_mRNA.gtf (or .fa)   : a set of known protein_coding transcripts
@@ -194,10 +196,10 @@ FEELnc_codpot uses a R script that will make a 10 fold cross-validation on the i
 
 If your input file is called **INPUT**, this second module will create these output files:
 
-	 - {INPUT}_RF_learningData.txt		: FEELnc metrics scores (ORF and mRNA sizes, k-mer frequencies and labels) for the training files
+	 - {INPUT}_RF_learningData.txt		: FEELnc metrics scores (ORF coverage and mRNA sizes, k-mer frequencies and labels) for the training files
 	 - {INPUT}_RF_stats.txt  : statistics for n cross validation on the training files.
 	 - {INPUT}_RF_TGROC.png  : TwoGraph ROC curve plot to select the best coding potential cutoff
-	 - {INPUT}_RF.txt	:  FEELnc metrics scores (ORF and mRNA sizes, k-mer frequencies and labels) for the testing file
+	 - {INPUT}_RF.txt	:  FEELnc metrics scores (ORF coverage and mRNA sizes, k-mer frequencies and labels) for the testing file
 	 - {INPUT}_RF_varImpPlot.png	:	Dotchart plot of variable importance as measured by a Random Forest
 
 	 - {INPUT}.lncRNA.gtf || {INPUT}.lncRNA.FA	:  a .GTF/.FA file of the transcripts below the CPS (i.e the final set of lncRNAs)
