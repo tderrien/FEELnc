@@ -155,7 +155,7 @@ my $numtxNon = undef;
 
 if(defined $numtx)
 {
-    if( ($numtx =~ tr/,//) > 1 )
+    if(($numtx =~ tr/,//) != 1)
     {
 	pod2usage ("- Error: --numtx option '$numtx' should be a list of two value separated by a ',' (see --help for more details)\n");
     }
