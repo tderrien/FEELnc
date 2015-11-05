@@ -187,10 +187,6 @@ for(i in 1:nb_cross_val)
                 tl    <- cont2[1,1]
             }
 
-        print(cont2)
-        print(cont)
-
-
         tp <- cont[2,2]
         fp <- cont[1,2]
         tn <- cont[1,1]
