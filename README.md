@@ -1,3 +1,10 @@
+### WARNING: We found some unexpected behaviour since the last major update (05/11/2015). Please use a previous version until this bug has been corrected. Sorry for the inconvenience.
+To do so:
+
+	git checkout bf6d4e9fdda8822cf67b9c80f2463c1ee5514b38
+
+
+
 # FEELnc
  FlExible Extraction of Long non-coding RNAs
 
