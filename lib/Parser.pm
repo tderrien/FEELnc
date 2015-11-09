@@ -20,7 +20,6 @@ package B<Parser> - Parse input files for FEELnc datastructures
 	use Parser;
 	my $refhgtf	 =	Parser::parseGTF('infile.gtf');
 	my $refhgene =	Parser::parseGTFgnlight('infile.gtf');
-	my $refhcpat =	Parser::parseCPAT('infile.cpat');
 
 =head1 DESCRIPTION
 
@@ -929,92 +928,5 @@ sub GTF2GTFgnlight{
 
 }
 
-=head2 parseCPAT
-	Title		:	parseCPAT
-	Function	:	parse a CPAT output file
-	Example		:	Parser::parseCPAT($featurefile, $verbosity);
-	Returns		: 	a tx-based CPAT hashfref
-	Args		:
-					- infile	: file - a CPAT file (mandatory)
-					- verbosity	: numeric - level of verbosity
-	Note		: see FEELnc_codpot.pl
-
-=cut
-sub parseCPAT{
-
-	my ($infile,  $verbosity) = @_;
-	$infile 		||='';
-	$verbosity 		||= 0;
-
-	# test if it is training file (i.e with label and ID but without codingprob)
-	my $istraining	=	0;
-
-	# infile
-	my $basename 	= basename($infile);
-
-	# Open file
-	open CPAT, "$infile" or croak "Error! Cannot open CPAT File ". $infile . ": ".$!;
-
-	print STDERR "Parsing CPAT file '$basename'...\n";
-
-	# count nb of lines
-	my $lc=Utils::countlinefile($infile);
-
-	# Store data
-	my %h_transcript;
-
-	# iterator line
-	my $i = 0;
-
-    while (<CPAT>){
-
-		# increment counter independently of verbosity (bug for $i ==1 afterward)
-		$i++;
-
- 		# verbose
-		Utils::showProgress($lc, $i, "Parse input CPAT file: ") if ($verbosity > 5);
-
-		chop;
-	    next if /^#/;
-        next if /^$/;
-        next if /^track/;
-
-		# test header and skip
-        if ($i == 1 ){
-        	if (/^ID/ && /Label/){         # If header cotnain training file informations
-	        	$istraining = 1;
-	        }
-        	next;
-        }
-
-		# split line by tab
-		my ($id, $mRNA_size, $ORF_size, $Fickett_score, $Hexamer_score, $coding_prob, $lab) = undef;
-		if ($istraining){
-			($id, $mRNA_size, $ORF_size, $Fickett_score, $Hexamer_score, $lab) = split(/\t/);
-		} else {
-			($id, $mRNA_size, $ORF_size, $Fickett_score, $Hexamer_score, $coding_prob) = split(/\t/);
-
-
-		}
-		# for different CPAT output
-		$lab 			= "NA"	if (!defined $lab);
-		$coding_prob	= "NA"	if (!defined $coding_prob);
-
-		# gene level
-		$h_transcript{$id}->{"mRNA_size"}		=   $mRNA_size;
-		$h_transcript{$id}->{"ORF_size"}		=   $ORF_size;
-		$h_transcript{$id}->{"Fickett_score"}	=   $Fickett_score;
-		$h_transcript{$id}->{"Hexamer_score"}	=   $Hexamer_score;
-		$h_transcript{$id}->{"coding_prob"}		=   $coding_prob;
-		$h_transcript{$id}->{"label"}			=   $lab;
-	}
-
-	# Test parsing
- 	if (scalar keys(%h_transcript) == 0){
-		croak	"Parser::parseCPAT => Data Structure returns an empty hash...\n";
-	}
-
-	return \%h_transcript;
-}
 
 1;
