@@ -51,7 +51,7 @@ if(length(new.packages) != 0)
         cat("Please wait during the installation of the R packages (only done once): ", new.packages, ".\n", sep="")
         install.packages(new.packages, repos="http://cran.r-project.org/",  dependencies = TRUE)
         cat("R packages: ", new.packages, " installed.\n", sep="")
-        }
+    }
 ## Loading library
 for(pack in list.of.packages)
     {

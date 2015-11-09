@@ -17,18 +17,18 @@ library(tools)
 args <- commandArgs(TRUE)
 
 ## Set generic values
-codFile   <- args[1]
-nonFile   <- args[2]
-testFile  <- args[3]
-outFile   <- args[4]
-numberT   <- as.numeric(args[5])
-seed      <- as.numeric(args[6])
-thresSpeM <- as.numeric(args[7])
-thresSpeL <- as.numeric(args[8])
+codFile    <- args[1]
+nonFile    <- args[2]
+testFile   <- args[3]
+outFile    <- args[4]
+numberT    <- as.numeric(args[5])
+seed       <- as.numeric(args[6])
+thresSpeM  <- as.numeric(args[7])
+thresSpeL  <- as.numeric(args[8])
 outSummary <- paste(file_path_sans_ext(outFile), "_summary.txt", sep="")
-outVar    <- paste(file_path_sans_ext(outFile), "_varImpPlot.png", sep="")
-outROC    <- paste(file_path_sans_ext(outFile), "_TGROC.png", sep="")
-outStats  <- paste(file_path_sans_ext(outFile), "_stats.txt", sep="")
+outVar     <- paste(file_path_sans_ext(outFile), "_varImpPlot.png", sep="")
+outROC     <- paste(file_path_sans_ext(outFile), "_TGROC.png", sep="")
+outStats   <- paste(file_path_sans_ext(outFile), "_stats.txt", sep="")
 list.of.packages <- c("ROCR","randomForest")
 
 if(length(args) != 8)
@@ -45,7 +45,7 @@ if(length(new.packages) != 0)
         cat("Please wait during the installation of the R packages (only done once): ", new.packages, ".\n", sep="")
         install.packages(new.packages, repos="http://cran.r-project.org/",  dependencies = TRUE)
         cat("R packages: ", new.packages, " installed.\n", sep="")
-        }
+    }
 ## Loading library
 for(pack in list.of.packages)
     {
