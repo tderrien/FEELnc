@@ -99,8 +99,8 @@ Add FEELnc scripts and the distribution-specific binary of KmerInShort to your P
 
 
 	# Coding_Potential
-    # Note1 :  as a test, the training is only done on  1000 tx (-n 1000 option)
-	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa -n 1000
+    # Note1 :  as a test, the training is only done on 1000 mRNAs and 1000 intergenic sequences (-n 1000,1000 option)
+	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa -n 1000,1000
 
     # Classifier
 	FEELnc_classifier.pl -i feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf -a annotation_chr38.gtf > candidate_lncRNA_classes.txt
@@ -203,14 +203,15 @@ FEELnc_codpot uses a R script that will make a 10 fold cross-validation on the i
 
 If your input file is called **INPUT**, this second module will create these output files:
 
-	 - {INPUT}_RF_learningData.txt		: FEELnc metrics scores (ORF coverage and mRNA sizes, k-mer frequencies and labels) for the training files
-	 - {INPUT}_RF_stats.txt  : statistics for n cross validation on the training files.
-	 - {INPUT}_RF_TGROC.png  : TwoGraph ROC curve plot to select the best coding potential cutoff
-	 - {INPUT}_RF.txt	:  FEELnc metrics scores (ORF coverage and mRNA sizes, k-mer frequencies and labels) for the testing file
-	 - {INPUT}_RF_varImpPlot.png	:	Dotchart plot of variable importance as measured by a Random Forest
+	 - {INPUT}_RF_learningData.txt: FEELnc metrics scores (ORF coverage and mRNA sizes, k-mer frequencies and labels) for the training files.
+	 - {INPUT}_RF_statsLearn_CrossValidation.txt: statistics for n cross validation on the training files.
+	 - {INPUT}_RF_TGROC.png: TwoGraph ROC curve plot to select the best coding potential cutoff.
+	 - {INPUT}_RF.txt: FEELnc metrics scores (ORF coverage and mRNA sizes, k-mer frequencies and labels) for the testing file.
+	 - {INPUT}_RF_varImpPlot.png: Dotchart plot of variable importance as measured by a Random Forest.
 
-	 - {INPUT}.lncRNA.gtf || {INPUT}.lncRNA.FA	:  a .GTF/.FA file of the transcripts below the CPS (i.e the final set of lncRNAs)
-	 - {INPUT}.mRNA.gtf || {INPUT}.mRNA.FA	:  a .GTF/.FA file of the transcripts above the coding potential cutoff (i.e the final set of mRNAs)
+	 - {INPUT}.lncRNA.gtf || {INPUT}.lncRNA.fa: a .GTF/.FA file of the transcripts below the CPS (i.e the final set of lncRNAs).
+	 - {INPUT}.mRNA.gtf || {INPUT}.mRNA.fa: a .GTF/.FA file of the transcripts above the coding potential cutoff (i.e the final set of mRNAs).
+	 - [Possibly] {INPUT}.noORF.gtf || {INPUT}.noORF.fa: a .GTF/.FA file of the transcripts without any ORF found by FEELnc using the specified --testorftype option (see FEELnc_codpot.pl options description for more details). Transcripts contained in this file most probably correspond to lncRNAs.
 
 An example of an {INPUT}_RF_TGROC.png graphic obtained using automatic threshold, i.e. sensibility equal to specificity on 10-fold cross-validation:
 ![ScreenShot](./image/FEELnc_codpot_performance.png)
