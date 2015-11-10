@@ -1,16 +1,15 @@
-### WARNING: We found some unexpected behaviour since the last major update (05/11/2015). Please use a previous version until this bug has been corrected. Sorry for the inconvenience.
-To do so:
-
-	git checkout bf6d4e9fdda8822cf67b9c80f2463c1ee5514b38
-
-
-
 # FEELnc
  FlExible Extraction of Long non-coding RNAs
+
+*Version (10/11/2015): Major bug correction during ORF sequences extraction from a GTF containing CDS information (the sequence was containing the RNA sequence in addition to the ORF). If you launched FEELnc analysis with a GTF including CDS information, please re-run your analysis with this new version. Sorry for the inconvenience.*
 
 *Version (05/11/2015): Major update, replace ORF length feature by ORF coverage feature (ORF length divided by RNA length)*
 
 *Version (26/05/2015): Major update includes the use of RandomForest for FEELnc_codpot*
+
+
+Please note that FEELnc project is still in working progress. But feel free to use it and send any comments/bug/suggestions. Thanks!
+
 
 ## Introduction
 
