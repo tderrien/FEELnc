@@ -105,14 +105,16 @@ Add FEELnc scripts to your PATH and add the distribution-specific binary of Kmer
 	# Note1 :  as a test, the training is only done on  1000 tx (-n 1000 option)
 	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa -n 1000
 
-    	# Classifier
+	# Classifier
 	FEELnc_classifier.pl -i feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf -a annotation_chr38.gtf > candidate_lncRNA_classes.txt
 
 
 ### Head of the principal output files on the toy exemple:
 **Filter**
+
 *candidate_lncRNA.gtf*: a GTF file containing each exon of all transcripts that passed the filter.
-	 head -n2 candidate_lncRNA.gtf
+
+	head -n2 candidate_lncRNA.gtf
 	 38	Cufflinks	exon	516103	518188	.	+	.	gene_id "XLOC_090599"; transcript_id "TCONS_00231416"; class_code "u"; exon_number "1"; oId "CUFF.138034.16"; tss_id "TSS139476";
 	 38	Cufflinks	exon	519376	519454	.	+	.	gene_id "XLOC_090599"; transcript_id "TCONS_00231416"; class_code "u"; exon_number "2"; oId "CUFF.138034.16"; tss_id "TSS139476";
 
@@ -125,33 +127,40 @@ Add FEELnc scripts to your PATH and add the distribution-specific binary of Kmer
 
 
 **Coding Potential**
+
 *candidate_lncRNA.gtf.lncRNA.gtf*: extraction of the original GTF file containing the transcripts predicted as lncRNAs.
-	 head -n2 candidate_lncRNA.gtf.lncRNA.gtf
+
+	head -n2 candidate_lncRNA.gtf.lncRNA.gtf
 	 38	Cufflinks	exon	516103	518188	.	+	.	gene_id "XLOC_090599"; transcript_id "TCONS_00231416"; class_code "u"; exon_number "1"; oId "CUFF.138034.16"; tss_id "TSS139476";
 	 38	Cufflinks	exon	519376	519454	.	+	.	gene_id "XLOC_090599"; transcript_id "TCONS_00231416"; class_code "u"; exon_number "2"; oId "CUFF.138034.16"; tss_id "TSS139476";
 
 *candidate_lncRNA.gtf.mRNA.gtf*: same as the previous file but for predicted mRNA transcripts.
-	 head -n2 candidate_lncRNA.gtf.mRNA.gtf
+
+	head -n2 candidate_lncRNA.gtf.mRNA.gtf
 	 38	Cufflinks	exon	23052109	23052291	.	+	.	gene_id "XLOC_090839"; transcript_id "TCONS_00232417"; class_code "u"; exon_number "1"; oId "CUFF.139754.1"; tss_id "TSS139994";
 	 38	Cufflinks	exon	23053697	23053936	.	+	.	gene_id "XLOC_090839"; transcript_id "TCONS_00232417"; class_code "u"; exon_number "2"; oId "CUFF.139754.1"; tss_id "TSS139994";
 
 *candidate_lncRNA.gtf_RF_summary.txt*: file containing the threshold use for the prediction and the number of predicted lncRNAs and mRNAs.
-	 cat candidate_lncRNA.gtf_RF_summary.txt
+
+	cat candidate_lncRNA.gtf_RF_summary.txt
 	 # Summary file:
 	 -With_cutoff:	0.526
 	 -Nb_lncRNAs:	282
 	 -Nb_mRNAs:	59
 
 *candidate_lncRNA.gtf_RF.txt*: the result file of the random forest prediction. The kmerScore_* columns are the kmer score for the transcript for each kmer size, higer values representing a high occurence of common mRNA kmer. The ORF_cover is the ratio between the ORF size and the RNA size. The coding_potential column is the ratio between the number of trees who have vote for the transcript to be a mRNAand the total number of trees. The label column is the biotype prediction of the transcript (0: non coding, 1: coding) depending on is coding_potential and the threshold (see *candidate_lncRNA.gtf_RF_summary.txt*).
-	 head -n3 candidate_lncRNA.gtf_RF.txt | column -t
+
+	head -n3 candidate_lncRNA.gtf_RF.txt | column -t
 	 name            kmerScore_1mer  kmerScore_2mer  kmerScore_3mer  kmerScore_6mer  kmerScore_9mer  kmerScore_12mer  ORF_cover           RNA_size  coding_potential  label
 	 TCONS_00231401  0.489996        0.478795        0.447059        0.353341        0.355575        0.490291         0.0234859675036928  13540     0.136             0
 	 TCONS_00231402  0.485523        0.467847        0.435232        0.333433        0.203866        0.360465         0.0155639755173419  17155     0.114             0
 
 
 **Classifier**
+
 *candidate_lncRNA_classes.txt*: the file report statistics on the interaction and every interactions between lncRNA and RNA contained in the input annotation. Lines begining with a '#' are comments and lines begining with a '*' are the best interactions for a specific lncRNA.
-	 head -n candidate_lncRNA_classes.txt
+
+	head -n candidate_lncRNA_classes.txt
 	 #FEELnc Classification
 	 #lncRNA file :  lncrna : feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf
 	 #mRNA file : annotation_chr38.gtf
