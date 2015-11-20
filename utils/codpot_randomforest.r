@@ -22,7 +22,7 @@ seed     <- as.numeric(args[6])
 
 outVar   <- paste(file_path_sans_ext(outFile), "_varImpPlot.png", sep="")
 outROC   <- paste(file_path_sans_ext(outFile), "_TGROC.png", sep="")
-outStats <- paste(file_path_sans_ext(outFile), "_stats.txt", sep="")
+outStats <- paste(file_path_sans_ext(outFile), "_statsLearn_CrossValidation.txt", sep="")
 outSummary <- paste(file_path_sans_ext(outFile), "_summary.txt", sep="")
 list.of.packages <- c("ROCR","randomForest")
 
@@ -51,7 +51,7 @@ if(length(new.packages) != 0)
         cat("Please wait during the installation of the R packages (only done once): ", new.packages, ".\n", sep="")
         install.packages(new.packages, repos="http://cran.r-project.org/",  dependencies = TRUE)
         cat("R packages: ", new.packages, " installed.\n", sep="")
-        }
+    }
 ## Loading library
 for(pack in list.of.packages)
     {

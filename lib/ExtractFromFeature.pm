@@ -50,11 +50,11 @@ $| = 1;
 # Check whether all features from a tx contain at least one CDS feat_level
 sub checkCDS {
 	my ($refarray) = @_;
-	
+
 	die "ExtractFromFeature::checkCDS => not features for refarray...\n" if (scalar @{$refarray}==0);
 
 	my $hasCDS	=	0;
-	
+
 	foreach my $exon (@{$refarray}) {
 		if ($exon->{'feat_level'} =~ /CDS/i){
 			return 1;
@@ -68,37 +68,37 @@ sub sortFeatures{
 	my ($refarray, $strand)	= @_;
 
 	die "ExtractFromFeature::feature2CDS => transcript  not defined...\n" if (not defined $refarray);
-	
+
 	my @features;
 	# reverse order if negative strand
 	if ($strand eq "-" || $strand eq "-1"){
 
 		 @features = sort { $b->{"start"} <=> $a->{"start"}} @{$refarray};
-	
+
 	} elsif ($strand eq "+" || $strand eq "1" || $strand eq "."){
-		
+
 		 @features = sort { $a->{"start"} <=> $b->{"start"}} @{$refarray};
-	
+
 	}else {
 		die "ExtractFromFeature::sortFeatures => strand '$strand' unknown...";
 	}
-	
+
 	return  @features;
 
 }
 
 # get the cumulative size of features from a array reference
 sub features2size{
-	my $refonarray 	=	shift;	
+	my $refonarray 	=	shift;
 	my $verbosity 	= 	shift;
 	$verbosity 		= 0 unless defined ($verbosity);
 
-	# print if verbosity	
+	# print if verbosity
 	print STDERR "Getting cumulative size of exon levels...\n" if ($verbosity > 0);
-	
+
 	# cumulsize
 	my $cumulsize	=	0;
-	
+
 	# Parse gtfHash to be printed
 	foreach my $feat1 (@{$refonarray}) {
 
@@ -109,13 +109,13 @@ sub features2size{
 }
 
 sub features2nbExon{
-	my $refonarray 	=	shift;	
+	my $refonarray 	=	shift;
 	my $verbosity 	= 	shift;
 	$verbosity 		= 0 unless defined ($verbosity);
 
-	# print if verbosity	
+	# print if verbosity
 	print STDERR "Getting number of exon(s)...\n" if ($verbosity > 0);
-	
+
 	# cumulsize
 	my $nbex	=	0;
 
@@ -132,13 +132,13 @@ sub features2nbExon{
 
 # return true if dubious biexonic tx (dubious means a tx with a small exon
 sub features2dubExon{
-	my ($refonarray, $minsize, $verbosity) 	=	@_;	
-	$minsize 	||=	25;	
+	my ($refonarray, $minsize, $verbosity) 	=	@_;
+	$minsize 	||=	25;
 	$verbosity 		||= 0;
 
-	# print if verbosity	
+	# print if verbosity
 	print STDERR "Getting dubious exonic transcript...\n" if ($verbosity > 0);
-	
+
 	# cumulsize
 	my $dubious	=	0;
 
@@ -149,7 +149,7 @@ sub features2dubExon{
         if ($size < $minsize){
             return 1;
             last;
-        } 
+        }
 
 	}
 
@@ -170,47 +170,47 @@ sub Tx2CDS{
 
 	# ORF inf
 	my $orf_length	= $refORF->{'orflength'} ;  # for ORF/sequence, we are at 0-based coordinates
-#     if ($refORF->{'check_stop'}){ 
+#     if ($refORF->{'check_stop'}){
 #         $orf_length = $orf_length - 3;
 #     }
- 
+
 	# Tx info
 	my $strand = $tx->{"strand"};
 
 	my $frame = ".";
-	
+
 #   	print Dumper $refORF;
 #  	print Dumper $tx;
-	
+
 	my @newfeatures = @{$tx->{"feature"}};
-	
+
 	# exon number
 	my $nbexons = scalar (@{$tx->{"feature"}});
-	
+
 	my $exonfromCDS=0;
-	# Iterate over ****SORTED**** wrt strand exons	
+	# Iterate over ****SORTED**** wrt strand exons
 	foreach my $exon (ExtractFromFeature::sortFeatures($tx->{"feature"}, $strand)) {
-    
+
 		# Current Exon length
 		my $exon_length = $exon->{"end"} - $exon->{"start"} +1;
 
 		# CDS start and end in genomic context
 		my ($cdss, $cdse);
-		
+
 		# *** Most important trick here ***
 		if ($strand eq "+" || $strand eq "." ){
 			$cdss 		= 	$exon->{"start"} + $refORF->{'start'};
 			$cdse 		= 	$cdss            + $orf_length;
 		} else {
-			$cdse 		= 	$exon->{"end"}   - $refORF->{'start'};		
-			$cdss 		= 	$cdse            - $orf_length;	
-		}	
-		
+			$cdse 		= 	$exon->{"end"}   - $refORF->{'start'};
+			$cdss 		= 	$cdse            - $orf_length;
+		}
+
 		# Compute the interval matched between exon and projected ORF
 		my ($startmatch, $endmatch) = Utils::foverlapmin($exon->{"start"}, $exon->{"end"}, $cdss, $cdse, '+', '+');
 		# Size of the matched region
  		my $matchlength = $endmatch - $startmatch +1;
- 		
+
  		# store features leve i.e CDS 5'UTR and 3'UTR at the moment
  		my (%FpUTR, %TpUTR, %CDS, %UTR, %start_codon, %stop_codon);
 
@@ -225,12 +225,12 @@ sub Tx2CDS{
 #  		print STDERR "$nbexons : CDSEx $exonfromCDS: refORF START: ",$refORF->{'start'},"  ORFLEngth: $orf_length - ($startmatch, $endmatch) $matchlength : (",$exon->{'start'},", ",$exon->{'end'},") $exon_length :  $cdss, $cdse\n";
  		my $startexon   =   $exon->{'start'};
  		my $endexon     =   $exon->{'end'};
- 		 		
+
  		# if match between ORFgenomic and exon => we are in CDS
-		if ($startmatch){	
-    		
+		if ($startmatch){
+
             $exonfromCDS++;
-    		    		    		
+
             # PLUS STRAND
             if ($strand  eq "+" || $strand eq "."){
 
@@ -240,56 +240,56 @@ sub Tx2CDS{
     		    my $CDS_end     =  $endmatch;
         		my $TpUTR_beg   =  $endmatch;
         		my $TpUTR_end   =  $endexon;
-    		            
+
     		    # if first exon
 	    	    if ($exonfromCDS == 1 ) {
-		    
+
                     %FpUTR          = ( "start" => $FpUTR_beg   , "end" => $FpUTR_end       , "feat_level" => 'UTR', 'frame' => $frame);
-                    %start_codon    = ( "start" => $startmatch  , "end" => $startmatch +2   ,  "feat_level" => 'start_codon', 'frame' => $frame);    
-    		
-    		
+                    %start_codon    = ( "start" => $startmatch  , "end" => $startmatch +2   ,  "feat_level" => 'start_codon', 'frame' => $frame);
+
+
     		        if ( $refORF->{'check_start'} ) {
             		    if ( $FpUTR_beg < $FpUTR_end ){
                             push (@newfeatures, \%FpUTR, \%start_codon);
 
 	    	            } else {
                             push (@newfeatures,  \%start_codon);
-		        
+
 		                }
 		            }
 		        }
-		    
+
     		    # last exon belonging to CDS
 	    	    if ( $orf_length <= $matchlength ){
-		    
+
 		            # weirdly, somteimes threre is is a shift between orf length and matchlength on thel ast exons
 		            my $diff_RestORFlength  = $matchlength - $orf_length;
-    		        $CDS_end                = $CDS_end - $diff_RestORFlength; 
-		        
-		        
+    		        $CDS_end                = $CDS_end - $diff_RestORFlength;
+
+
 #    		        $CDS_beg
-                	%TpUTR          =  ( "start" => $TpUTR_beg              , "end" => $TpUTR_end           , "feat_level" => 'UTR', 'frame' => $frame);		    		    
-	        	    %stop_codon     = ( "start"  => $CDS_end-2	        	, "end" => $CDS_end            ,  "feat_level" => 'stop_codon', 'frame' => $frame);   
-            
+                	%TpUTR          =  ( "start" => $TpUTR_beg              , "end" => $TpUTR_end           , "feat_level" => 'UTR', 'frame' => $frame);
+	        	    %stop_codon     = ( "start"  => $CDS_end-2	        	, "end" => $CDS_end            ,  "feat_level" => 'stop_codon', 'frame' => $frame);
+
     		        if ( $refORF->{'check_stop'} ) {
-    
+
     		            push (@newfeatures, \%stop_codon);
-    		        
+
     		            # adapt CDS coordinates with stop for + strand
                         $CDS_end = $CDS_end - 3 ;
         	        }
-            	
+
             	    # add UTR
                     if ( $TpUTR_beg <  $TpUTR_end ){
                         push (@newfeatures, \%TpUTR)
-                    } 
+                    }
 		        }
-		    
+
 		        # CDS
                 %CDS            = ( "start" => $CDS_beg	, "end" => $CDS_end    ,  "feat_level" => 'CDS', 'frame' => $frame);
 
                 push (@newfeatures,  \%CDS);
-                
+
             ##############
             # MINUS STRAND
             ##############
@@ -301,80 +301,80 @@ sub Tx2CDS{
     		    my $CDS_end     =  $endmatch;
         		my $TpUTR_beg   =  $startexon;
         		my $TpUTR_end   =  $startmatch;
-        		            
+
     		    # if first exon
 	    	    if ($exonfromCDS == 1 ) {
-		    
+
                     %FpUTR          = ( "start" => $FpUTR_beg					, "end" => $FpUTR_end   , "feat_level" => 'UTR',        'frame' => $frame);
-                    %start_codon    = ( "start" => $endmatch -2	                , "end" => $endmatch    ,  "feat_level" => 'start_codon', 'frame' => $frame);    
-    		
-    		
+                    %start_codon    = ( "start" => $endmatch -2	                , "end" => $endmatch    ,  "feat_level" => 'start_codon', 'frame' => $frame);
+
+
     		        if ( $refORF->{'check_start'} ) {
             		    if ( $FpUTR_beg < $FpUTR_end ){
                             push (@newfeatures, \%FpUTR, \%start_codon);
 
 	    	            } else {
                             push (@newfeatures,  \%start_codon);
-		        
+
 		                }
 		            }
 		        }
-		    
+
     		    # last exon belonging to CDS
 	    	    if ( $orf_length <= $matchlength ){
-		    
+
 		            # weirdly, somteimes threre is is a shift between orf length and matchlength on thel ast exons
 		            my $diff_RestORFlength  = $matchlength - $orf_length;
-    		        $CDS_beg                = $CDS_beg + $diff_RestORFlength; 
-		        
-		        
+    		        $CDS_beg                = $CDS_beg + $diff_RestORFlength;
+
+
 #    		        $CDS_beg
-                	%TpUTR          =  ( "start" => $TpUTR_beg              , "end" => $TpUTR_end           , "feat_level" => 'UTR', 'frame' => $frame);		    		    
-	        	    %stop_codon     = ( "start"  => $CDS_beg	        	, "end" => $CDS_beg + 2           ,  "feat_level" => 'stop_codon', 'frame' => $frame);   
-            
+                	%TpUTR          =  ( "start" => $TpUTR_beg              , "end" => $TpUTR_end           , "feat_level" => 'UTR', 'frame' => $frame);
+	        	    %stop_codon     = ( "start"  => $CDS_beg	        	, "end" => $CDS_beg + 2           ,  "feat_level" => 'stop_codon', 'frame' => $frame);
+
     		        if ( $refORF->{'check_stop'} ) {
-    
+
     		            push (@newfeatures, \%stop_codon);
-    		        
+
     		            # adapt CDS coordinates with stop for + strand
                          $CDS_beg = $CDS_beg +3  ;
         	        }
-            	
+
             	    # add UTR
                     if ( $TpUTR_beg <  $TpUTR_end ){
                         push (@newfeatures, \%TpUTR)
-                    } 
+                    }
 		        }
-		    
+
 		        # CDS
                 %CDS            = ( "start" => $CDS_beg	, "end" => $CDS_end    ,  "feat_level" => 'CDS', 'frame' => $frame);
 
                 push (@newfeatures,  \%CDS);
-            
+
             }
-            
+
 #            print Dumper \@newfeatures;
-			
+
 			##################################################
 			# Reinitialiez ORF start and length	for next exon
 			$refORF->{'start'}	= 0;            # we are in a match with ORF,
 			$orf_length   		= $orf_length - $matchlength;
-			
-			
-		# UTR only	
-		} else { 		
+
+
+		# UTR only
+		} else {
 			%FpUTR =   ( "start" => $exon->{'start'}, "end" => $exon->{'end'}  ,  "feat_level" => 'UTR', 'frame' => $frame);
 			push (@newfeatures, \%FpUTR);
-			
+
 			# Reinitialiez UTR size or ORF start
-			$refORF->{'start'}	= $refORF->{'start'} - $exon_length; 
+			$refORF->{'start'}	= $refORF->{'start'} - $exon_length;
 
 		}
     }
-    
+
     # assign new feature instead of features
     @{$tx->{'feature'}} = @newfeatures;
-    
+
 
     return $tx;
 }
@@ -385,50 +385,55 @@ sub Tx2CDS{
 
 # Get fasta sequence from a set of features coordinates
 sub feature2seq{
-	my ($refarray,  $genome, $chr, $strand, $filterCDS, $verbosity)	= @_;
-	
-	$chr			||= 	undef; # since,we are at the feature level, we don't have the chromosome information (need to be defined)
-	$filterCDS		||=		0; # get only CDS and stop codon sequence
-	$verbosity		||=		0;
-	
-	# initialize sequence string
-	my $seqstring = "";
-	
+    my ($refarray,  $genome, $chr, $strand, $filterCDS, $verbosity)	= @_;
+
+    $chr       ||= undef; # since,we are at the feature level, we don't have the chromosome information (need to be defined)
+    $filterCDS ||= 0; # get only CDS and stop codon sequence
+    $verbosity ||= 0;
+
+    # initialize sequence string
+    my $seqstring = "";
+
     # Test parsing i.e empty reafarray
-	die "ExtractFromFeature::feature2seq => ref not defined...\n" if (not defined $refarray);
+    die "ExtractFromFeature::feature2seq => ref not defined...\n" if (not defined $refarray);
 
-	# check $chr is defined
-	die "ExtractFromFeature::feature2seq => chromosome '$chr' not defined...\n" if (not defined $chr);
-	
+    # check $chr is defined
+    die "ExtractFromFeature::feature2seq => chromosome '$chr' not defined...\n" if (not defined $chr);
 
-	# create genome DB if does not exist
-	my $db       = Bio::DB::Fasta->new($genome);
 
-	
-	foreach my $exon (@{$refarray}) {
-	
-        ## VW modification
-        # next if don't want CDS ***
-        next if ((!$filterCDS) && ($exon->{'feat_level'} =~ /(CDS|stop_codon|start_codon)/i));
-		
-		# get coordinates
-		my $s	= $exon->{"start"};
-		my $e	= $exon->{"end"};
- 		my $featseq   	=  ""; # initialize in case pb with bio::db index
- 		$featseq		=  $db->seq($chr, $s => $e);
-		if (!defined $featseq || $featseq eq ""){
-			warn "ExtractFromFeature::feature2seq: your seq $chr:$s-$e returns an empty string!...Check 'chr' prefix between your annotation and genome files or remove your genome index file ('".$genome.".index')...\n" if ($verbosity >5);
-			return undef;
-		}
-		$seqstring   	.=  $featseq ;
-    }
-    
-	#RevComp if strand -
-	if ($strand eq '-'|| $strand eq '-1') {
-        $seqstring 	= StringUtils::getRevComp($seqstring, $verbosity);
+    # create genome DB if does not exist
+    my $db = Bio::DB::Fasta->new($genome);
+
+
+    foreach my $exon (@{$refarray}) {
+
+	## VW modification
+	# next if don't want CDS ***
+	next if ((!$filterCDS) && ($exon->{'feat_level'} =~ /(CDS|stop_codon|start_codon)/i));
+
+	# we want only CDS
+	# if we want CDS but the feature level we look at is not a CDS or the codon stop
+	next if (($filterCDS)  && ($exon->{'feat_level'} !~ /(CDS|stop_codon)/i));
+
+	# get coordinates
+	my $s       = $exon->{"start"};
+	my $e       = $exon->{"end"};
+	my $featseq =  ""; # initialize in case pb with bio::db index
+	$featseq    =  $db->seq($chr, $s => $e);
+	if (!defined $featseq || $featseq eq ""){
+	    warn "ExtractFromFeature::feature2seq: your seq $chr:$s-$e returns an empty string!...Check 'chr' prefix between your annotation and genome files or remove your genome index file ('".$genome.".index')...\n" if ($verbosity >5);
+	    return undef;
 	}
-	return $seqstring;
+	$seqstring .= $featseq ;
+    }
+
+    #RevComp if strand -
+    if ($strand eq '-'|| $strand eq '-1') {
+        $seqstring = StringUtils::getRevComp($seqstring, $verbosity);
+    }
+    return $seqstring;
 }
+
 
 # Get min and max positions from a set of exons coordinates
 sub getMinMax{
@@ -437,9 +442,9 @@ sub getMinMax{
 
     # Test parsing i.e empty hash
     die " Error! ExtractFromFeature: getMinMax return empty hash...\n" if (scalar(@{$refa}) == 0);
-    
+
     my @array =();
-	
+
 	# put all dat in @array
 	foreach my $exon (@{$refa}) {
 		push (@array, $exon->{"start"}, $exon->{"end"});
@@ -447,7 +452,7 @@ sub getMinMax{
 	my @arraysorted = sort { $a <=> $b } @array;
 
 	my $mincoord = $arraysorted[0];
-	my $maxcoord = $arraysorted[-1];	
+	my $maxcoord = $arraysorted[-1];
 
     return ($mincoord, $maxcoord);
 }
@@ -462,7 +467,7 @@ sub getIntrons{
 	die "ExtractFromFeature::getIntrons => ref not defined...\n" if (not defined $refarray);
 
     my @introns =();
-    
+
     # if transcript mono exonic
     if (scalar (@{$refarray}) == 1){
     	return \@introns;
@@ -488,10 +493,10 @@ sub getKeyFromFeature{
 
     # Test parsing i.e empty hash
     die " Error! ExtractFromFeature: getKeyFromFeature return empty hash...\n" unless (scalar(keys(%h))>0);
-    
+
 	# die if transcript is not in hash
 	die "Error! ExtractFromFeature: $tx not in hash..." unless exists ($h{$tx});
-	
+
 	# return keyfeat or 0
 	if ( exists(${$h{$tx}->{"feature"}}[0]->{$keyfeat}) ){
 		return ${$h{$tx}->{"feature"}}[0]->{$keyfeat};
@@ -507,7 +512,7 @@ sub addKeyValAttrib{
 	my ($tx, $refhmatchTxGn, $keylabel, $vallabel, $verbosity)	= @_;
     $tx				||=     undef; 			# $tx id
     $refhmatchTxGn	||=     undef;			# ref on a hash that contain matching transcript as key and their geneid as values (from Parser::parsedoubleGtf) { 'ENSCAFT00000041202' => 'ENSCAFG00000026919' },
-	$keylabel		||=		'keylabel';	
+	$keylabel		||=		'keylabel';
 	$vallabel		||=		"vallabel";
 	$verbosity		||=		0;
 
@@ -530,7 +535,7 @@ sub addKeyValAttrib{
 
 	my @newfeatures;
 	foreach my $feat (@{$tx->{"feature"}}){
-		
+
 		# create new hash to be added
 		my %addinfos = ( $keylabel => $txids, $vallabel => $gnids);
 		my %merge = (%addinfos, %{$feat});
@@ -551,28 +556,28 @@ sub intersectFeatures{
 
 	my ($refA, $refB, $stranded, $verbosity)	= @_;
 
-    $refA			||=     undef; 		# $ref on exon array A     
+    $refA			||=     undef; 		# $ref on exon array A
     $refB			||=     undef; 		# $ref on exon array B
-    $stranded		||=     0; 			# mode 0 is unstranded, 1 if required same strande and -1 different strand 
+    $stranded		||=     0; 			# mode 0 is unstranded, 1 if required same strande and -1 different strand
 	$verbosity		||=		0;
 
 	die "ExtractFromFeature::intersectFeatures => refA not defined...\n" unless (defined $refA);
 	die "ExtractFromFeature::intersectFeatures => refB not defined...\n" unless (defined $refB);
 
 	my $cumul_overlap_size =0;
-	
+
 	# Loop on exon of A
 	foreach my $featureA (@{$refA}) {
-	
+
 		# and B
 		foreach my $featureB (@{$refB}) {
 
 			#  END exons of B if if current exons of B start is greater than end exon A
 			last if ( $featureB->{"start"} > $featureA->{"end"});
-				
+
 			# compute the size of the overlap with sub from Utils;
 			my $sizeover 	= Utils::foverlapsizerange($featureA->{"start"}, $featureA->{"end"}, $featureB->{"start"}, $featureB->{"end"}, $featureA->{"strand"}, $featureB->{"strand"}, $stranded);
-			
+
 			# for mode wholeseq
 			$cumul_overlap_size += $sizeover;
 		}
@@ -585,26 +590,26 @@ sub intersectFeaturesBool{
 
 	my ($refA, $refB, $stranded, $verbosity)	= @_;
 
-    $refA			||=     undef; 		# $ref on exon array A     
+    $refA			||=     undef; 		# $ref on exon array A
     $refB			||=     undef; 		# $ref on exon array B
-    $stranded		||=     0; 			# mode 0 is unstranded, 1 if required same strande and -1 different strand 
+    $stranded		||=     0; 			# mode 0 is unstranded, 1 if required same strande and -1 different strand
 	$verbosity		||=		0;
 
 	die "ExtractFromFeature::intersectFeatures => refA not defined...\n" unless (defined $refA);
 	die "ExtractFromFeature::intersectFeatures => refB not defined...\n" unless (defined $refB);
-	
+
 	# Loop on exon of A
 	foreach my $featureA (@{$refA}) {
-	
+
 		# and B
 		foreach my $featureB (@{$refB}) {
 
 			#  END exons of B if if current exons of B start is greater than end exon A
 			last if ( $featureB->{"start"} > $featureA->{"end"});
-				
+
 			# compute the size of the overlap with sub from Utils;
 			return 1 if ( Utils::foverlap($featureA->{"start"}, $featureA->{"end"}, $featureB->{"start"}, $featureB->{"end"}, $featureA->{"strand"}, $featureB->{"strand"}, $stranded) );
-			
+
 		}
 	}
 	return undef;
