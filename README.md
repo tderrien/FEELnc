@@ -119,7 +119,8 @@ Add FEELnc scripts to your PATH and add the distribution-specific binary of Kmer
 	 38	Cufflinks	exon	519376	519454	.	+	.	gene_id "XLOC_090599"; transcript_id "TCONS_00231416"; class_code "u"; exon_number "2"; oId "CUFF.138034.16"; tss_id "TSS139476";
 
 *transcript_chr38.feelncfilter.log*: the log of the filter, write each transcripts that have been removed and the reason.
-	 head -n4 transcript_chr38.feelncfilter.log
+
+	head -n4 transcript_chr38.feelncfilter.log
 	 COMMAND
 	 /usr/bin/perl -w ${FEELNCPATH}/FEELnc_filter.pl -i transcript_chr38.gtf -a annotation_chr38.gtf -b transcript_biotype=protein_coding
 	 Filter monoexonic (option 0): TCONS_00234417 =  1 exon (with strand .)...
