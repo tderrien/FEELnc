@@ -1,7 +1,7 @@
 # FEELnc
  FlExible Extraction of Long non-coding RNAs
 
-*Version (10/11/2015): Major bug correction during ORF sequences extraction from a GTF containing CDS information (the sequence was containing the RNA sequence in addition to the ORF). If you launched FEELnc analysis with a GTF including CDS information, please re-run your analysis with this new version. Sorry for the inconvenience.*
+*Version (10/11/2015): Major Update. Correction of bug  during ORF sequences extraction from a GTF containing CDS information (the sequence was containing the RNA sequence in addition to the ORF). If you launched FEELnc analysis with a GTF including CDS information, please re-run your analysis with this new version. Sorry for the inconvenience.*
 
 *Version (05/11/2015): Major update, replace ORF length feature by ORF coverage feature (ORF length divided by RNA length)*
 
