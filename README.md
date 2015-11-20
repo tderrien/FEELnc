@@ -161,7 +161,7 @@ Add FEELnc scripts to your PATH and add the distribution-specific binary of Kmer
 
 *candidate_lncRNA_classes.txt*: the file report statistics on the interaction and every interactions between lncRNA and RNA contained in the input annotation. Lines begining with a '#' are comments and lines begining with a '*' are the best interactions for a specific lncRNA.
 
-	head -n candidate_lncRNA_classes.txt
+	head -n13 candidate_lncRNA_classes.txt
 	 #FEELnc Classification
 	 #lncRNA file :  lncrna : feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf
 	 #mRNA file : annotation_chr38.gtf
