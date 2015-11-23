@@ -1,356 +1,346 @@
-#FEELnc Classification
-#lncRNA file :  lncrna : ./feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf 
-#mRNA file : annotation_chr38.gtf
-#Minimal window size : 10000
-#Maximal window size : 100000
-#Number of lncRNA : 282 
-#Number of mRNA : 293
-#Number of interaction : 345 
-#Number of lncRNA without interaction : 30
-#List of lncRNA without interaction : TCONS_00231718 TCONS_00232885 TCONS_00231717 TCONS_00231711 TCONS_00232954 TCONS_00231758 TCONS_00232925 TCONS_00231770 TCONS_00231712 TCONS_00232969 TCONS_00232893 TCONS_00231948 TCONS_00231773 TCONS_00232894 TCONS_00232805 TCONS_00231757 TCONS_00232958 TCONS_00232876 TCONS_00232871 TCONS_00231772 TCONS_00232968 TCONS_00232872 TCONS_00232806 TCONS_00231962 TCONS_00232926 TCONS_00231942 TCONS_00232804 TCONS_00232808 TCONS_00231769 TCONS_00231774
-#INTERACTIONS
-*lncRNA	XLOC_090640	TCONS_00231611	RNA_partner	ENSCAFG00000010206	ENSCAFT00000016203	antisense	intergenic	1555	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090615	TCONS_00231491	RNA_partner	ENSCAFG00000009901	ENSCAFT00000046245	sense	intergenic	44590	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090878	TCONS_00232594	RNA_partner	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090690	TCONS_00231846	RNA_partner	ENSCAFG00000021604	ENSCAFT00000033711	antisense	genic	0	 Status=containing	 Subtype=intronic
-*lncRNA	XLOC_090970	TCONS_00232964	RNA_partner	ENSCAFG00000021604	ENSCAFT00000033711	sense	intergenic	5524	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_091060	TCONS_00233539	RNA_partner	ENSCAFG00000023513	ENSCAFT00000036175	sense	intergenic	369	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090720	TCONS_00231945	RNA_partner	ENSCAFG00000026373	ENSCAFT00000040656	sense	intergenic	66670	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090691	TCONS_00231848	RNA_partner	ENSCAFG00000021604	ENSCAFT00000033711	antisense	intergenic	39885	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090829	TCONS_00232405	RNA_partner	ENSCAFG00000025115	ENSCAFT00000018582	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-lncRNA	XLOC_090829	TCONS_00232405	RNA_partner	ENSCAFG00000025115	ENSCAFT00000018604	antisense	intergenic	9767	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090737	TCONS_00232010	RNA_partner	ENSCAFG00000013502	ENSCAFT00000021419	antisense	genic	0	 Status=nested	 Subtype=exonic
-*lncRNA	XLOC_090992	TCONS_00233057	RNA_partner	ENSCAFG00000013637	ENSCAFT00000021622	antisense	intergenic	68598	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090652	TCONS_00231715	RNA_partner	ENSCAFG00000021533	ENSCAFT00000033640	antisense	genic	0	 Status=containing	 Subtype=intronic
-*lncRNA	XLOC_090627	TCONS_00231552	RNA_partner	ENSCAFG00000010038	ENSCAFT00000015965	antisense	intergenic	1824	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090599	TCONS_00231415	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	8145	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_091067	TCONS_00233568	RNA_partner	ENSCAFG00000028933	ENSCAFT00000050050	antisense	intergenic	3324	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_091067	TCONS_00233568	RNA_partner	ENSCAFG00000028933	ENSCAFT00000048290	antisense	intergenic	6333	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_091067	TCONS_00233568	RNA_partner	ENSCAFG00000012174	ENSCAFT00000019707	sense	intergenic	7282	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090747	TCONS_00232078	RNA_partner	ENSCAFG00000013317	ENSCAFT00000021142	sense	intergenic	1952	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090752	TCONS_00232089	RNA_partner	ENSCAFG00000013259	ENSCAFT00000021052	antisense	intergenic	3327	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090606	TCONS_00231449	RNA_partner	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	 Status=nested	 Subtype=exonic
-lncRNA	XLOC_090606	TCONS_00231449	RNA_partner	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2139	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090620	TCONS_00231533	RNA_partner	ENSCAFG00000009999	ENSCAFT00000015918	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-lncRNA	XLOC_090620	TCONS_00231533	RNA_partner	ENSCAFG00000009970	ENSCAFT00000015870	antisense	intergenic	657	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090726	TCONS_00231954	RNA_partner	ENSCAFG00000013637	ENSCAFT00000021622	sense	intergenic	60824	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090652	TCONS_00231713	RNA_partner	ENSCAFG00000021533	ENSCAFT00000033640	antisense	intergenic	28415	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090606	TCONS_00231448	RNA_partner	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	 Status=nested	 Subtype=exonic
-lncRNA	XLOC_090606	TCONS_00231448	RNA_partner	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2139	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090720	TCONS_00231944	RNA_partner	ENSCAFG00000026373	ENSCAFT00000040656	sense	intergenic	66670	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090989	TCONS_00233037	RNA_partner	ENSCAFG00000011340	ENSCAFT00000018023	antisense	intergenic	5988	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090606	TCONS_00231454	RNA_partner	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	 Status=nested	 Subtype=exonic
-lncRNA	XLOC_090606	TCONS_00231454	RNA_partner	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2210	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090720	TCONS_00231943	RNA_partner	ENSCAFG00000026373	ENSCAFT00000040656	sense	intergenic	66670	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090744	TCONS_00232061	RNA_partner	ENSCAFG00000013336	ENSCAFT00000021179	sense	intergenic	28636	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090964	TCONS_00232952	RNA_partner	ENSCAFG00000026633	ENSCAFT00000040916	sense	intergenic	66675	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090795	TCONS_00232276	RNA_partner	ENSCAFG00000012566	ENSCAFT00000019952	antisense	intergenic	24437	 Status=convergent	 Subtype=downstream
-lncRNA	XLOC_090795	TCONS_00232276	RNA_partner	ENSCAFG00000023704	ENSCAFT00000036617	sense	intergenic	26617	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090802	TCONS_00232319	RNA_partner	ENSCAFG00000012174	ENSCAFT00000019707	antisense	intergenic	641	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090802	TCONS_00232319	RNA_partner	ENSCAFG00000028933	ENSCAFT00000050050	sense	intergenic	779	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090802	TCONS_00232319	RNA_partner	ENSCAFG00000032332	ENSCAFT00000047817	antisense	intergenic	8255	 Status=convergent	 Subtype=downstream
-lncRNA	XLOC_090802	TCONS_00232319	RNA_partner	ENSCAFG00000028933	ENSCAFT00000048290	sense	intergenic	3788	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090752	TCONS_00232085	RNA_partner	ENSCAFG00000013259	ENSCAFT00000021052	antisense	intergenic	3324	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_091057	TCONS_00233513	RNA_partner	ENSCAFG00000023704	ENSCAFT00000036617	antisense	intergenic	24758	 Status=convergent	 Subtype=downstream
-lncRNA	XLOC_091057	TCONS_00233513	RNA_partner	ENSCAFG00000012566	ENSCAFT00000019952	sense	intergenic	26122	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090970	TCONS_00232966	RNA_partner	ENSCAFG00000021604	ENSCAFT00000033711	sense	intergenic	5524	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_091060	TCONS_00233536	RNA_partner	ENSCAFG00000023513	ENSCAFT00000036175	sense	intergenic	4446	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090738	TCONS_00232020	RNA_partner	ENSCAFG00000013491	ENSCAFT00000021392	sense	intergenic	6860	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_091058	TCONS_00233515	RNA_partner	ENSCAFG00000012566	ENSCAFT00000019952	sense	intergenic	14689	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090892	TCONS_00232659	RNA_partner	ENSCAFG00000020616	ENSCAFT00000032723	sense	intergenic	3521	 Status=same_strand	 Subtype=downstream
-lncRNA	XLOC_090892	TCONS_00232659	RNA_partner	ENSCAFG00000010051	ENSCAFT00000015981	antisense	intergenic	6524	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090925	TCONS_00232810	RNA_partner	ENSCAFG00000010525	ENSCAFT00000016748	sense	intergenic	20055	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_091027	TCONS_00233310	RNA_partner	ENSCAFG00000032051	ENSCAFT00000036830	sense	intergenic	8387	 Status=same_strand	 Subtype=downstream
-lncRNA	XLOC_091027	TCONS_00233310	RNA_partner	ENSCAFG00000013058	ENSCAFT00000020714	sense	intergenic	9113	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090827	TCONS_00232401	RNA_partner	ENSCAFG00000025115	ENSCAFT00000018582	antisense	intergenic	8283	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090878	TCONS_00232604	RNA_partner	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_091071	TCONS_00233577	RNA_partner	ENSCAFG00000011865	ENSCAFT00000018843	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-lncRNA	XLOC_091071	TCONS_00233577	RNA_partner	ENSCAFG00000029844	ENSCAFT00000047126	antisense	intergenic	7805	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090606	TCONS_00231442	RNA_partner	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-lncRNA	XLOC_090606	TCONS_00231442	RNA_partner	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	625	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090742	TCONS_00232052	RNA_partner	ENSCAFG00000013353	ENSCAFT00000037837	antisense	intergenic	16793	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090742	TCONS_00232052	RNA_partner	ENSCAFG00000013353	ENSCAFT00000021201	antisense	intergenic	16793	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090943	TCONS_00232879	RNA_partner	ENSCAFG00000010624	ENSCAFT00000016924	antisense	intergenic	25119	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090599	TCONS_00231410	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090878	TCONS_00232603	RNA_partner	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090634	TCONS_00231601	RNA_partner	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	3157	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090634	TCONS_00231593	RNA_partner	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2408	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090937	TCONS_00232869	RNA_partner	ENSCAFG00000032530	ENSCAFT00000043356	sense	intergenic	85972	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090683	TCONS_00231828	RNA_partner	ENSCAFG00000010815	ENSCAFT00000017213	sense	intergenic	19267	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090991	TCONS_00233052	RNA_partner	ENSCAFG00000013637	ENSCAFT00000021622	antisense	intergenic	27440	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090729	TCONS_00231961	RNA_partner	ENSCAFG00000013637	ENSCAFT00000021622	sense	intergenic	95727	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_091032	TCONS_00233351	RNA_partner	ENSCAFG00000013015	ENSCAFT00000020665	antisense	intergenic	15339	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090861	TCONS_00232465	RNA_partner	ENSCAFG00000009564	ENSCAFT00000015202	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-*lncRNA	XLOC_090752	TCONS_00232088	RNA_partner	ENSCAFG00000013259	ENSCAFT00000021052	antisense	intergenic	3326	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090606	TCONS_00231450	RNA_partner	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	 Status=nested	 Subtype=exonic
-lncRNA	XLOC_090606	TCONS_00231450	RNA_partner	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2139	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090599	TCONS_00231408	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090599	TCONS_00231406	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090634	TCONS_00231600	RNA_partner	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2414	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090688	TCONS_00231843	RNA_partner	ENSCAFG00000010839	ENSCAFT00000017231	sense	intergenic	51002	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090707	TCONS_00231908	RNA_partner	ENSCAFG00000011325	ENSCAFT00000018005	antisense	intergenic	6195	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090707	TCONS_00231908	RNA_partner	ENSCAFG00000031609	ENSCAFT00000047625	sense	intergenic	9383	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090817	TCONS_00232386	RNA_partner	ENSCAFG00000011795	ENSCAFT00000018715	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-*lncRNA	XLOC_090827	TCONS_00232402	RNA_partner	ENSCAFG00000025115	ENSCAFT00000018582	antisense	intergenic	8283	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090878	TCONS_00232597	RNA_partner	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090822	TCONS_00232392	RNA_partner	ENSCAFG00000011747	ENSCAFT00000018659	sense	intergenic	10065	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090862	TCONS_00232466	RNA_partner	ENSCAFG00000031149	ENSCAFT00000047341	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-*lncRNA	XLOC_090943	TCONS_00232881	RNA_partner	ENSCAFG00000010624	ENSCAFT00000016924	antisense	intergenic	22770	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090947	TCONS_00232887	RNA_partner	ENSCAFG00000028763	ENSCAFT00000050209	sense	genic	0	 Status=containing	 Subtype=intronic
-lncRNA	XLOC_090947	TCONS_00232887	RNA_partner	ENSCAFG00000002103	ENSCAFT00000013152	antisense	genic	0	 Status=containing	 Subtype=intronic
-lncRNA	XLOC_090947	TCONS_00232887	RNA_partner	ENSCAFG00000029859	ENSCAFT00000048330	sense	genic	0	 Status=containing	 Subtype=intronic
-*lncRNA	XLOC_091060	TCONS_00233537	RNA_partner	ENSCAFG00000023513	ENSCAFT00000036175	sense	intergenic	4235	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090743	TCONS_00232053	RNA_partner	ENSCAFG00000013346	ENSCAFT00000021186	antisense	genic	0	 Status=overlapping	 Subtype=intronic
-*lncRNA	XLOC_090606	TCONS_00231451	RNA_partner	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	 Status=nested	 Subtype=exonic
-lncRNA	XLOC_090606	TCONS_00231451	RNA_partner	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2139	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090891	TCONS_00232655	RNA_partner	ENSCAFG00000010051	ENSCAFT00000015981	antisense	intergenic	855	 Status=convergent	 Subtype=downstream
-lncRNA	XLOC_090891	TCONS_00232655	RNA_partner	ENSCAFG00000020616	ENSCAFT00000032723	sense	intergenic	8438	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090599	TCONS_00231404	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090802	TCONS_00232318	RNA_partner	ENSCAFG00000012174	ENSCAFT00000019707	antisense	intergenic	576	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090802	TCONS_00232318	RNA_partner	ENSCAFG00000028933	ENSCAFT00000050050	sense	intergenic	779	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090802	TCONS_00232318	RNA_partner	ENSCAFG00000032332	ENSCAFT00000047817	antisense	intergenic	8255	 Status=convergent	 Subtype=downstream
-lncRNA	XLOC_090802	TCONS_00232318	RNA_partner	ENSCAFG00000028933	ENSCAFT00000048290	sense	intergenic	3788	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090599	TCONS_00231401	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090892	TCONS_00232662	RNA_partner	ENSCAFG00000020616	ENSCAFT00000032723	sense	genic	0	 Status=containing	 Subtype=intronic
-lncRNA	XLOC_090892	TCONS_00232662	RNA_partner	ENSCAFG00000010051	ENSCAFT00000015981	antisense	intergenic	6524	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090620	TCONS_00231531	RNA_partner	ENSCAFG00000009999	ENSCAFT00000015918	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-lncRNA	XLOC_090620	TCONS_00231531	RNA_partner	ENSCAFG00000009970	ENSCAFT00000015870	antisense	intergenic	516	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090743	TCONS_00232058	RNA_partner	ENSCAFG00000013346	ENSCAFT00000021186	antisense	intergenic	377	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090991	TCONS_00233053	RNA_partner	ENSCAFG00000013637	ENSCAFT00000021622	antisense	intergenic	27440	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090743	TCONS_00232054	RNA_partner	ENSCAFG00000013346	ENSCAFT00000021186	antisense	genic	0	 Status=overlapping	 Subtype=intronic
-*lncRNA	XLOC_090966	TCONS_00232956	RNA_partner	ENSCAFG00000010839	ENSCAFT00000017231	antisense	intergenic	174	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090892	TCONS_00232661	RNA_partner	ENSCAFG00000020616	ENSCAFT00000032723	sense	genic	0	 Status=containing	 Subtype=intronic
-lncRNA	XLOC_090892	TCONS_00232661	RNA_partner	ENSCAFG00000010051	ENSCAFT00000015981	antisense	intergenic	6524	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090831	TCONS_00232408	RNA_partner	ENSCAFG00000011692	ENSCAFT00000018544	sense	intergenic	12346	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090831	TCONS_00232408	RNA_partner	ENSCAFG00000011706	ENSCAFT00000018594	antisense	intergenic	14517	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090694	TCONS_00231853	RNA_partner	ENSCAFG00000010842	ENSCAFT00000017240	antisense	genic	0	 Status=overlapping	 Subtype=intronic
-*lncRNA	XLOC_090599	TCONS_00231416	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	8242	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090964	TCONS_00232953	RNA_partner	ENSCAFG00000026633	ENSCAFT00000040916	sense	intergenic	66675	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090802	TCONS_00232320	RNA_partner	ENSCAFG00000012174	ENSCAFT00000019707	antisense	intergenic	692	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090802	TCONS_00232320	RNA_partner	ENSCAFG00000028933	ENSCAFT00000050050	sense	intergenic	779	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090802	TCONS_00232320	RNA_partner	ENSCAFG00000032332	ENSCAFT00000047817	antisense	intergenic	8255	 Status=convergent	 Subtype=downstream
-lncRNA	XLOC_090802	TCONS_00232320	RNA_partner	ENSCAFG00000028933	ENSCAFT00000048290	sense	intergenic	3788	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090802	TCONS_00232322	RNA_partner	ENSCAFG00000028933	ENSCAFT00000050050	sense	intergenic	779	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090802	TCONS_00232322	RNA_partner	ENSCAFG00000032332	ENSCAFT00000047817	antisense	intergenic	8255	 Status=convergent	 Subtype=downstream
-lncRNA	XLOC_090802	TCONS_00232322	RNA_partner	ENSCAFG00000028933	ENSCAFT00000048290	sense	intergenic	3788	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090802	TCONS_00232322	RNA_partner	ENSCAFG00000012174	ENSCAFT00000019707	antisense	intergenic	3732	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090947	TCONS_00232886	RNA_partner	ENSCAFG00000028763	ENSCAFT00000050209	sense	genic	0	 Status=containing	 Subtype=intronic
-lncRNA	XLOC_090947	TCONS_00232886	RNA_partner	ENSCAFG00000002103	ENSCAFT00000013152	antisense	genic	0	 Status=containing	 Subtype=intronic
-lncRNA	XLOC_090947	TCONS_00232886	RNA_partner	ENSCAFG00000029859	ENSCAFT00000048330	sense	genic	0	 Status=containing	 Subtype=intronic
-*lncRNA	XLOC_090892	TCONS_00232657	RNA_partner	ENSCAFG00000020616	ENSCAFT00000032723	sense	intergenic	4060	 Status=same_strand	 Subtype=downstream
-lncRNA	XLOC_090892	TCONS_00232657	RNA_partner	ENSCAFG00000010051	ENSCAFT00000015981	antisense	intergenic	6524	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090961	TCONS_00232948	RNA_partner	ENSCAFG00000010835	ENSCAFT00000017226	antisense	intergenic	16040	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090720	TCONS_00231947	RNA_partner	ENSCAFG00000026373	ENSCAFT00000040656	sense	intergenic	66670	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090599	TCONS_00231405	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_091060	TCONS_00233538	RNA_partner	ENSCAFG00000023513	ENSCAFT00000036175	sense	intergenic	369	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090878	TCONS_00232599	RNA_partner	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090943	TCONS_00232880	RNA_partner	ENSCAFG00000010624	ENSCAFT00000016924	antisense	intergenic	25023	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090818	TCONS_00232387	RNA_partner	ENSCAFG00000031934	ENSCAFT00000048683	antisense	intergenic	2535	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090827	TCONS_00232398	RNA_partner	ENSCAFG00000025115	ENSCAFT00000018582	antisense	intergenic	8283	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_091082	TCONS_00233594	RNA_partner	ENSCAFG00000031934	ENSCAFT00000048683	sense	intergenic	1773	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090878	TCONS_00232596	RNA_partner	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090689	TCONS_00231844	RNA_partner	ENSCAFG00000010839	ENSCAFT00000017231	sense	intergenic	59856	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090966	TCONS_00232957	RNA_partner	ENSCAFG00000010839	ENSCAFT00000017231	antisense	intergenic	174	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090971	TCONS_00232967	RNA_partner	ENSCAFG00000021604	ENSCAFT00000033711	sense	intergenic	81822	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_091056	TCONS_00233512	RNA_partner	ENSCAFG00000023704	ENSCAFT00000036617	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-*lncRNA	XLOC_090658	TCONS_00231722	RNA_partner	ENSCAFG00000010525	ENSCAFT00000016748	antisense	intergenic	9853	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090606	TCONS_00231441	RNA_partner	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-lncRNA	XLOC_090606	TCONS_00231441	RNA_partner	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	486	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_091111	TCONS_00233707	RNA_partner	ENSCAFG00000030554	ENSCAFT00000018156	sense	intergenic	3652	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_091111	TCONS_00233707	RNA_partner	ENSCAFG00000030554	ENSCAFT00000018170	sense	intergenic	4577	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090618	TCONS_00231522	RNA_partner	ENSCAFG00000009901	ENSCAFT00000046245	sense	intergenic	10016	 Status=same_strand	 Subtype=downstream
-lncRNA	XLOC_090618	TCONS_00231522	RNA_partner	ENSCAFG00000009901	ENSCAFT00000015800	sense	intergenic	10019	 Status=same_strand	 Subtype=downstream
-lncRNA	XLOC_090618	TCONS_00231522	RNA_partner	ENSCAFG00000024609	ENSCAFT00000037921	sense	intergenic	18666	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090618	TCONS_00231522	RNA_partner	ENSCAFG00000009901	ENSCAFT00000049341	sense	intergenic	10016	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_091073	TCONS_00233580	RNA_partner	ENSCAFG00000011857	ENSCAFT00000018829	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-lncRNA	XLOC_091073	TCONS_00233580	RNA_partner	ENSCAFG00000011835	ENSCAFT00000018806	antisense	intergenic	6095	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090752	TCONS_00232087	RNA_partner	ENSCAFG00000013259	ENSCAFT00000021052	antisense	intergenic	3325	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090968	TCONS_00232961	RNA_partner	ENSCAFG00000010839	ENSCAFT00000017231	antisense	intergenic	11872	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090989	TCONS_00233036	RNA_partner	ENSCAFG00000011340	ENSCAFT00000018023	antisense	intergenic	5988	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090606	TCONS_00231452	RNA_partner	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	 Status=nested	 Subtype=exonic
-lncRNA	XLOC_090606	TCONS_00231452	RNA_partner	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2139	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090860	TCONS_00232464	RNA_partner	ENSCAFG00000009459	ENSCAFT00000015038	sense	intergenic	24831	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090860	TCONS_00232464	RNA_partner	ENSCAFG00000009462	ENSCAFT00000015041	antisense	intergenic	29095	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090820	TCONS_00232389	RNA_partner	ENSCAFG00000011785	ENSCAFT00000018701	antisense	intergenic	4174	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_091011	TCONS_00233145	RNA_partner	ENSCAFG00000013289	ENSCAFT00000044816	sense	genic	0	 Status=overlapping	 Subtype=intronic
-lncRNA	XLOC_091011	TCONS_00233145	RNA_partner	ENSCAFG00000013289	ENSCAFT00000021112	sense	genic	0	 Status=nested	 Subtype=intronic
-*lncRNA	XLOC_090994	TCONS_00233059	RNA_partner	ENSCAFG00000013627	ENSCAFT00000021613	sense	intergenic	10677	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090675	TCONS_00231789	RNA_partner	ENSCAFG00000010731	ENSCAFT00000017072	antisense	genic	0	 Status=nested	 Subtype=exonic
-*lncRNA	XLOC_090966	TCONS_00232955	RNA_partner	ENSCAFG00000010839	ENSCAFT00000017231	antisense	intergenic	174	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090892	TCONS_00232660	RNA_partner	ENSCAFG00000020616	ENSCAFT00000032723	sense	genic	0	 Status=containing	 Subtype=exonic
-lncRNA	XLOC_090892	TCONS_00232660	RNA_partner	ENSCAFG00000010051	ENSCAFT00000015981	antisense	intergenic	6524	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090744	TCONS_00232063	RNA_partner	ENSCAFG00000013336	ENSCAFT00000021179	sense	intergenic	35060	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090974	TCONS_00232971	RNA_partner	ENSCAFG00000010842	ENSCAFT00000017240	sense	intergenic	85066	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_091032	TCONS_00233352	RNA_partner	ENSCAFG00000013015	ENSCAFT00000020665	antisense	intergenic	13332	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_091055	TCONS_00233511	RNA_partner	ENSCAFG00000012569	ENSCAFT00000019970	antisense	genic	0	 Status=overlapping	 Subtype=intronic
-*lncRNA	XLOC_090639	TCONS_00231610	RNA_partner	ENSCAFG00000010198	ENSCAFT00000016185	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-*lncRNA	XLOC_090878	TCONS_00232598	RNA_partner	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090724	TCONS_00231951	RNA_partner	ENSCAFG00000013641	ENSCAFT00000021629	antisense	intergenic	2551	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090827	TCONS_00232400	RNA_partner	ENSCAFG00000025115	ENSCAFT00000018582	antisense	intergenic	8283	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090993	TCONS_00233058	RNA_partner	ENSCAFG00000013627	ENSCAFT00000021613	sense	intergenic	73088	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090599	TCONS_00231419	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	8242	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090633	TCONS_00231590	RNA_partner	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	4962	 Status=convergent	 Subtype=downstream
-lncRNA	XLOC_090633	TCONS_00231590	RNA_partner	ENSCAFG00000010144	ENSCAFT00000016113	antisense	intergenic	8138	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090606	TCONS_00231453	RNA_partner	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	 Status=nested	 Subtype=exonic
-lncRNA	XLOC_090606	TCONS_00231453	RNA_partner	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2140	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090743	TCONS_00232057	RNA_partner	ENSCAFG00000013346	ENSCAFT00000021186	antisense	intergenic	377	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090606	TCONS_00231447	RNA_partner	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	 Status=nested	 Subtype=exonic
-lncRNA	XLOC_090606	TCONS_00231447	RNA_partner	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2139	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090606	TCONS_00231443	RNA_partner	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-lncRNA	XLOC_090606	TCONS_00231443	RNA_partner	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	642	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090785	TCONS_00232223	RNA_partner	ENSCAFG00000012621	ENSCAFT00000020056	antisense	intergenic	6479	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090998	TCONS_00233083	RNA_partner	ENSCAFG00000013601	ENSCAFT00000021557	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-lncRNA	XLOC_090998	TCONS_00233083	RNA_partner	ENSCAFG00000013601	ENSCAFT00000021570	antisense	intergenic	72	 Status=convergent	 Subtype=downstream
-lncRNA	XLOC_090998	TCONS_00233083	RNA_partner	ENSCAFG00000013540	ENSCAFT00000021486	sense	intergenic	2616	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090726	TCONS_00231956	RNA_partner	ENSCAFG00000013637	ENSCAFT00000021622	sense	intergenic	74091	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090892	TCONS_00232658	RNA_partner	ENSCAFG00000020616	ENSCAFT00000032723	sense	intergenic	3555	 Status=same_strand	 Subtype=downstream
-lncRNA	XLOC_090892	TCONS_00232658	RNA_partner	ENSCAFG00000010051	ENSCAFT00000015981	antisense	intergenic	6524	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_091031	TCONS_00233349	RNA_partner	ENSCAFG00000013035	ENSCAFT00000020678	sense	intergenic	5141	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_091031	TCONS_00233349	RNA_partner	ENSCAFG00000013035	ENSCAFT00000020677	sense	intergenic	5373	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090974	TCONS_00232975	RNA_partner	ENSCAFG00000010842	ENSCAFT00000017240	sense	intergenic	44952	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_091060	TCONS_00233540	RNA_partner	ENSCAFG00000023513	ENSCAFT00000036175	sense	intergenic	369	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090634	TCONS_00231602	RNA_partner	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	9337	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090694	TCONS_00231852	RNA_partner	ENSCAFG00000010842	ENSCAFT00000017240	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-*lncRNA	XLOC_090974	TCONS_00232973	RNA_partner	ENSCAFG00000010842	ENSCAFT00000017240	sense	intergenic	44952	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090707	TCONS_00231910	RNA_partner	ENSCAFG00000011325	ENSCAFT00000018005	antisense	intergenic	6195	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090707	TCONS_00231910	RNA_partner	ENSCAFG00000031609	ENSCAFT00000047625	sense	intergenic	9383	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090674	TCONS_00231787	RNA_partner	ENSCAFG00000010731	ENSCAFT00000017072	antisense	genic	0	 Status=nested	 Subtype=intronic
-*lncRNA	XLOC_091058	TCONS_00233516	RNA_partner	ENSCAFG00000012566	ENSCAFT00000019952	sense	intergenic	14665	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_091013	TCONS_00233149	RNA_partner	ENSCAFG00000013259	ENSCAFT00000021052	sense	intergenic	55054	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090802	TCONS_00232321	RNA_partner	ENSCAFG00000012174	ENSCAFT00000019707	antisense	intergenic	692	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090802	TCONS_00232321	RNA_partner	ENSCAFG00000028933	ENSCAFT00000050050	sense	intergenic	779	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090802	TCONS_00232321	RNA_partner	ENSCAFG00000032332	ENSCAFT00000047817	antisense	intergenic	8255	 Status=convergent	 Subtype=downstream
-lncRNA	XLOC_090802	TCONS_00232321	RNA_partner	ENSCAFG00000028933	ENSCAFT00000048290	sense	intergenic	3788	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090743	TCONS_00232059	RNA_partner	ENSCAFG00000013346	ENSCAFT00000021186	antisense	intergenic	377	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090752	TCONS_00232086	RNA_partner	ENSCAFG00000013259	ENSCAFT00000021052	antisense	intergenic	3325	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090634	TCONS_00231595	RNA_partner	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2409	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090634	TCONS_00231594	RNA_partner	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2408	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090785	TCONS_00232224	RNA_partner	ENSCAFG00000012621	ENSCAFT00000020056	antisense	intergenic	7630	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090744	TCONS_00232064	RNA_partner	ENSCAFG00000013336	ENSCAFT00000021179	sense	intergenic	28636	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090639	TCONS_00231607	RNA_partner	ENSCAFG00000010198	ENSCAFT00000016185	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-*lncRNA	XLOC_090700	TCONS_00231870	RNA_partner	ENSCAFG00000011125	ENSCAFT00000017715	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-*lncRNA	XLOC_090688	TCONS_00231842	RNA_partner	ENSCAFG00000010839	ENSCAFT00000017231	sense	intergenic	51002	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090763	TCONS_00232140	RNA_partner	ENSCAFG00000012997	ENSCAFT00000020633	sense	intergenic	37730	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090915	TCONS_00232764	RNA_partner	ENSCAFG00000029799	ENSCAFT00000046901	antisense	genic	0	 Status=overlapping	 Subtype=intronic
-lncRNA	XLOC_090915	TCONS_00232764	RNA_partner	ENSCAFG00000010239	ENSCAFT00000016260	antisense	intergenic	1870	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090662	TCONS_00231753	RNA_partner	ENSCAFG00000010595	ENSCAFT00000044512	antisense	intergenic	66882	 Status=convergent	 Subtype=downstream
-lncRNA	XLOC_090662	TCONS_00231753	RNA_partner	ENSCAFG00000010595	ENSCAFT00000016835	antisense	intergenic	69592	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090878	TCONS_00232593	RNA_partner	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090994	TCONS_00233060	RNA_partner	ENSCAFG00000013627	ENSCAFT00000021613	sense	intergenic	10266	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090720	TCONS_00231946	RNA_partner	ENSCAFG00000026373	ENSCAFT00000040656	sense	intergenic	66670	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090599	TCONS_00231417	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	8242	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090743	TCONS_00232056	RNA_partner	ENSCAFG00000013346	ENSCAFT00000021186	antisense	intergenic	377	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090966	TCONS_00232960	RNA_partner	ENSCAFG00000010839	ENSCAFT00000017231	antisense	intergenic	1254	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090634	TCONS_00231597	RNA_partner	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2410	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090878	TCONS_00232601	RNA_partner	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_091093	TCONS_00233633	RNA_partner	ENSCAFG00000011731	ENSCAFT00000018655	sense	intergenic	40864	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090817	TCONS_00232385	RNA_partner	ENSCAFG00000011795	ENSCAFT00000018715	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-*lncRNA	XLOC_090937	TCONS_00232867	RNA_partner	ENSCAFG00000032530	ENSCAFT00000043356	sense	intergenic	18647	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090599	TCONS_00231407	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090727	TCONS_00231957	RNA_partner	ENSCAFG00000013637	ENSCAFT00000021622	sense	genic	0	 Status=containing	 Subtype=intronic
-*lncRNA	XLOC_090744	TCONS_00232062	RNA_partner	ENSCAFG00000013336	ENSCAFT00000021179	sense	intergenic	28636	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090970	TCONS_00232965	RNA_partner	ENSCAFG00000021604	ENSCAFT00000033711	sense	intergenic	5524	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090746	TCONS_00232077	RNA_partner	ENSCAFG00000013336	ENSCAFT00000021179	sense	intergenic	6186	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090886	TCONS_00232636	RNA_partner	ENSCAFG00000009999	ENSCAFT00000015918	sense	intergenic	184	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090886	TCONS_00232636	RNA_partner	ENSCAFG00000028060	ENSCAFT00000042343	antisense	intergenic	1289	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090886	TCONS_00232636	RNA_partner	ENSCAFG00000010030	ENSCAFT00000015952	antisense	intergenic	8175	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090620	TCONS_00231540	RNA_partner	ENSCAFG00000009999	ENSCAFT00000015918	antisense	genic	0	 Status=overlapping	 Subtype=intronic
-*lncRNA	XLOC_090599	TCONS_00231414	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090639	TCONS_00231609	RNA_partner	ENSCAFG00000010198	ENSCAFT00000016185	antisense	intergenic	766	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090652	TCONS_00231714	RNA_partner	ENSCAFG00000021533	ENSCAFT00000033640	antisense	genic	0	 Status=containing	 Subtype=intronic
-*lncRNA	XLOC_090822	TCONS_00232391	RNA_partner	ENSCAFG00000011747	ENSCAFT00000018659	sense	intergenic	10055	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090991	TCONS_00233054	RNA_partner	ENSCAFG00000013637	ENSCAFT00000021622	antisense	intergenic	27440	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_091025	TCONS_00233261	RNA_partner	ENSCAFG00000013079	ENSCAFT00000020753	antisense	intergenic	3412	 Status=convergent	 Subtype=downstream
-lncRNA	XLOC_091025	TCONS_00233261	RNA_partner	ENSCAFG00000013068	ENSCAFT00000020736	sense	intergenic	7803	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090664	TCONS_00231756	RNA_partner	ENSCAFG00000010603	ENSCAFT00000016853	antisense	intergenic	77031	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_091058	TCONS_00233514	RNA_partner	ENSCAFG00000012566	ENSCAFT00000019952	sense	intergenic	15062	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090974	TCONS_00232972	RNA_partner	ENSCAFG00000010842	ENSCAFT00000017240	sense	intergenic	85066	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090777	TCONS_00232178	RNA_partner	ENSCAFG00000012732	ENSCAFT00000020175	antisense	intergenic	2331	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090777	TCONS_00232178	RNA_partner	ENSCAFG00000012733	ENSCAFT00000020181	sense	intergenic	5163	 Status=same_strand	 Subtype=downstream
-lncRNA	XLOC_090777	TCONS_00232178	RNA_partner	ENSCAFG00000012722	ENSCAFT00000020174	sense	intergenic	3019	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090628	TCONS_00231554	RNA_partner	ENSCAFG00000025208	ENSCAFT00000039078	antisense	intergenic	1622	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090628	TCONS_00231554	RNA_partner	ENSCAFG00000010051	ENSCAFT00000015981	sense	intergenic	4505	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090943	TCONS_00232878	RNA_partner	ENSCAFG00000010624	ENSCAFT00000016924	antisense	intergenic	25650	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090788	TCONS_00232240	RNA_partner	ENSCAFG00000012579	ENSCAFT00000019982	sense	intergenic	1068	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090795	TCONS_00232275	RNA_partner	ENSCAFG00000012566	ENSCAFT00000019952	antisense	intergenic	24437	 Status=convergent	 Subtype=downstream
-lncRNA	XLOC_090795	TCONS_00232275	RNA_partner	ENSCAFG00000023704	ENSCAFT00000036617	sense	intergenic	26617	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090794	TCONS_00232274	RNA_partner	ENSCAFG00000023704	ENSCAFT00000036617	sense	intergenic	7324	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090599	TCONS_00231403	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090620	TCONS_00231532	RNA_partner	ENSCAFG00000009999	ENSCAFT00000015918	antisense	genic	0	 Status=overlapping	 Subtype=intronic
-lncRNA	XLOC_090620	TCONS_00231532	RNA_partner	ENSCAFG00000009970	ENSCAFT00000015870	antisense	intergenic	517	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090878	TCONS_00232595	RNA_partner	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090599	TCONS_00231402	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090878	TCONS_00232602	RNA_partner	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_091083	TCONS_00233601	RNA_partner	ENSCAFG00000031934	ENSCAFT00000048683	sense	intergenic	4985	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090634	TCONS_00231598	RNA_partner	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2410	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090727	TCONS_00231958	RNA_partner	ENSCAFG00000013637	ENSCAFT00000021622	sense	genic	0	 Status=containing	 Subtype=intronic
-*lncRNA	XLOC_090678	TCONS_00231794	RNA_partner	ENSCAFG00000010781	ENSCAFT00000017151	antisense	genic	0	 Status=nested	 Subtype=intronic
-lncRNA	XLOC_090678	TCONS_00231794	RNA_partner	ENSCAFG00000010794	ENSCAFT00000017171	sense	intergenic	8293	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090678	TCONS_00231794	RNA_partner	ENSCAFG00000010781	ENSCAFT00000017154	antisense	genic	0	 Status=overlapping	 Subtype=intronic
-*lncRNA	XLOC_090915	TCONS_00232763	RNA_partner	ENSCAFG00000029799	ENSCAFT00000046901	antisense	intergenic	1058	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090915	TCONS_00232763	RNA_partner	ENSCAFG00000010239	ENSCAFT00000016260	antisense	intergenic	1870	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090620	TCONS_00231539	RNA_partner	ENSCAFG00000009999	ENSCAFT00000015918	antisense	genic	0	 Status=overlapping	 Subtype=intronic
-*lncRNA	XLOC_090599	TCONS_00231413	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_091032	TCONS_00233350	RNA_partner	ENSCAFG00000013015	ENSCAFT00000020665	antisense	intergenic	18981	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090732	TCONS_00231964	RNA_partner	ENSCAFG00000013620	ENSCAFT00000021590	antisense	intergenic	1471	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090732	TCONS_00231964	RNA_partner	ENSCAFG00000013601	ENSCAFT00000021570	sense	intergenic	9792	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090732	TCONS_00231964	RNA_partner	ENSCAFG00000013601	ENSCAFT00000021557	sense	intergenic	9590	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090634	TCONS_00231599	RNA_partner	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2410	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090628	TCONS_00231553	RNA_partner	ENSCAFG00000025208	ENSCAFT00000039078	antisense	intergenic	1622	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090628	TCONS_00231553	RNA_partner	ENSCAFG00000010051	ENSCAFT00000015981	sense	intergenic	4505	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090620	TCONS_00231537	RNA_partner	ENSCAFG00000009999	ENSCAFT00000015918	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-*lncRNA	XLOC_091083	TCONS_00233600	RNA_partner	ENSCAFG00000031934	ENSCAFT00000048683	sense	intergenic	4985	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090743	TCONS_00232055	RNA_partner	ENSCAFG00000013346	ENSCAFT00000021186	antisense	intergenic	371	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090758	TCONS_00232114	RNA_partner	ENSCAFG00000013086	ENSCAFT00000020761	antisense	genic	0	 Status=overlapping	 Subtype=intronic
-*lncRNA	XLOC_090639	TCONS_00231608	RNA_partner	ENSCAFG00000010198	ENSCAFT00000016185	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-*lncRNA	XLOC_090785	TCONS_00232222	RNA_partner	ENSCAFG00000012621	ENSCAFT00000020056	antisense	intergenic	6282	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090827	TCONS_00232403	RNA_partner	ENSCAFG00000025115	ENSCAFT00000018582	antisense	intergenic	8283	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090726	TCONS_00231955	RNA_partner	ENSCAFG00000013637	ENSCAFT00000021622	sense	intergenic	60824	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090634	TCONS_00231596	RNA_partner	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2409	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090683	TCONS_00231829	RNA_partner	ENSCAFG00000010815	ENSCAFT00000017213	sense	intergenic	19283	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090620	TCONS_00231538	RNA_partner	ENSCAFG00000009999	ENSCAFT00000015918	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-*lncRNA	XLOC_090829	TCONS_00232406	RNA_partner	ENSCAFG00000025115	ENSCAFT00000018582	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-lncRNA	XLOC_090829	TCONS_00232406	RNA_partner	ENSCAFG00000025115	ENSCAFT00000018604	antisense	intergenic	9767	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090785	TCONS_00232221	RNA_partner	ENSCAFG00000012621	ENSCAFT00000020056	antisense	intergenic	5831	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090758	TCONS_00232115	RNA_partner	ENSCAFG00000013086	ENSCAFT00000020761	antisense	genic	0	 Status=overlapping	 Subtype=intronic
-*lncRNA	XLOC_090763	TCONS_00232139	RNA_partner	ENSCAFG00000012997	ENSCAFT00000020633	sense	intergenic	43579	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090763	TCONS_00232139	RNA_partner	ENSCAFG00000012992	ENSCAFT00000020625	antisense	intergenic	49065	 Status=convergent	 Subtype=downstream
-lncRNA	XLOC_090763	TCONS_00232139	RNA_partner	ENSCAFG00000013015	ENSCAFT00000020665	sense	intergenic	49540	 Status=same_strand	 Subtype=downstream
-lncRNA	XLOC_090763	TCONS_00232139	RNA_partner	ENSCAFG00000012992	ENSCAFT00000020626	antisense	intergenic	49059	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090675	TCONS_00231788	RNA_partner	ENSCAFG00000010731	ENSCAFT00000017072	antisense	genic	0	 Status=nested	 Subtype=exonic
-*lncRNA	XLOC_091067	TCONS_00233569	RNA_partner	ENSCAFG00000028933	ENSCAFT00000050050	antisense	intergenic	3304	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_091067	TCONS_00233569	RNA_partner	ENSCAFG00000028933	ENSCAFT00000048290	antisense	intergenic	6313	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_091067	TCONS_00233569	RNA_partner	ENSCAFG00000012174	ENSCAFT00000019707	sense	intergenic	7282	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090937	TCONS_00232868	RNA_partner	ENSCAFG00000032530	ENSCAFT00000043356	sense	intergenic	23510	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090606	TCONS_00231445	RNA_partner	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	 Status=nested	 Subtype=exonic
-lncRNA	XLOC_090606	TCONS_00231445	RNA_partner	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2139	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090633	TCONS_00231592	RNA_partner	ENSCAFG00000010144	ENSCAFT00000016113	antisense	intergenic	8606	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090690	TCONS_00231845	RNA_partner	ENSCAFG00000021604	ENSCAFT00000033711	antisense	genic	0	 Status=containing	 Subtype=intronic
-*lncRNA	XLOC_090725	TCONS_00231953	RNA_partner	ENSCAFG00000013641	ENSCAFT00000021629	antisense	intergenic	86041	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090732	TCONS_00231966	RNA_partner	ENSCAFG00000013620	ENSCAFT00000021590	antisense	intergenic	1483	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090732	TCONS_00231966	RNA_partner	ENSCAFG00000013601	ENSCAFT00000021570	sense	intergenic	9792	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090732	TCONS_00231966	RNA_partner	ENSCAFG00000013601	ENSCAFT00000021557	sense	intergenic	9590	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090744	TCONS_00232060	RNA_partner	ENSCAFG00000013346	ENSCAFT00000021186	antisense	intergenic	32820	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090744	TCONS_00232060	RNA_partner	ENSCAFG00000013336	ENSCAFT00000021179	sense	intergenic	35060	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090878	TCONS_00232600	RNA_partner	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090660	TCONS_00231733	RNA_partner	ENSCAFG00000010552	ENSCAFT00000016789	antisense	genic	0	 Status=overlapping	 Subtype=intronic
-lncRNA	XLOC_090660	TCONS_00231733	RNA_partner	ENSCAFG00000010573	ENSCAFT00000016817	sense	intergenic	4547	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090732	TCONS_00231965	RNA_partner	ENSCAFG00000013620	ENSCAFT00000021590	antisense	intergenic	1483	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090732	TCONS_00231965	RNA_partner	ENSCAFG00000013601	ENSCAFT00000021570	sense	intergenic	9792	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090732	TCONS_00231965	RNA_partner	ENSCAFG00000013601	ENSCAFT00000021557	sense	intergenic	9590	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090724	TCONS_00231952	RNA_partner	ENSCAFG00000013641	ENSCAFT00000021629	antisense	intergenic	3720	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090974	TCONS_00232974	RNA_partner	ENSCAFG00000010842	ENSCAFT00000017240	sense	intergenic	44952	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_091013	TCONS_00233148	RNA_partner	ENSCAFG00000013259	ENSCAFT00000021052	sense	intergenic	55618	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090960	TCONS_00232947	RNA_partner	ENSCAFG00000010794	ENSCAFT00000017171	antisense	intergenic	99842	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090992	TCONS_00233055	RNA_partner	ENSCAFG00000013637	ENSCAFT00000021622	antisense	intergenic	40976	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090646	TCONS_00231692	RNA_partner	ENSCAFG00000031664	ENSCAFT00000048673	sense	intergenic	16529	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_091009	TCONS_00233127	RNA_partner	ENSCAFG00000013336	ENSCAFT00000021179	antisense	intergenic	6186	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090599	TCONS_00231411	RNA_partner	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_090992	TCONS_00233056	RNA_partner	ENSCAFG00000013637	ENSCAFT00000021622	antisense	intergenic	40976	 Status=convergent	 Subtype=downstream
-*lncRNA	XLOC_090732	TCONS_00231967	RNA_partner	ENSCAFG00000013620	ENSCAFT00000021590	antisense	intergenic	2151	 Status=divergent	 Subtype=upstream
-lncRNA	XLOC_090732	TCONS_00231967	RNA_partner	ENSCAFG00000013601	ENSCAFT00000021570	sense	intergenic	9792	 Status=same_strand	 Subtype=upstream
-lncRNA	XLOC_090732	TCONS_00231967	RNA_partner	ENSCAFG00000013601	ENSCAFT00000021557	sense	intergenic	9590	 Status=same_strand	 Subtype=upstream
-*lncRNA	XLOC_090688	TCONS_00231841	RNA_partner	ENSCAFG00000010839	ENSCAFT00000017231	sense	intergenic	34682	 Status=same_strand	 Subtype=downstream
-*lncRNA	XLOC_091073	TCONS_00233579	RNA_partner	ENSCAFG00000011857	ENSCAFT00000018829	antisense	genic	0	 Status=overlapping	 Subtype=exonic
-lncRNA	XLOC_091073	TCONS_00233579	RNA_partner	ENSCAFG00000011835	ENSCAFT00000018806	antisense	intergenic	6095	 Status=divergent	 Subtype=upstream
-*lncRNA	XLOC_090608	TCONS_00231457	RNA_partner	ENSCAFG00000028371	ENSCAFT00000042654	sense	intergenic	15808	 Status=same_strand	 Subtype=downstream
+isBest	lncRNA_gene	lncRNA_transcript	partnerRNA_gene	partnerRNA_transcript	direction	type	distance	subtype	location
+1	XLOC_090743	TCONS_00232056	ENSCAFG00000013346	ENSCAFT00000021186	antisense	intergenic	377	divergent	upstream
+1	XLOC_090720	TCONS_00231943	ENSCAFG00000026373	ENSCAFT00000040656	sense	intergenic	66670	same_strand	upstream
+1	XLOC_090678	TCONS_00231794	ENSCAFG00000010781	ENSCAFT00000017151	antisense	genic	0	nested	intronic
+0	XLOC_090678	TCONS_00231794	ENSCAFG00000010794	ENSCAFT00000017171	sense	intergenic	8293	same_strand	upstream
+0	XLOC_090678	TCONS_00231794	ENSCAFG00000010781	ENSCAFT00000017154	antisense	genic	0	overlapping	intronic
+1	XLOC_090878	TCONS_00232599	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	same_strand	upstream
+1	XLOC_090974	TCONS_00232971	ENSCAFG00000010842	ENSCAFT00000017240	sense	intergenic	85066	same_strand	downstream
+1	XLOC_090620	TCONS_00231531	ENSCAFG00000009999	ENSCAFT00000015918	antisense	genic	0	overlapping	exonic
+0	XLOC_090620	TCONS_00231531	ENSCAFG00000009970	ENSCAFT00000015870	antisense	intergenic	516	divergent	upstream
+1	XLOC_090892	TCONS_00232662	ENSCAFG00000020616	ENSCAFT00000032723	sense	genic	0	containing	intronic
+0	XLOC_090892	TCONS_00232662	ENSCAFG00000010051	ENSCAFT00000015981	antisense	intergenic	6524	convergent	downstream
+1	XLOC_090878	TCONS_00232598	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	same_strand	upstream
+1	XLOC_091055	TCONS_00233511	ENSCAFG00000012569	ENSCAFT00000019970	antisense	genic	0	overlapping	intronic
+1	XLOC_091032	TCONS_00233351	ENSCAFG00000013015	ENSCAFT00000020665	antisense	intergenic	15339	divergent	upstream
+1	XLOC_090620	TCONS_00231537	ENSCAFG00000009999	ENSCAFT00000015918	antisense	genic	0	overlapping	exonic
+1	XLOC_090878	TCONS_00232604	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	same_strand	upstream
+1	XLOC_090827	TCONS_00232400	ENSCAFG00000025115	ENSCAFT00000018582	antisense	intergenic	8283	convergent	downstream
+1	XLOC_090747	TCONS_00232078	ENSCAFG00000013317	ENSCAFT00000021142	sense	intergenic	1952	same_strand	upstream
+1	XLOC_090763	TCONS_00232140	ENSCAFG00000012997	ENSCAFT00000020633	sense	intergenic	37730	same_strand	upstream
+1	XLOC_090743	TCONS_00232053	ENSCAFG00000013346	ENSCAFT00000021186	antisense	genic	0	overlapping	intronic
+1	XLOC_090639	TCONS_00231609	ENSCAFG00000010198	ENSCAFT00000016185	antisense	intergenic	766	convergent	downstream
+1	XLOC_090606	TCONS_00231451	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	nested	exonic
+0	XLOC_090606	TCONS_00231451	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2139	divergent	upstream
+1	XLOC_090947	TCONS_00232886	ENSCAFG00000028763	ENSCAFT00000050209	sense	genic	0	containing	intronic
+0	XLOC_090947	TCONS_00232886	ENSCAFG00000002103	ENSCAFT00000013152	antisense	genic	0	containing	intronic
+0	XLOC_090947	TCONS_00232886	ENSCAFG00000029859	ENSCAFT00000048330	sense	genic	0	containing	intronic
+1	XLOC_090994	TCONS_00233060	ENSCAFG00000013627	ENSCAFT00000021613	sense	intergenic	10266	same_strand	downstream
+1	XLOC_090727	TCONS_00231958	ENSCAFG00000013637	ENSCAFT00000021622	sense	genic	0	containing	intronic
+1	XLOC_090608	TCONS_00231457	ENSCAFG00000028371	ENSCAFT00000042654	sense	intergenic	15808	same_strand	downstream
+1	XLOC_091056	TCONS_00233512	ENSCAFG00000023704	ENSCAFT00000036617	antisense	genic	0	overlapping	exonic
+1	XLOC_090646	TCONS_00231692	ENSCAFG00000031664	ENSCAFT00000048673	sense	intergenic	16529	same_strand	upstream
+1	XLOC_090802	TCONS_00232320	ENSCAFG00000012174	ENSCAFT00000019707	antisense	intergenic	692	divergent	upstream
+0	XLOC_090802	TCONS_00232320	ENSCAFG00000028933	ENSCAFT00000050050	sense	intergenic	779	same_strand	upstream
+0	XLOC_090802	TCONS_00232320	ENSCAFG00000032332	ENSCAFT00000047817	antisense	intergenic	8255	convergent	downstream
+0	XLOC_090802	TCONS_00232320	ENSCAFG00000028933	ENSCAFT00000048290	sense	intergenic	3788	same_strand	upstream
+1	XLOC_090886	TCONS_00232636	ENSCAFG00000009999	ENSCAFT00000015918	sense	intergenic	184	same_strand	upstream
+0	XLOC_090886	TCONS_00232636	ENSCAFG00000028060	ENSCAFT00000042343	antisense	intergenic	1289	divergent	upstream
+0	XLOC_090886	TCONS_00232636	ENSCAFG00000010030	ENSCAFT00000015952	antisense	intergenic	8175	divergent	upstream
+1	XLOC_090964	TCONS_00232953	ENSCAFG00000026633	ENSCAFT00000040916	sense	intergenic	66675	same_strand	upstream
+1	XLOC_090892	TCONS_00232659	ENSCAFG00000020616	ENSCAFT00000032723	sense	intergenic	3521	same_strand	downstream
+0	XLOC_090892	TCONS_00232659	ENSCAFG00000010051	ENSCAFT00000015981	antisense	intergenic	6524	convergent	downstream
+1	XLOC_090785	TCONS_00232223	ENSCAFG00000012621	ENSCAFT00000020056	antisense	intergenic	6479	divergent	upstream
+1	XLOC_090925	TCONS_00232810	ENSCAFG00000010525	ENSCAFT00000016748	sense	intergenic	20055	same_strand	downstream
+1	XLOC_090970	TCONS_00232964	ENSCAFG00000021604	ENSCAFT00000033711	sense	intergenic	5524	same_strand	upstream
+1	XLOC_091060	TCONS_00233537	ENSCAFG00000023513	ENSCAFT00000036175	sense	intergenic	4235	same_strand	downstream
+1	XLOC_090694	TCONS_00231853	ENSCAFG00000010842	ENSCAFT00000017240	antisense	genic	0	overlapping	intronic
+1	XLOC_090634	TCONS_00231598	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2410	divergent	upstream
+1	XLOC_090892	TCONS_00232660	ENSCAFG00000020616	ENSCAFT00000032723	sense	genic	0	containing	exonic
+0	XLOC_090892	TCONS_00232660	ENSCAFG00000010051	ENSCAFT00000015981	antisense	intergenic	6524	convergent	downstream
+1	XLOC_090974	TCONS_00232973	ENSCAFG00000010842	ENSCAFT00000017240	sense	intergenic	44952	same_strand	downstream
+1	XLOC_090690	TCONS_00231846	ENSCAFG00000021604	ENSCAFT00000033711	antisense	genic	0	containing	intronic
+1	XLOC_090878	TCONS_00232594	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	same_strand	upstream
+1	XLOC_090968	TCONS_00232961	ENSCAFG00000010839	ENSCAFT00000017231	antisense	intergenic	11872	convergent	downstream
+1	XLOC_090606	TCONS_00231449	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	nested	exonic
+0	XLOC_090606	TCONS_00231449	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2139	divergent	upstream
+1	XLOC_090674	TCONS_00231787	ENSCAFG00000010731	ENSCAFT00000017072	antisense	genic	0	nested	intronic
+1	XLOC_090794	TCONS_00232274	ENSCAFG00000023704	ENSCAFT00000036617	sense	intergenic	7324	same_strand	downstream
+1	XLOC_091032	TCONS_00233352	ENSCAFG00000013015	ENSCAFT00000020665	antisense	intergenic	13332	divergent	upstream
+1	XLOC_090861	TCONS_00232465	ENSCAFG00000009564	ENSCAFT00000015202	antisense	genic	0	overlapping	exonic
+1	XLOC_090763	TCONS_00232139	ENSCAFG00000012997	ENSCAFT00000020633	sense	intergenic	43579	same_strand	upstream
+0	XLOC_090763	TCONS_00232139	ENSCAFG00000012992	ENSCAFT00000020625	antisense	intergenic	49065	convergent	downstream
+0	XLOC_090763	TCONS_00232139	ENSCAFG00000013015	ENSCAFT00000020665	sense	intergenic	49540	same_strand	downstream
+0	XLOC_090763	TCONS_00232139	ENSCAFG00000012992	ENSCAFT00000020626	antisense	intergenic	49059	convergent	downstream
+1	XLOC_091011	TCONS_00233145	ENSCAFG00000013289	ENSCAFT00000044816	sense	genic	0	overlapping	intronic
+0	XLOC_091011	TCONS_00233145	ENSCAFG00000013289	ENSCAFT00000021112	sense	genic	0	nested	intronic
+1	XLOC_090878	TCONS_00232602	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	same_strand	upstream
+1	XLOC_090970	TCONS_00232965	ENSCAFG00000021604	ENSCAFT00000033711	sense	intergenic	5524	same_strand	upstream
+1	XLOC_090720	TCONS_00231945	ENSCAFG00000026373	ENSCAFT00000040656	sense	intergenic	66670	same_strand	upstream
+1	XLOC_090831	TCONS_00232408	ENSCAFG00000011692	ENSCAFT00000018544	sense	intergenic	12346	same_strand	upstream
+0	XLOC_090831	TCONS_00232408	ENSCAFG00000011706	ENSCAFT00000018594	antisense	intergenic	14517	divergent	upstream
+1	XLOC_090966	TCONS_00232957	ENSCAFG00000010839	ENSCAFT00000017231	antisense	intergenic	174	divergent	upstream
+1	XLOC_090974	TCONS_00232975	ENSCAFG00000010842	ENSCAFT00000017240	sense	intergenic	44952	same_strand	downstream
+1	XLOC_090599	TCONS_00231417	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	8242	same_strand	downstream
+1	XLOC_090599	TCONS_00231403	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	same_strand	downstream
+1	XLOC_090743	TCONS_00232058	ENSCAFG00000013346	ENSCAFT00000021186	antisense	intergenic	377	divergent	upstream
+1	XLOC_090752	TCONS_00232089	ENSCAFG00000013259	ENSCAFT00000021052	antisense	intergenic	3327	divergent	upstream
+1	XLOC_090878	TCONS_00232595	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	same_strand	upstream
+1	XLOC_090660	TCONS_00231733	ENSCAFG00000010552	ENSCAFT00000016789	antisense	genic	0	overlapping	intronic
+0	XLOC_090660	TCONS_00231733	ENSCAFG00000010573	ENSCAFT00000016817	sense	intergenic	4547	same_strand	upstream
+1	XLOC_090878	TCONS_00232601	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	same_strand	upstream
+1	XLOC_091058	TCONS_00233515	ENSCAFG00000012566	ENSCAFT00000019952	sense	intergenic	14689	same_strand	downstream
+1	XLOC_090992	TCONS_00233056	ENSCAFG00000013637	ENSCAFT00000021622	antisense	intergenic	40976	convergent	downstream
+1	XLOC_090960	TCONS_00232947	ENSCAFG00000010794	ENSCAFT00000017171	antisense	intergenic	99842	convergent	downstream
+1	XLOC_090785	TCONS_00232222	ENSCAFG00000012621	ENSCAFT00000020056	antisense	intergenic	6282	divergent	upstream
+1	XLOC_090777	TCONS_00232178	ENSCAFG00000012732	ENSCAFT00000020175	antisense	intergenic	2331	divergent	upstream
+0	XLOC_090777	TCONS_00232178	ENSCAFG00000012733	ENSCAFT00000020181	sense	intergenic	5163	same_strand	downstream
+0	XLOC_090777	TCONS_00232178	ENSCAFG00000012722	ENSCAFT00000020174	sense	intergenic	3019	same_strand	upstream
+1	XLOC_090652	TCONS_00231714	ENSCAFG00000021533	ENSCAFT00000033640	antisense	genic	0	containing	intronic
+1	XLOC_090662	TCONS_00231753	ENSCAFG00000010595	ENSCAFT00000044512	antisense	intergenic	66882	convergent	downstream
+0	XLOC_090662	TCONS_00231753	ENSCAFG00000010595	ENSCAFT00000016835	antisense	intergenic	69592	convergent	downstream
+1	XLOC_090620	TCONS_00231539	ENSCAFG00000009999	ENSCAFT00000015918	antisense	genic	0	overlapping	intronic
+1	XLOC_090827	TCONS_00232398	ENSCAFG00000025115	ENSCAFT00000018582	antisense	intergenic	8283	convergent	downstream
+1	XLOC_090634	TCONS_00231600	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2414	divergent	upstream
+1	XLOC_090599	TCONS_00231404	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	same_strand	downstream
+1	XLOC_090989	TCONS_00233036	ENSCAFG00000011340	ENSCAFT00000018023	antisense	intergenic	5988	convergent	downstream
+1	XLOC_090634	TCONS_00231601	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	3157	divergent	upstream
+1	XLOC_090639	TCONS_00231610	ENSCAFG00000010198	ENSCAFT00000016185	antisense	genic	0	overlapping	exonic
+1	XLOC_090742	TCONS_00232052	ENSCAFG00000013353	ENSCAFT00000037837	antisense	intergenic	16793	divergent	upstream
+0	XLOC_090742	TCONS_00232052	ENSCAFG00000013353	ENSCAFT00000021201	antisense	intergenic	16793	divergent	upstream
+1	XLOC_090961	TCONS_00232948	ENSCAFG00000010835	ENSCAFT00000017226	antisense	intergenic	16040	divergent	upstream
+1	XLOC_090633	TCONS_00231590	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	4962	convergent	downstream
+0	XLOC_090633	TCONS_00231590	ENSCAFG00000010144	ENSCAFT00000016113	antisense	intergenic	8138	divergent	upstream
+1	XLOC_090827	TCONS_00232402	ENSCAFG00000025115	ENSCAFT00000018582	antisense	intergenic	8283	convergent	downstream
+1	XLOC_090620	TCONS_00231532	ENSCAFG00000009999	ENSCAFT00000015918	antisense	genic	0	overlapping	intronic
+0	XLOC_090620	TCONS_00231532	ENSCAFG00000009970	ENSCAFT00000015870	antisense	intergenic	517	divergent	upstream
+1	XLOC_090878	TCONS_00232600	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	same_strand	upstream
+1	XLOC_090878	TCONS_00232603	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	same_strand	upstream
+1	XLOC_090689	TCONS_00231844	ENSCAFG00000010839	ENSCAFT00000017231	sense	intergenic	59856	same_strand	downstream
+1	XLOC_090628	TCONS_00231554	ENSCAFG00000025208	ENSCAFT00000039078	antisense	intergenic	1622	divergent	upstream
+0	XLOC_090628	TCONS_00231554	ENSCAFG00000010051	ENSCAFT00000015981	sense	intergenic	4505	same_strand	upstream
+1	XLOC_090620	TCONS_00231540	ENSCAFG00000009999	ENSCAFT00000015918	antisense	genic	0	overlapping	intronic
+1	XLOC_090991	TCONS_00233053	ENSCAFG00000013637	ENSCAFT00000021622	antisense	intergenic	27440	convergent	downstream
+1	XLOC_090802	TCONS_00232318	ENSCAFG00000012174	ENSCAFT00000019707	antisense	intergenic	576	divergent	upstream
+0	XLOC_090802	TCONS_00232318	ENSCAFG00000028933	ENSCAFT00000050050	sense	intergenic	779	same_strand	upstream
+0	XLOC_090802	TCONS_00232318	ENSCAFG00000032332	ENSCAFT00000047817	antisense	intergenic	8255	convergent	downstream
+0	XLOC_090802	TCONS_00232318	ENSCAFG00000028933	ENSCAFT00000048290	sense	intergenic	3788	same_strand	upstream
+1	XLOC_090599	TCONS_00231419	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	8242	same_strand	downstream
+1	XLOC_090606	TCONS_00231442	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	overlapping	exonic
+0	XLOC_090606	TCONS_00231442	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	625	divergent	upstream
+1	XLOC_090606	TCONS_00231454	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	nested	exonic
+0	XLOC_090606	TCONS_00231454	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2210	divergent	upstream
+1	XLOC_090971	TCONS_00232967	ENSCAFG00000021604	ENSCAFT00000033711	sense	intergenic	81822	same_strand	upstream
+1	XLOC_090991	TCONS_00233054	ENSCAFG00000013637	ENSCAFT00000021622	antisense	intergenic	27440	convergent	downstream
+1	XLOC_091073	TCONS_00233579	ENSCAFG00000011857	ENSCAFT00000018829	antisense	genic	0	overlapping	exonic
+0	XLOC_091073	TCONS_00233579	ENSCAFG00000011835	ENSCAFT00000018806	antisense	intergenic	6095	divergent	upstream
+1	XLOC_090943	TCONS_00232878	ENSCAFG00000010624	ENSCAFT00000016924	antisense	intergenic	25650	divergent	upstream
+1	XLOC_090726	TCONS_00231955	ENSCAFG00000013637	ENSCAFT00000021622	sense	intergenic	60824	same_strand	upstream
+1	XLOC_090732	TCONS_00231966	ENSCAFG00000013620	ENSCAFT00000021590	antisense	intergenic	1483	divergent	upstream
+0	XLOC_090732	TCONS_00231966	ENSCAFG00000013601	ENSCAFT00000021570	sense	intergenic	9792	same_strand	upstream
+0	XLOC_090732	TCONS_00231966	ENSCAFG00000013601	ENSCAFT00000021557	sense	intergenic	9590	same_strand	upstream
+1	XLOC_090724	TCONS_00231951	ENSCAFG00000013641	ENSCAFT00000021629	antisense	intergenic	2551	divergent	upstream
+1	XLOC_090992	TCONS_00233057	ENSCAFG00000013637	ENSCAFT00000021622	antisense	intergenic	68598	convergent	downstream
+1	XLOC_090658	TCONS_00231722	ENSCAFG00000010525	ENSCAFT00000016748	antisense	intergenic	9853	divergent	upstream
+1	XLOC_090746	TCONS_00232077	ENSCAFG00000013336	ENSCAFT00000021179	sense	intergenic	6186	same_strand	downstream
+1	XLOC_090822	TCONS_00232392	ENSCAFG00000011747	ENSCAFT00000018659	sense	intergenic	10065	same_strand	downstream
+1	XLOC_090743	TCONS_00232054	ENSCAFG00000013346	ENSCAFT00000021186	antisense	genic	0	overlapping	intronic
+1	XLOC_091082	TCONS_00233594	ENSCAFG00000031934	ENSCAFT00000048683	sense	intergenic	1773	same_strand	downstream
+1	XLOC_090974	TCONS_00232974	ENSCAFG00000010842	ENSCAFT00000017240	sense	intergenic	44952	same_strand	downstream
+1	XLOC_090599	TCONS_00231415	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	8145	same_strand	downstream
+1	XLOC_090683	TCONS_00231828	ENSCAFG00000010815	ENSCAFT00000017213	sense	intergenic	19267	same_strand	downstream
+1	XLOC_090878	TCONS_00232593	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	same_strand	upstream
+1	XLOC_090606	TCONS_00231443	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	overlapping	exonic
+0	XLOC_090606	TCONS_00231443	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	642	divergent	upstream
+1	XLOC_090752	TCONS_00232087	ENSCAFG00000013259	ENSCAFT00000021052	antisense	intergenic	3325	divergent	upstream
+1	XLOC_090937	TCONS_00232868	ENSCAFG00000032530	ENSCAFT00000043356	sense	intergenic	23510	same_strand	upstream
+1	XLOC_090633	TCONS_00231592	ENSCAFG00000010144	ENSCAFT00000016113	antisense	intergenic	8606	divergent	upstream
+1	XLOC_090688	TCONS_00231842	ENSCAFG00000010839	ENSCAFT00000017231	sense	intergenic	51002	same_strand	downstream
+1	XLOC_090599	TCONS_00231406	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	same_strand	downstream
+1	XLOC_090915	TCONS_00232763	ENSCAFG00000029799	ENSCAFT00000046901	antisense	intergenic	1058	divergent	upstream
+0	XLOC_090915	TCONS_00232763	ENSCAFG00000010239	ENSCAFT00000016260	antisense	intergenic	1870	convergent	downstream
+1	XLOC_090720	TCONS_00231947	ENSCAFG00000026373	ENSCAFT00000040656	sense	intergenic	66670	same_strand	upstream
+1	XLOC_091025	TCONS_00233261	ENSCAFG00000013079	ENSCAFT00000020753	antisense	intergenic	3412	convergent	downstream
+0	XLOC_091025	TCONS_00233261	ENSCAFG00000013068	ENSCAFT00000020736	sense	intergenic	7803	same_strand	downstream
+1	XLOC_090991	TCONS_00233052	ENSCAFG00000013637	ENSCAFT00000021622	antisense	intergenic	27440	convergent	downstream
+1	XLOC_090707	TCONS_00231908	ENSCAFG00000011325	ENSCAFT00000018005	antisense	intergenic	6195	divergent	upstream
+0	XLOC_090707	TCONS_00231908	ENSCAFG00000031609	ENSCAFT00000047625	sense	intergenic	9383	same_strand	downstream
+1	XLOC_091073	TCONS_00233580	ENSCAFG00000011857	ENSCAFT00000018829	antisense	genic	0	overlapping	exonic
+0	XLOC_091073	TCONS_00233580	ENSCAFG00000011835	ENSCAFT00000018806	antisense	intergenic	6095	divergent	upstream
+1	XLOC_090700	TCONS_00231870	ENSCAFG00000011125	ENSCAFT00000017715	antisense	genic	0	overlapping	exonic
+1	XLOC_090822	TCONS_00232391	ENSCAFG00000011747	ENSCAFT00000018659	sense	intergenic	10055	same_strand	downstream
+1	XLOC_091009	TCONS_00233127	ENSCAFG00000013336	ENSCAFT00000021179	antisense	intergenic	6186	convergent	downstream
+1	XLOC_091111	TCONS_00233707	ENSCAFG00000030554	ENSCAFT00000018156	sense	intergenic	3652	same_strand	upstream
+0	XLOC_091111	TCONS_00233707	ENSCAFG00000030554	ENSCAFT00000018170	sense	intergenic	4577	same_strand	upstream
+1	XLOC_090606	TCONS_00231448	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	nested	exonic
+0	XLOC_090606	TCONS_00231448	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2139	divergent	upstream
+1	XLOC_091067	TCONS_00233568	ENSCAFG00000028933	ENSCAFT00000050050	antisense	intergenic	3324	divergent	upstream
+0	XLOC_091067	TCONS_00233568	ENSCAFG00000028933	ENSCAFT00000048290	antisense	intergenic	6333	divergent	upstream
+0	XLOC_091067	TCONS_00233568	ENSCAFG00000012174	ENSCAFT00000019707	sense	intergenic	7282	same_strand	upstream
+1	XLOC_090634	TCONS_00231594	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2408	divergent	upstream
+1	XLOC_090966	TCONS_00232955	ENSCAFG00000010839	ENSCAFT00000017231	antisense	intergenic	174	divergent	upstream
+1	XLOC_090994	TCONS_00233059	ENSCAFG00000013627	ENSCAFT00000021613	sense	intergenic	10677	same_strand	downstream
+1	XLOC_090970	TCONS_00232966	ENSCAFG00000021604	ENSCAFT00000033711	sense	intergenic	5524	same_strand	upstream
+1	XLOC_091067	TCONS_00233569	ENSCAFG00000028933	ENSCAFT00000050050	antisense	intergenic	3304	divergent	upstream
+0	XLOC_091067	TCONS_00233569	ENSCAFG00000028933	ENSCAFT00000048290	antisense	intergenic	6313	divergent	upstream
+0	XLOC_091067	TCONS_00233569	ENSCAFG00000012174	ENSCAFT00000019707	sense	intergenic	7282	same_strand	upstream
+1	XLOC_090606	TCONS_00231453	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	nested	exonic
+0	XLOC_090606	TCONS_00231453	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2140	divergent	upstream
+1	XLOC_090599	TCONS_00231411	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	same_strand	downstream
+1	XLOC_090726	TCONS_00231954	ENSCAFG00000013637	ENSCAFT00000021622	sense	intergenic	60824	same_strand	upstream
+1	XLOC_090989	TCONS_00233037	ENSCAFG00000011340	ENSCAFT00000018023	antisense	intergenic	5988	convergent	downstream
+1	XLOC_090732	TCONS_00231965	ENSCAFG00000013620	ENSCAFT00000021590	antisense	intergenic	1483	divergent	upstream
+0	XLOC_090732	TCONS_00231965	ENSCAFG00000013601	ENSCAFT00000021570	sense	intergenic	9792	same_strand	upstream
+0	XLOC_090732	TCONS_00231965	ENSCAFG00000013601	ENSCAFT00000021557	sense	intergenic	9590	same_strand	upstream
+1	XLOC_090802	TCONS_00232319	ENSCAFG00000012174	ENSCAFT00000019707	antisense	intergenic	641	divergent	upstream
+0	XLOC_090802	TCONS_00232319	ENSCAFG00000028933	ENSCAFT00000050050	sense	intergenic	779	same_strand	upstream
+0	XLOC_090802	TCONS_00232319	ENSCAFG00000032332	ENSCAFT00000047817	antisense	intergenic	8255	convergent	downstream
+0	XLOC_090802	TCONS_00232319	ENSCAFG00000028933	ENSCAFT00000048290	sense	intergenic	3788	same_strand	upstream
+1	XLOC_090818	TCONS_00232387	ENSCAFG00000031934	ENSCAFT00000048683	antisense	intergenic	2535	divergent	upstream
+1	XLOC_090707	TCONS_00231910	ENSCAFG00000011325	ENSCAFT00000018005	antisense	intergenic	6195	divergent	upstream
+0	XLOC_090707	TCONS_00231910	ENSCAFG00000031609	ENSCAFT00000047625	sense	intergenic	9383	same_strand	downstream
+1	XLOC_091060	TCONS_00233538	ENSCAFG00000023513	ENSCAFT00000036175	sense	intergenic	369	same_strand	downstream
+1	XLOC_090634	TCONS_00231596	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2409	divergent	upstream
+1	XLOC_090829	TCONS_00232406	ENSCAFG00000025115	ENSCAFT00000018582	antisense	genic	0	overlapping	exonic
+0	XLOC_090829	TCONS_00232406	ENSCAFG00000025115	ENSCAFT00000018604	antisense	intergenic	9767	convergent	downstream
+1	XLOC_090691	TCONS_00231848	ENSCAFG00000021604	ENSCAFT00000033711	antisense	intergenic	39885	divergent	upstream
+1	XLOC_090744	TCONS_00232061	ENSCAFG00000013336	ENSCAFT00000021179	sense	intergenic	28636	same_strand	upstream
+1	XLOC_091027	TCONS_00233310	ENSCAFG00000032051	ENSCAFT00000036830	sense	intergenic	8387	same_strand	downstream
+0	XLOC_091027	TCONS_00233310	ENSCAFG00000013058	ENSCAFT00000020714	sense	intergenic	9113	same_strand	upstream
+1	XLOC_090795	TCONS_00232276	ENSCAFG00000012566	ENSCAFT00000019952	antisense	intergenic	24437	convergent	downstream
+0	XLOC_090795	TCONS_00232276	ENSCAFG00000023704	ENSCAFT00000036617	sense	intergenic	26617	same_strand	downstream
+1	XLOC_090690	TCONS_00231845	ENSCAFG00000021604	ENSCAFT00000033711	antisense	genic	0	containing	intronic
+1	XLOC_090743	TCONS_00232057	ENSCAFG00000013346	ENSCAFT00000021186	antisense	intergenic	377	divergent	upstream
+1	XLOC_090732	TCONS_00231964	ENSCAFG00000013620	ENSCAFT00000021590	antisense	intergenic	1471	divergent	upstream
+0	XLOC_090732	TCONS_00231964	ENSCAFG00000013601	ENSCAFT00000021570	sense	intergenic	9792	same_strand	upstream
+0	XLOC_090732	TCONS_00231964	ENSCAFG00000013601	ENSCAFT00000021557	sense	intergenic	9590	same_strand	upstream
+1	XLOC_090615	TCONS_00231491	ENSCAFG00000009901	ENSCAFT00000046245	sense	intergenic	44590	same_strand	upstream
+1	XLOC_090732	TCONS_00231967	ENSCAFG00000013620	ENSCAFT00000021590	antisense	intergenic	2151	divergent	upstream
+0	XLOC_090732	TCONS_00231967	ENSCAFG00000013601	ENSCAFT00000021570	sense	intergenic	9792	same_strand	upstream
+0	XLOC_090732	TCONS_00231967	ENSCAFG00000013601	ENSCAFT00000021557	sense	intergenic	9590	same_strand	upstream
+1	XLOC_090827	TCONS_00232403	ENSCAFG00000025115	ENSCAFT00000018582	antisense	intergenic	8283	convergent	downstream
+1	XLOC_091013	TCONS_00233149	ENSCAFG00000013259	ENSCAFT00000021052	sense	intergenic	55054	same_strand	downstream
+1	XLOC_090726	TCONS_00231956	ENSCAFG00000013637	ENSCAFT00000021622	sense	intergenic	74091	same_strand	upstream
+1	XLOC_090628	TCONS_00231553	ENSCAFG00000025208	ENSCAFT00000039078	antisense	intergenic	1622	divergent	upstream
+0	XLOC_090628	TCONS_00231553	ENSCAFG00000010051	ENSCAFT00000015981	sense	intergenic	4505	same_strand	upstream
+1	XLOC_090634	TCONS_00231595	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2409	divergent	upstream
+1	XLOC_090892	TCONS_00232657	ENSCAFG00000020616	ENSCAFT00000032723	sense	intergenic	4060	same_strand	downstream
+0	XLOC_090892	TCONS_00232657	ENSCAFG00000010051	ENSCAFT00000015981	antisense	intergenic	6524	convergent	downstream
+1	XLOC_090974	TCONS_00232972	ENSCAFG00000010842	ENSCAFT00000017240	sense	intergenic	85066	same_strand	downstream
+1	XLOC_091032	TCONS_00233350	ENSCAFG00000013015	ENSCAFT00000020665	antisense	intergenic	18981	divergent	upstream
+1	XLOC_090993	TCONS_00233058	ENSCAFG00000013627	ENSCAFT00000021613	sense	intergenic	73088	same_strand	downstream
+1	XLOC_090758	TCONS_00232115	ENSCAFG00000013086	ENSCAFT00000020761	antisense	genic	0	overlapping	intronic
+1	XLOC_090785	TCONS_00232221	ENSCAFG00000012621	ENSCAFT00000020056	antisense	intergenic	5831	divergent	upstream
+1	XLOC_090738	TCONS_00232020	ENSCAFG00000013491	ENSCAFT00000021392	sense	intergenic	6860	same_strand	downstream
+1	XLOC_090606	TCONS_00231445	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	nested	exonic
+0	XLOC_090606	TCONS_00231445	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2139	divergent	upstream
+1	XLOC_090943	TCONS_00232879	ENSCAFG00000010624	ENSCAFT00000016924	antisense	intergenic	25119	divergent	upstream
+1	XLOC_090606	TCONS_00231447	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	nested	exonic
+0	XLOC_090606	TCONS_00231447	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2139	divergent	upstream
+1	XLOC_090829	TCONS_00232405	ENSCAFG00000025115	ENSCAFT00000018582	antisense	genic	0	overlapping	exonic
+0	XLOC_090829	TCONS_00232405	ENSCAFG00000025115	ENSCAFT00000018604	antisense	intergenic	9767	convergent	downstream
+1	XLOC_090599	TCONS_00231414	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	same_strand	downstream
+1	XLOC_090817	TCONS_00232385	ENSCAFG00000011795	ENSCAFT00000018715	antisense	genic	0	overlapping	exonic
+1	XLOC_090998	TCONS_00233083	ENSCAFG00000013601	ENSCAFT00000021557	antisense	genic	0	overlapping	exonic
+0	XLOC_090998	TCONS_00233083	ENSCAFG00000013601	ENSCAFT00000021570	antisense	intergenic	72	convergent	downstream
+0	XLOC_090998	TCONS_00233083	ENSCAFG00000013540	ENSCAFT00000021486	sense	intergenic	2616	same_strand	downstream
+1	XLOC_090758	TCONS_00232114	ENSCAFG00000013086	ENSCAFT00000020761	antisense	genic	0	overlapping	intronic
+1	XLOC_090627	TCONS_00231552	ENSCAFG00000010038	ENSCAFT00000015965	antisense	intergenic	1824	convergent	downstream
+1	XLOC_090599	TCONS_00231402	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	same_strand	downstream
+1	XLOC_090943	TCONS_00232880	ENSCAFG00000010624	ENSCAFT00000016924	antisense	intergenic	25023	divergent	upstream
+1	XLOC_091057	TCONS_00233513	ENSCAFG00000023704	ENSCAFT00000036617	antisense	intergenic	24758	convergent	downstream
+0	XLOC_091057	TCONS_00233513	ENSCAFG00000012566	ENSCAFT00000019952	sense	intergenic	26122	same_strand	downstream
+1	XLOC_090788	TCONS_00232240	ENSCAFG00000012579	ENSCAFT00000019982	sense	intergenic	1068	same_strand	downstream
+1	XLOC_090599	TCONS_00231405	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	same_strand	downstream
+1	XLOC_090802	TCONS_00232321	ENSCAFG00000012174	ENSCAFT00000019707	antisense	intergenic	692	divergent	upstream
+0	XLOC_090802	TCONS_00232321	ENSCAFG00000028933	ENSCAFT00000050050	sense	intergenic	779	same_strand	upstream
+0	XLOC_090802	TCONS_00232321	ENSCAFG00000032332	ENSCAFT00000047817	antisense	intergenic	8255	convergent	downstream
+0	XLOC_090802	TCONS_00232321	ENSCAFG00000028933	ENSCAFT00000048290	sense	intergenic	3788	same_strand	upstream
+1	XLOC_090752	TCONS_00232088	ENSCAFG00000013259	ENSCAFT00000021052	antisense	intergenic	3326	divergent	upstream
+1	XLOC_090915	TCONS_00232764	ENSCAFG00000029799	ENSCAFT00000046901	antisense	genic	0	overlapping	intronic
+0	XLOC_090915	TCONS_00232764	ENSCAFG00000010239	ENSCAFT00000016260	antisense	intergenic	1870	convergent	downstream
+1	XLOC_090639	TCONS_00231608	ENSCAFG00000010198	ENSCAFT00000016185	antisense	genic	0	overlapping	exonic
+1	XLOC_090599	TCONS_00231413	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	same_strand	downstream
+1	XLOC_091083	TCONS_00233601	ENSCAFG00000031934	ENSCAFT00000048683	sense	intergenic	4985	same_strand	upstream
+1	XLOC_090640	TCONS_00231611	ENSCAFG00000010206	ENSCAFT00000016203	antisense	intergenic	1555	convergent	downstream
+1	XLOC_090802	TCONS_00232322	ENSCAFG00000028933	ENSCAFT00000050050	sense	intergenic	779	same_strand	upstream
+0	XLOC_090802	TCONS_00232322	ENSCAFG00000032332	ENSCAFT00000047817	antisense	intergenic	8255	convergent	downstream
+0	XLOC_090802	TCONS_00232322	ENSCAFG00000028933	ENSCAFT00000048290	sense	intergenic	3788	same_strand	upstream
+0	XLOC_090802	TCONS_00232322	ENSCAFG00000012174	ENSCAFT00000019707	antisense	intergenic	3732	divergent	upstream
+1	XLOC_090878	TCONS_00232596	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	same_strand	upstream
+1	XLOC_090878	TCONS_00232597	ENSCAFG00000009675	ENSCAFT00000015370	sense	intergenic	19181	same_strand	upstream
+1	XLOC_090652	TCONS_00231713	ENSCAFG00000021533	ENSCAFT00000033640	antisense	intergenic	28415	convergent	downstream
+1	XLOC_090795	TCONS_00232275	ENSCAFG00000012566	ENSCAFT00000019952	antisense	intergenic	24437	convergent	downstream
+0	XLOC_090795	TCONS_00232275	ENSCAFG00000023704	ENSCAFT00000036617	sense	intergenic	26617	same_strand	downstream
+1	XLOC_090752	TCONS_00232086	ENSCAFG00000013259	ENSCAFT00000021052	antisense	intergenic	3325	divergent	upstream
+1	XLOC_090599	TCONS_00231407	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	same_strand	downstream
+1	XLOC_091083	TCONS_00233600	ENSCAFG00000031934	ENSCAFT00000048683	sense	intergenic	4985	same_strand	upstream
+1	XLOC_090729	TCONS_00231961	ENSCAFG00000013637	ENSCAFT00000021622	sense	intergenic	95727	same_strand	downstream
+1	XLOC_090599	TCONS_00231410	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	same_strand	downstream
+1	XLOC_090688	TCONS_00231841	ENSCAFG00000010839	ENSCAFT00000017231	sense	intergenic	34682	same_strand	downstream
+1	XLOC_090737	TCONS_00232010	ENSCAFG00000013502	ENSCAFT00000021419	antisense	genic	0	nested	exonic
+1	XLOC_090634	TCONS_00231593	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2408	divergent	upstream
+1	XLOC_091060	TCONS_00233539	ENSCAFG00000023513	ENSCAFT00000036175	sense	intergenic	369	same_strand	downstream
+1	XLOC_090937	TCONS_00232867	ENSCAFG00000032530	ENSCAFT00000043356	sense	intergenic	18647	same_strand	upstream
+1	XLOC_091060	TCONS_00233536	ENSCAFG00000023513	ENSCAFT00000036175	sense	intergenic	4446	same_strand	downstream
+1	XLOC_090724	TCONS_00231952	ENSCAFG00000013641	ENSCAFT00000021629	antisense	intergenic	3720	divergent	upstream
+1	XLOC_090891	TCONS_00232655	ENSCAFG00000010051	ENSCAFT00000015981	antisense	intergenic	855	convergent	downstream
+0	XLOC_090891	TCONS_00232655	ENSCAFG00000020616	ENSCAFT00000032723	sense	intergenic	8438	same_strand	downstream
+1	XLOC_090725	TCONS_00231953	ENSCAFG00000013641	ENSCAFT00000021629	antisense	intergenic	86041	divergent	upstream
+1	XLOC_090634	TCONS_00231602	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	9337	divergent	upstream
+1	XLOC_090892	TCONS_00232658	ENSCAFG00000020616	ENSCAFT00000032723	sense	intergenic	3555	same_strand	downstream
+0	XLOC_090892	TCONS_00232658	ENSCAFG00000010051	ENSCAFT00000015981	antisense	intergenic	6524	convergent	downstream
+1	XLOC_091060	TCONS_00233540	ENSCAFG00000023513	ENSCAFT00000036175	sense	intergenic	369	same_strand	downstream
+1	XLOC_090785	TCONS_00232224	ENSCAFG00000012621	ENSCAFT00000020056	antisense	intergenic	7630	divergent	upstream
+1	XLOC_090744	TCONS_00232064	ENSCAFG00000013336	ENSCAFT00000021179	sense	intergenic	28636	same_strand	upstream
+1	XLOC_090606	TCONS_00231452	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	nested	exonic
+0	XLOC_090606	TCONS_00231452	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2139	divergent	upstream
+1	XLOC_090937	TCONS_00232869	ENSCAFG00000032530	ENSCAFT00000043356	sense	intergenic	85972	same_strand	upstream
+1	XLOC_090743	TCONS_00232055	ENSCAFG00000013346	ENSCAFT00000021186	antisense	intergenic	371	divergent	upstream
+1	XLOC_091058	TCONS_00233516	ENSCAFG00000012566	ENSCAFT00000019952	sense	intergenic	14665	same_strand	downstream
+1	XLOC_091071	TCONS_00233577	ENSCAFG00000011865	ENSCAFT00000018843	antisense	genic	0	overlapping	exonic
+0	XLOC_091071	TCONS_00233577	ENSCAFG00000029844	ENSCAFT00000047126	antisense	intergenic	7805	convergent	downstream
+1	XLOC_090966	TCONS_00232960	ENSCAFG00000010839	ENSCAFT00000017231	antisense	intergenic	1254	divergent	upstream
+1	XLOC_090827	TCONS_00232401	ENSCAFG00000025115	ENSCAFT00000018582	antisense	intergenic	8283	convergent	downstream
+1	XLOC_090683	TCONS_00231829	ENSCAFG00000010815	ENSCAFT00000017213	sense	intergenic	19283	same_strand	downstream
+1	XLOC_090618	TCONS_00231522	ENSCAFG00000009901	ENSCAFT00000046245	sense	intergenic	10016	same_strand	downstream
+0	XLOC_090618	TCONS_00231522	ENSCAFG00000009901	ENSCAFT00000015800	sense	intergenic	10019	same_strand	downstream
+0	XLOC_090618	TCONS_00231522	ENSCAFG00000024609	ENSCAFT00000037921	sense	intergenic	18666	same_strand	upstream
+0	XLOC_090618	TCONS_00231522	ENSCAFG00000009901	ENSCAFT00000049341	sense	intergenic	10016	same_strand	downstream
+1	XLOC_090862	TCONS_00232466	ENSCAFG00000031149	ENSCAFT00000047341	antisense	genic	0	overlapping	exonic
+1	XLOC_090964	TCONS_00232952	ENSCAFG00000026633	ENSCAFT00000040916	sense	intergenic	66675	same_strand	upstream
+1	XLOC_090720	TCONS_00231946	ENSCAFG00000026373	ENSCAFT00000040656	sense	intergenic	66670	same_strand	upstream
+1	XLOC_090744	TCONS_00232060	ENSCAFG00000013346	ENSCAFT00000021186	antisense	intergenic	32820	divergent	upstream
+0	XLOC_090744	TCONS_00232060	ENSCAFG00000013336	ENSCAFT00000021179	sense	intergenic	35060	same_strand	upstream
+1	XLOC_090820	TCONS_00232389	ENSCAFG00000011785	ENSCAFT00000018701	antisense	intergenic	4174	convergent	downstream
+1	XLOC_090727	TCONS_00231957	ENSCAFG00000013637	ENSCAFT00000021622	sense	genic	0	containing	intronic
+1	XLOC_090620	TCONS_00231533	ENSCAFG00000009999	ENSCAFT00000015918	antisense	genic	0	overlapping	exonic
+0	XLOC_090620	TCONS_00231533	ENSCAFG00000009970	ENSCAFT00000015870	antisense	intergenic	657	divergent	upstream
+1	XLOC_090652	TCONS_00231715	ENSCAFG00000021533	ENSCAFT00000033640	antisense	genic	0	containing	intronic
+1	XLOC_090943	TCONS_00232881	ENSCAFG00000010624	ENSCAFT00000016924	antisense	intergenic	22770	divergent	upstream
+1	XLOC_090599	TCONS_00231416	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	8242	same_strand	downstream
+1	XLOC_091013	TCONS_00233148	ENSCAFG00000013259	ENSCAFT00000021052	sense	intergenic	55618	same_strand	downstream
+1	XLOC_090675	TCONS_00231789	ENSCAFG00000010731	ENSCAFT00000017072	antisense	genic	0	nested	exonic
+1	XLOC_090639	TCONS_00231607	ENSCAFG00000010198	ENSCAFT00000016185	antisense	genic	0	overlapping	exonic
+1	XLOC_091093	TCONS_00233633	ENSCAFG00000011731	ENSCAFT00000018655	sense	intergenic	40864	same_strand	upstream
+1	XLOC_090752	TCONS_00232085	ENSCAFG00000013259	ENSCAFT00000021052	antisense	intergenic	3324	divergent	upstream
+1	XLOC_090620	TCONS_00231538	ENSCAFG00000009999	ENSCAFT00000015918	antisense	genic	0	overlapping	exonic
+1	XLOC_090992	TCONS_00233055	ENSCAFG00000013637	ENSCAFT00000021622	antisense	intergenic	40976	convergent	downstream
+1	XLOC_090664	TCONS_00231756	ENSCAFG00000010603	ENSCAFT00000016853	antisense	intergenic	77031	divergent	upstream
+1	XLOC_090606	TCONS_00231441	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	overlapping	exonic
+0	XLOC_090606	TCONS_00231441	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	486	divergent	upstream
+1	XLOC_090892	TCONS_00232661	ENSCAFG00000020616	ENSCAFT00000032723	sense	genic	0	containing	intronic
+0	XLOC_090892	TCONS_00232661	ENSCAFG00000010051	ENSCAFT00000015981	antisense	intergenic	6524	convergent	downstream
+1	XLOC_091058	TCONS_00233514	ENSCAFG00000012566	ENSCAFT00000019952	sense	intergenic	15062	same_strand	downstream
+1	XLOC_090860	TCONS_00232464	ENSCAFG00000009459	ENSCAFT00000015038	sense	intergenic	24831	same_strand	upstream
+0	XLOC_090860	TCONS_00232464	ENSCAFG00000009462	ENSCAFT00000015041	antisense	intergenic	29095	divergent	upstream
+1	XLOC_090634	TCONS_00231597	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2410	divergent	upstream
+1	XLOC_090675	TCONS_00231788	ENSCAFG00000010731	ENSCAFT00000017072	antisense	genic	0	nested	exonic
+1	XLOC_090720	TCONS_00231944	ENSCAFG00000026373	ENSCAFT00000040656	sense	intergenic	66670	same_strand	upstream
+1	XLOC_090599	TCONS_00231408	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	same_strand	downstream
+1	XLOC_090966	TCONS_00232956	ENSCAFG00000010839	ENSCAFT00000017231	antisense	intergenic	174	divergent	upstream
+1	XLOC_090634	TCONS_00231599	ENSCAFG00000010148	ENSCAFT00000016118	antisense	intergenic	2410	divergent	upstream
+1	XLOC_090743	TCONS_00232059	ENSCAFG00000013346	ENSCAFT00000021186	antisense	intergenic	377	divergent	upstream
+1	XLOC_090599	TCONS_00231401	ENSCAFG00000009602	ENSCAFT00000049169	sense	intergenic	7295	same_strand	downstream
+1	XLOC_090688	TCONS_00231843	ENSCAFG00000010839	ENSCAFT00000017231	sense	intergenic	51002	same_strand	downstream
+1	XLOC_090694	TCONS_00231852	ENSCAFG00000010842	ENSCAFT00000017240	antisense	genic	0	overlapping	exonic
+1	XLOC_090817	TCONS_00232386	ENSCAFG00000011795	ENSCAFT00000018715	antisense	genic	0	overlapping	exonic
+1	XLOC_091031	TCONS_00233349	ENSCAFG00000013035	ENSCAFT00000020678	sense	intergenic	5141	same_strand	upstream
+0	XLOC_091031	TCONS_00233349	ENSCAFG00000013035	ENSCAFT00000020677	sense	intergenic	5373	same_strand	upstream
+1	XLOC_090744	TCONS_00232063	ENSCAFG00000013336	ENSCAFT00000021179	sense	intergenic	35060	same_strand	upstream
+1	XLOC_090744	TCONS_00232062	ENSCAFG00000013336	ENSCAFT00000021179	sense	intergenic	28636	same_strand	upstream
+1	XLOC_090606	TCONS_00231450	ENSCAFG00000009623	ENSCAFT00000015286	antisense	genic	0	nested	exonic
+0	XLOC_090606	TCONS_00231450	ENSCAFG00000009619	ENSCAFT00000015284	antisense	intergenic	2139	divergent	upstream
+1	XLOC_090947	TCONS_00232887	ENSCAFG00000028763	ENSCAFT00000050209	sense	genic	0	containing	intronic
+0	XLOC_090947	TCONS_00232887	ENSCAFG00000002103	ENSCAFT00000013152	antisense	genic	0	containing	intronic
+0	XLOC_090947	TCONS_00232887	ENSCAFG00000029859	ENSCAFT00000048330	sense	genic	0	containing	intronic
