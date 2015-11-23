@@ -109,75 +109,8 @@ Add FEELnc scripts to your PATH and add the distribution-specific binary of Kmer
 	FEELnc_classifier.pl -i feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf -a annotation_chr38.gtf > candidate_lncRNA_classes.txt
 
 
-### Head of the principal output files on the toy exemple:
-**Filter**
-
-*candidate_lncRNA.gtf*: a GTF file containing each exon of all transcripts that passed the filter.
-
-	head -n2 candidate_lncRNA.gtf
-	 38	Cufflinks	exon	516103	518188	.	+	.	gene_id "XLOC_090599"; transcript_id "TCONS_00231416"; class_code "u"; exon_number "1"; oId "CUFF.138034.16"; tss_id "TSS139476";
-	 38	Cufflinks	exon	519376	519454	.	+	.	gene_id "XLOC_090599"; transcript_id "TCONS_00231416"; class_code "u"; exon_number "2"; oId "CUFF.138034.16"; tss_id "TSS139476";
-
-*transcript_chr38.feelncfilter.log*: the log of the filter, write each transcripts that have been removed and the reason.
-
-	head -n4 transcript_chr38.feelncfilter.log
-	 COMMAND
-	 /usr/bin/perl -w ${FEELNCPATH}/FEELnc_filter.pl -i transcript_chr38.gtf -a annotation_chr38.gtf -b transcript_biotype=protein_coding
-	 Filter monoexonic (option 0): TCONS_00234417 =  1 exon (with strand .)...
-	 Filter monoexonic (option 0): TCONS_00234233 =  1 exon (with strand .)...
-
-
-**Coding Potential**
-
-*candidate_lncRNA.gtf.lncRNA.gtf*: extraction of the original GTF file containing the transcripts predicted as lncRNAs.
-
-	head -n2 candidate_lncRNA.gtf.lncRNA.gtf
-	 38	Cufflinks	exon	516103	518188	.	+	.	gene_id "XLOC_090599"; transcript_id "TCONS_00231416"; class_code "u"; exon_number "1"; oId "CUFF.138034.16"; tss_id "TSS139476";
-	 38	Cufflinks	exon	519376	519454	.	+	.	gene_id "XLOC_090599"; transcript_id "TCONS_00231416"; class_code "u"; exon_number "2"; oId "CUFF.138034.16"; tss_id "TSS139476";
-
-*candidate_lncRNA.gtf.mRNA.gtf*: same as the previous file but for predicted mRNA transcripts.
-
-	head -n2 candidate_lncRNA.gtf.mRNA.gtf
-	 38	Cufflinks	exon	23052109	23052291	.	+	.	gene_id "XLOC_090839"; transcript_id "TCONS_00232417"; class_code "u"; exon_number "1"; oId "CUFF.139754.1"; tss_id "TSS139994";
-	 38	Cufflinks	exon	23053697	23053936	.	+	.	gene_id "XLOC_090839"; transcript_id "TCONS_00232417"; class_code "u"; exon_number "2"; oId "CUFF.139754.1"; tss_id "TSS139994";
-
-*candidate_lncRNA.gtf_RF_summary.txt*: file containing the threshold use for the prediction and the number of predicted lncRNAs and mRNAs.
-
-	cat candidate_lncRNA.gtf_RF_summary.txt
-	 # Summary file:
-	 -With_cutoff:	0.526
-	 -Nb_lncRNAs:	282
-	 -Nb_mRNAs:	59
-
-*candidate_lncRNA.gtf_RF.txt*: the result file of the random forest prediction. The kmerScore_* columns are the kmer score for the transcript for each kmer size, higer values representing a high occurence of common mRNA kmer. The ORF_cover is the ratio between the ORF size and the RNA size. The coding_potential column is the ratio between the number of trees who have vote for the transcript to be a mRNAand the total number of trees. The label column is the biotype prediction of the transcript (0: non coding, 1: coding) depending on is coding_potential and the threshold (see *candidate_lncRNA.gtf_RF_summary.txt*).
-
-	head -n3 candidate_lncRNA.gtf_RF.txt | column -t
-	 name            kmerScore_1mer  kmerScore_2mer  kmerScore_3mer  kmerScore_6mer  kmerScore_9mer  kmerScore_12mer  ORF_cover           RNA_size  coding_potential  label
-	 TCONS_00231401  0.489996        0.478795        0.447059        0.353341        0.355575        0.490291         0.0234859675036928  13540     0.136             0
-	 TCONS_00231402  0.485523        0.467847        0.435232        0.333433        0.203866        0.360465         0.0155639755173419  17155     0.114             0
-
-
-**Classifier**
-
-*candidate_lncRNA_classes.txt*: the file report statistics on the interaction and every interactions between lncRNA and RNA contained in the input annotation. Lines begining with a '#' are comments and lines begining with a '*' are the best interactions for a specific lncRNA.
-
-	head -n13 candidate_lncRNA_classes.txt
-	 #FEELnc Classification
-	 #lncRNA file :  lncrna : feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf
-	 #mRNA file : annotation_chr38.gtf
-	 #Minimal window size : 10000
-	 #Maximal window size : 100000
-	 #Number of lncRNA : 282
-	 #Number of mRNA : 293
-	 #Number of interaction : 345
-	 #Number of lncRNA without interaction : 30
-	 #List of lncRNA without interaction : TCONS_00231718 TCONS_00232885 TCONS_00231717 TCONS_00231711 TCONS_00232954 TCONS_00231758 TCONS_00232925 TCONS_00231770 TCONS_00231712 TCONS_00232969 TCONS_00232893 TCONS_00231948 TCONS_00231773 TCONS_00232894 TCONS_00232805 TCONS_00231757 TCONS_00232958 TCONS_00232876 TCONS_00232871 TCONS_00231772 TCONS_00232968 TCONS_00232872 TCONS_00232806 TCONS_00231962 TCONS_00232926 TCONS_00231942 TCONS_00232804 TCONS_00232808 TCONS_00231769 TCONS_00231774
-	 #INTERACTIONS
-	 *lncRNA	XLOC_090640	TCONS_00231611	RNA_partner	ENSCAFG00000010206	ENSCAFT00000016203	antisense	intergenic	1555	 Status=convergent	 Subtype=downstream
-	 *lncRNA	XLOC_090615	TCONS_00231491	RNA_partner	ENSCAFG00000009901	ENSCAFT00000046245	sense	intergenic	44590	 Status=same_strand	 Subtype=upstream
-
-
-For more details, see the specific parts on each modules
+### Results on the toy exemple:
+The **results** directory in **test** contain the results files on the toy exemple. For more details, see the specific parts on each modules.
 
 
 -------------------------
