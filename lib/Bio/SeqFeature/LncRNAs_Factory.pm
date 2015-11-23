@@ -149,6 +149,7 @@ sub DoItForMe{
 	my $lncrna_file = shift;
 	my $mrna_file = shift;
 	my $max_window = shift;
+	my $verbosity = shift;
 
 	print STDERR "window : $window - max window : $max_window - lncrna : $lncrna_file - mrna : $mrna_file\n";
 	my $db_lnc = Bio::SeqFeature::database_part->new();
@@ -198,9 +199,11 @@ sub DoItForMe{
 		$numberlnc++;
 
 		while (($interaction_per_lncRNA) == 0 && ($step*$window <= $max_window)) {
-			if ($step >1) {
-				print  STDERR "No interaction found for ", $object->get_tag_values("transcript_id"), " within a window  of size  ", $window*($step-1), ". Expanded to : ", $window*$step,"\n";
+		    if ($step >1) {
+			if($verbosity >= 2) {
+			    print  STDERR "No interaction found for ", $object->get_tag_values("transcript_id"), " within a window  of size  ", $window*($step-1), ". Expanded to : ", $window*$step,"\n";
 			}
+		    }
 
 			my $autour_s = $object->start() - $step*$window; # upstream
 			my $autour_e = $object->end() + $step*$window; #downstream
@@ -225,8 +228,10 @@ sub DoItForMe{
  			}
 
 
-			if ($nombre%100 ==0 && $prec !=$nombre ){
-				print STDERR " ... Looking for interactions, currently eq to $nombre \n" ;
+		    if ($nombre%100 ==0 && $prec !=$nombre ){
+			if($verbosity >= 1){
+			    print STDERR " ... Looking for interactions, currently eq to $nombre \n" ;
+			}
 				$prec = $nombre;
 			}
 
@@ -241,8 +246,6 @@ sub DoItForMe{
 
 	# Make a log file
 	my $logName = Utils::renamefile($lncrna_file, ".feelncclassifier.log");
-
-	print $lncrna_file."\t".$logName."\n";
 
 	# Open the file
 	open FILE, "> $logName" or die "Error! Cannot access log file '". $logName . "': ".$!;

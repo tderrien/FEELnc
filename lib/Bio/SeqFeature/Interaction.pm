@@ -12,13 +12,13 @@ Authors: Audrey DAVID - M2 Informatique opt Bioinfo Nantes
 		 Thomas	 DERRIEN - CNRS Rennes
 If you have questions please contact authors.
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 Implement several method to manipulate Interaction
-Implementation of classification rules of Derrien et al 2011. 
+Implementation of classification rules of Derrien et al 2011.
 =head1 Others
 
-Usually many of these method as Method has to be used like : 
+Usually many of these method as Method has to be used like :
 
 my $res = $interaction->Method();
 
@@ -33,7 +33,7 @@ use Carp;
 
 =head1 new
 
-Bio::SeqFeature::Interaction 
+Bio::SeqFeature::Interaction
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ Bio::SeqFeature::Interaction
 	_overlaps: Boolean
 	_direction 	 : 1, 0 or -1
 	_distance: integer value
-notice : 
+notice :
 	only the object and the subject can be set using new method
 	the others attributes have to be calculate using the appropriate method
 =cut
@@ -53,7 +53,7 @@ our $ABSTRACT='';
 
 sub new {
 my ($pkg, %args) = @_;
-	 
+
 my $interaction;
 	if( ($pkg eq 'Bio::SeqFeature::InterGenic') or ($pkg eq 'Bio::SeqFeature::Genic')) {
 
@@ -72,13 +72,13 @@ my $interaction;
 		}, $pkg;
 	}else {
 		croak (" Abstract class : Error \n Report to the manual or contact the authors \n");
-	 	## make it looks like an abstract class  
+	 	## make it looks like an abstract class
 	}
 
-	
+
 	if (exists $args{'-subject'}) {
 		if ( !defined ($args{'-subject'})){
-			carp(" Warning: Value subject not defined \n ");		
+			carp(" Warning: Value subject not defined \n ");
 		}else{
 			$interaction->subject($args{'-subject'});
 		}
@@ -90,7 +90,7 @@ my $interaction;
 			$interaction->object($args{'-object'});
 		}
 	}
- 
+
   return $interaction;
 }
 
@@ -98,7 +98,7 @@ my $interaction;
 
 Bio::SeqFeature:Interaction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 	set or get object values of an Bio::SeqFeature:Interaction object
 	must be a Bio::SeqFeatureI
 =cut
@@ -119,7 +119,7 @@ sub subject {
 
 Bio::SeqFeature:Interaction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 	set or get subject values of an Bio::SeqFeature:Interaction object
 	must be a Bio::SeqFeatureI
 =cut
@@ -172,14 +172,14 @@ sub _isComplete{
 
 Bio::SeqFeature:Interaction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 	get direction values of an Bio::SeqFeature:Interaction object
- 
+
 =cut
 
 sub direction {
 
-	my $self = shift; 
+	my $self = shift;
 	my $direction = $self->_get_direction();
 	return $direction;
 }
@@ -191,7 +191,7 @@ sub _set_direction {
 	if (@_) {
 		$self->{'_direction'} = shift;
 	}else {
-		croak ("direction undefined, cannot set direction \n"); # i want it to die because it's a protected method; then the developper make an error 
+		croak ("direction undefined, cannot set direction \n"); # i want it to die because it's a protected method; then the developper make an error
 	}
 }
 
@@ -200,7 +200,7 @@ sub _set_direction {
 # Bio::SeqFeature:Interaction
 
 sub _get_direction {
-	my $self = shift; 
+	my $self = shift;
 	if (_isDefined($self->{'_direction'}) == 0 ) { #1st call is not defined
 		$self->_set_direction($self->_calculate_direction);
 		my $direction = $self->_get_direction();
@@ -229,12 +229,12 @@ sub _calculate_direction {
 
 Bio::SeqFeature:Interaction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 	get type of an Bio::SeqFeature:Interaction object
 =cut
 sub type {
 
-	my $self = shift; 
+	my $self = shift;
 	my $type = $self->_get_type();
 	return $type;
 }
@@ -244,7 +244,7 @@ sub _set_type {
 	if (@_) {
 		$self->{'_type'} = shift;
 	}else {
-		croak ("Type undefined, cannot set type value \n"); # i want it to die because it's a protected method; then the developper make an error 
+		croak ("Type undefined, cannot set type value \n"); # i want it to die because it's a protected method; then the developper make an error
 	}
 }
 
@@ -253,7 +253,7 @@ sub _set_type {
 # Bio::SeqFeature:Interaction
 
 sub _get_type {
-	my $self = shift; 
+	my $self = shift;
 	if (! defined $self->{'_type'}) { #1st call is not defined
 		$self->_set_type($self->_calculate_type);
 		my $type = $self->_get_type();
@@ -269,9 +269,9 @@ sub _calculate_type {
 	my $object = $self->object();
 	my $subject = $self->subject();
 	if (_isComplete($self) == 1 ){
-		if ($subject->overlaps($object) == 1){ 
+		if ($subject->overlaps($object) == 1){
 			return(1); # genic
-		}else { 
+		}else {
 			return(0); #intergenic
 		}
 	} else { croak (" Interaction : calculate_direction : You must have an object and a subject to have calculate a direction \n ");}
@@ -281,7 +281,7 @@ sub _calculate_type {
 
 Bio::SeqFeature:Interaction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 	get distance inside a complete interaction : object and subject are store
 	if type is not set it will be calculate and store
 =cut
@@ -315,7 +315,7 @@ sub _calculate_distance{
 			$distance = $self->{'_object'}->start() - $self->{'_subject'}->end();
 			if ( $distance < 0 ) {
 				$distance = $self->{'_subject'}->start() - $self->{'_object'}->end();
-			}	
+			}
 		}
 		return $distance;
 	}
@@ -334,9 +334,9 @@ sub _set_distance {
 
 =head1 overlap()
 
-returns the number of bases that are overlapping for a genic interaction 
+returns the number of bases that are overlapping for a genic interaction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 this fucntions calculates the number of bases that overalps between the subject and object
 
 =cut
@@ -362,7 +362,7 @@ sub _get_overlap {
 
 sub _calculate_overlap{
 	my $self = shift;
-	
+
 	if (_isComplete($self) == 0 ){
 		croak (" Interaction : get_distance : calculate_distance : You must have an object and a subject to have calculate a distance \n ");
 	}
@@ -370,7 +370,7 @@ sub _calculate_overlap{
 		my $type = $self->type();
 		my $overlap =0;
 		if ( $type == 1) {
-			$overlap=$self->overlap();		
+			$overlap=$self->overlap();
 		}
 		return $overlap;
 	}
@@ -391,7 +391,7 @@ sub _set_overlap {
 
 Bio::SeqFeature:Interaction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 	$interaction->printer_mini()
 	print minimal interaction informations
 =cut
@@ -399,10 +399,16 @@ Bio::SeqFeature:Interaction
 sub printer_mini {
 	my $self=shift;
 	my $best = shift;
-	
-	if (defined $best) {print '*'}
-#	print 	join ("\t", $self->object()->primary_tag(),  $self->object()->get_tag_values("gene_id"),  $self->object()->get_tag_values("transcript_id"),  $self->subject()->primary_tag(), $self->subject()->get_tag_values("gene_id"), $self->subject()->get_tag_values("transcript_id"),  _conversion_direction($self->direction()), _conversion_type($self->type()), $self->distance());
-	print 	join ("\t", $self->object()->primary_tag(),  $self->object()->get_tag_values("gene_id"),  $self->object()->get_tag_values("transcript_id"),  "RNA_partner", $self->subject()->get_tag_values("gene_id"), $self->subject()->get_tag_values("transcript_id"),  _conversion_direction($self->direction()), _conversion_type($self->type()), $self->distance());
+
+	#VW: variable best
+	my $bestVal = 0;
+	# VW modif
+	if (defined $best) {$bestVal = 1}
+
+	# print 	join ("\t", $self->object()->primary_tag(),  $self->object()->get_tag_values("gene_id"),  $self->object()->get_tag_values("transcript_id"),  $self->subject()->primary_tag(), $self->subject()->get_tag_values("gene_id"), $self->subject()->get_tag_values("transcript_id"),  _conversion_direction($self->direction()), _conversion_type($self->type()), $self->distance());
+	# print 	join ("\t", $self->object()->primary_tag(),  $self->object()->get_tag_values("gene_id"),  $self->object()->get_tag_values("transcript_id"),  "RNA_partner", $self->subject()->get_tag_values("gene_id"), $self->subject()->get_tag_values("transcript_id"),  _conversion_direction($self->direction()), _conversion_type($self->type()), $self->distance());
+
+	print 	join ("\t", $bestVal, $self->object()->get_tag_values("gene_id"), $self->object()->get_tag_values("transcript_id"), $self->subject()->get_tag_values("gene_id"), $self->subject()->get_tag_values("transcript_id"), _conversion_direction($self->direction()), _conversion_type($self->type()), $self->distance());
 }
 
 
@@ -410,7 +416,7 @@ sub printer_mini {
 
 Bio::SeqFeature:Interaction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 	$interaction->printer()
 	print interaction informations
 =cut
@@ -418,7 +424,7 @@ Bio::SeqFeature:Interaction
 sub printer {
 	my $self = shift;
 	my $inversion = _sayme_switching($self->{'_object'});
-	
+
 #	print "\t Object \n";
 #	_ligne_carre();
 	_print_finfo($self->{'_object'});
@@ -429,20 +435,20 @@ sub printer {
 			_mRNA_informations($self->{'_object'});
 		}
 
-	
+
 	print "\t Subject \n";
 	_ligne_carre();
 	_print_finfo($self->{'_subject'});
-	
+
 	# print subject specific informations according to his primary tag
 		if ($inversion == 1){
 			_mRNA_informations($self->{'_subject'});
 		}else{
 			_lncRNA_informations($self->{'_subject'});
 		}
-		
+
 	if ($self->{'_subject'}->seq_id() eq "-555") {
-			
+
 		print "\t Interaction information \n";
 		_ligne_carre();
 		print "\t Direction : ", _conversion_direction($self->direction()),"\n";
@@ -451,18 +457,18 @@ sub printer {
 		if( _isComplete($self) == 1) { print ("",$self->distance(), "\n");} else { print "NULL \n";}
 	}
 	print "Yahohooh\n";
-	_ligne_carre();	
+	_ligne_carre();
 }
 sub _mRNA_informations{
 	my $elem = shift;
 	print "\t || Transcript id : ",$elem->get_tag_values("transcript_id"), "\n";
-	
+
 }
 sub _lncRNA_informations{
 	my $elem = shift;
 	print "\t || Transcript id : ",$elem->get_tag_values("transcript_id"), "\n";
-    #print "\t || Gene id : ",$elem->get_tag_values("gene_id"), "\n"; 
-	
+    #print "\t || Gene id : ",$elem->get_tag_values("gene_id"), "\n";
+
 }
 # when you switch the object and subject , then, theirs attributes are not the same, the bioPerl class
 # raise fatal error
@@ -497,8 +503,8 @@ sub _print_finfo{
 }
 
 # transform the direction interger value in the appropriate direction string value <<< lawl
-# 0 <=> direction 
-# 1 <=> anti direction 
+# 0 <=> direction
+# 1 <=> anti direction
 sub _conversion_direction {
 	my $i= shift;
 	my %direction = ("1","sense","-1","antisense","0","strand(s) unknow");
@@ -509,21 +515,21 @@ sub _conversion_direction {
 
 
 # transform the type interger value in the appropriate type string value <<< lawl
-# 0 <=> intergenic 
+# 0 <=> intergenic
 # 1 <=> genic
 
 sub _conversion_type {
 	my $i = shift;
 	my @TYPES= ("intergenic", 'genic');
 	return ($TYPES[$i]);
-	
+
 }
 
 sub isGenic {
 	my $self = shift;
 	my $type = $self->type();
 	if ($type == 1){ return 1;} else { return 0;}
-	
+
 }
 sub isInterGenic{
 	my $self = shift;
@@ -531,7 +537,7 @@ sub isInterGenic{
 	if ($type == 1){ return 0;} else { return 1;}
 }
 
-## print the object tags list   
+## print the object tags list
 sub tags_list {
 	my $self = shift;
 	my @ks = keys(%{$self});
@@ -544,13 +550,13 @@ sub tags_list {
 sub get_tag_value{
 	my $self  = shift; #interaction
 	my $tag   = shift; # the tag
-	
+
 	if (_isExist_hash($self,$tag) == 1){
 		return $self->{$tag};
 	}
 	#$self->tags_list();
 	return -555; #"tag does not exist";
-	
+
 }
 
 # look for the existance of a key in a hash

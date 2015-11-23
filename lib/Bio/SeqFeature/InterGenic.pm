@@ -6,7 +6,7 @@ SUPER CLASS : Interaction
 
 Bio::SeqFeature::InteractionCollection
 
-Use : Interaction 
+Use : Interaction
 
 =head1 ABOUT
 Authors: Audrey DAVID - M2 Informatique opt Bioinfo Nantes
@@ -14,10 +14,10 @@ Authors: Audrey DAVID - M2 Informatique opt Bioinfo Nantes
 		 Thomas	 DERRIEN - CNRS Rennes
 If you have questions contact authors.
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 Implement several method to manipulate intergenic interaction
-Implementation of classification rules of Derrien et al 2011. 
+Implementation of classification rules of Derrien et al 2011.
 
 =cut
 
@@ -32,9 +32,9 @@ use Bio::SeqFeature::Generic;
 
 Bio::SeqFeature::InterGenic
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
-constructor	 
+constructor
 =cut
 sub new {
 
@@ -60,7 +60,7 @@ sub _get_upstream{
 		$self->_set_upstream($self->isUpstream());
 	}
 	return $self->{'_upstream'};
-	
+
 }
 # private method : _get_divergent
 # function : get divergent parameter
@@ -75,11 +75,11 @@ sub _get_divergent{
 	return $self->{'_divergent'};
 }
 
-				
+
 # private method : _set_upstream
 # function : set upstream parameter
 # arg(s): $self
-# return: /				
+# return: /
 sub _set_upstream{
 	my $self = shift;
 	if (@_){
@@ -105,10 +105,10 @@ sub _set_divergent{
 =cut
 =head1 isUpstream()
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 	my $res = $interaction->isUpstream();
-	return 1 if it's an upstream interaction 
-	return 0 if it's a downstream interaction 
+	return 1 if it's an upstream interaction
+	return 0 if it's a downstream interaction
 =cut
 
 sub isUpstream{
@@ -119,24 +119,24 @@ sub isUpstream{
 	}
 	my $object = $self->object();
 	my $subject = $self->subject();
-	
+
 	# Obj = lncRNA
 	#print STDERR "obj : ", $object->get_tag_values("transcript_id"), "\n";
-	
+
 	if ($subject->strand == 1) {
 		if ($object->start() > $subject->end()){
 			return 0; #is downstream
 		}
 		return 1; #is upstream
 	}
-	
+
 	if ($subject->strand == -1) {
 		if ($object->start() > $subject->end()){
 			return 1; #is upstream
 		}
 		return 0; #is  downstream
 	}
-	
+
 }
 
 # private method : _get_subtype
@@ -164,12 +164,12 @@ sub _calculate_subtype(){
 	my $interaction = shift;
 	if ($interaction->_isComplete() == 0) {
 		croak ("To make operation on interaction, you must have an complete interaction \n");
-	}	
+	}
 	if ($interaction->isUpstream){
 		return 1; # upstream
 	}
 	return 0; # downstream
-		
+
 }
 
 
@@ -191,10 +191,10 @@ sub _set_subtype{
 =cut
 =head1 isDownstream()
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 	my $res = $interaction->isDownstream();
-	return 1 if it's a downstream interaction 
-	return 0 if it's an upstream interaction 
+	return 1 if it's a downstream interaction
+	return 0 if it's an upstream interaction
 =cut
 
 # oppposite :  is amont
@@ -207,16 +207,16 @@ sub isDownstream{
 		return 1;
 	}
 }
- 
+
 
 =head1 isDivergent()
 
 Bio::SeqFeature:Interaction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 	my $res = $interaction->isDivergent();
 	say if the interaction belong to Divergent class
-	object direction 1 , subject direction -1 
+	object direction 1 , subject direction -1
 =cut
 
 sub isDivergent{
@@ -229,7 +229,7 @@ sub isDivergent{
 	}else{ # anti direction
 		my $object = $self->object();
 		my $subject = $self->subject();
-		
+
 		#		if ( ($object->strand() ==1 &&  $self->isUpstream()) || ($object->strand() == -1 && $self->isDownstream() == 1 ) ) {
 		# VW: modification of the condition
 		if ( $self->isDownstream() == 1 ) {
@@ -244,13 +244,13 @@ sub isDivergent{
 
 Bio::SeqFeature:Interaction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 	my $res = $interaction->subtype();
 	get subtype value of an Bio::SeqFeature:Interaction object
 =cut
 
 sub subtype{
-	
+
 	my $self = shift;
 	return $self->_get_subtype();
 }
@@ -260,11 +260,11 @@ sub subtype{
 
 Bio::SeqFeature:Interaction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 	$interaction->printer();
 	print information of an Bio::SeqFeature:Interaction object
- 
-=cut	
+
+=cut
 # this fonction use the SUPER printer and is also defined in intergenic
 sub printer {
 	my $self = shift;
@@ -281,18 +281,21 @@ sub printer {
 
 Bio::SeqFeature:Interaction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 	$interaction->printer_mini();
 	print information of an Bio::SeqFeature:Interaction object
- 
-=cut	
+
+=cut
 # this fonction use the SUPER printer and is also defined in intergenic
 sub printer_mini {
 	my $self = shift;
 	my $best=shift;
 	$self->SUPER::printer_mini($best);
-	print "\t Status=",_print_divergent($self->_get_divergent());
-	print "\t Subtype=",_print_subtype($self->subtype()),"\n";
+	# print "\t Status=",_print_divergent($self->_get_divergent());
+	# print "\t Subtype=",_print_subtype($self->subtype()),"\n";
+	#VW modif
+	print "\t",_print_divergent($self->_get_divergent());
+	print "\t",_print_subtype($self->subtype()),"\n";
 
 }
 # private method : _print_divergent

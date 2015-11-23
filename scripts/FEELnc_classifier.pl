@@ -6,7 +6,7 @@ use warnings;
 use Pod::Usage;
 use Getopt::Long;
 use File::Basename;
-        
+
 # database parameters and type are always required
 # you  might want to give two others parameters, always going together, gff3 file and gtf file from cuffmerge
 use Bio::SeqFeature::database_part;
@@ -14,22 +14,24 @@ use Bio::SeqFeature::LncRNAs_Factory;
 use Bio::SeqFeature::InteractionCollection;
 
 # Global Variables
-my $lncrna_file		="";
-my $mrna_file		="";
-my $window			= 10000; # 10kb
-my $maxwindow		= 100000; # 100kb 
-my $help			= 0;
-my $man				= 0;
+my $lncrna_file	="";
+my $mrna_file   ="";
+my $window      = 10000; # 10kb
+my $maxwindow   = 100000; # 100kb
+my $verbosity   = 0;
+my $help        = 0;
+my $man         = 0;
 
 
 # Parsing parameters
 GetOptions(
-	"window|w=i"	=> \$window,
-    "lncrna|i=s"	=> \$lncrna_file,
-    "mrna|a=s"		=> \$mrna_file,
+    "window|w=i"    => \$window,
+    "lncrna|i=s"    => \$lncrna_file,
+    "mrna|a=s"      => \$mrna_file,
     "maxwindow|m=i" => \$maxwindow,
-    "help|?"		=> \$help,
-	"man"		=> \$man,    
+    "verbosity|v=i" => \$verbosity,
+    "help|?"        => \$help,
+    "man"           => \$man,
     ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -44,8 +46,8 @@ pod2usage("Error: Cannot read your input annotation file '$mrna_file'...\nFor he
 
 unless (defined $maxwindow) {$maxwindow=$window};
 
-my $collection =  Bio::SeqFeature::LncRNAs_Factory->DoItForMe($window,$lncrna_file,$mrna_file,$maxwindow);
- 
+my $collection =  Bio::SeqFeature::LncRNAs_Factory->DoItForMe($window,$lncrna_file,$mrna_file,$maxwindow,$verbosity);
+
 $collection->print_all_interactions();
 exit(0);
 
@@ -60,7 +62,7 @@ __END__
 
 =head1 NAME
 
-FEELnc_classifier.pl - classifying new lncRNAs w.r.t to the annotation of mRNAs 
+FEELnc_classifier.pl - classifying new lncRNAs w.r.t to the annotation of mRNAs
 
 =head1 VERSION
 
@@ -72,46 +74,46 @@ FEELnc_classifier.pl -i lncRNA.gtf -a mRNA.gtf  > lncRNA_classes.txt
 
 =head1 DESCRIPTION
 
-FEELnc (Fast and Effective Extraction of Long non-coding RNAs) is dedicated to the annotation of lncRNAs 
+FEELnc (Fast and Effective Extraction of Long non-coding RNAs) is dedicated to the annotation of lncRNAs
 based on a set of transcripts as input (basically a cufflink transcripts.gtf file)
 The last step if the pipeline (FEELnc_classifier) consists in classifying new lncRNAs w.r.t to the annotation of mRNAs in order to annotate :
 
 * Intergenic lncRNAs i.e lincRNAs
-	
+
 	- divergent : when the lincRNA is transcribed in an opposite direction (head to head) w.r.t to the closest mRNA
-	
+
 	- convergent: when the lincRNA is transcribed in a convergent direction w.r.t to the closest mRNA
-	
+
 	- same_strand: when the lincRNA is transcribed in a same starnd w.r.t to the closest mRNA
 
 * Genic lncRNAs:  lncRNAs overlapping mRNAs either
-	
+
 	- Exonic:
 		antisense : at least one lncRNA exon overlaps in antisense an mRNA exon
 		sense : there should not be since there are filtered in the first step
-	
+
 	- Intronic:
 		antisense : lncRNA exon overlaps in antisense mRNA introns (but none exons)
 		sense : lncRNA exon overlaps in sense mRNA introns (but none exons)
-	
+
 	- Containing:
 		antisense : lncRNA intron overlaps antisense mRNA exons
 		sense : lncRNA intron overlaps sense mRNA exons
-		
+
 =head1 OPTIONS
 
 =head2 General
 
   --help                Print this help
   --man                 Open man page
-  --verbosity		Level of verbosity
-  
+  -v,--verbosity	Level of verbosity
+
 
 =head2 Mandatory arguments
 
-  -i,--lncrna=file.gtf		Specify the lncRNA GTF file 
+  -i,--lncrna=file.gtf	Specify the lncRNA GTF file
   -a,--mrna=file.gtf	Specify the annotation GTF file (file of protein coding annotation)
-  
+
 
 =head2 Filtering arguments
 
@@ -122,13 +124,13 @@ The last step if the pipeline (FEELnc_classifier) consists in classifying new ln
 
 =over 4
 
-=item - 
+=item -
 Valentin Wucher <vwucher@univ-rennes1.fr>
 
-=item 
+=item
 Thomas Derrien <tderrien@univ-rennes1.fr>
 
-=item  
+=item
 Fabrice Legeai <fabrice.legeai@inria.fr>
 
 =back

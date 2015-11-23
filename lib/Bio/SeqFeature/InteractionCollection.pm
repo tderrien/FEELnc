@@ -17,12 +17,12 @@ Authors: Audrey DAVID - M2 Informatique opt Bioinfo Nantes
 		 Thomas	 DERRIEN - CNRS Rennes
 If you have questions contact authors.
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 Implement several method to manipulate Collection of interaction
-Implementation of classification rules of Derrien et al 2011. 
+Implementation of classification rules of Derrien et al 2011.
 = head1 Others
-Usually many of these method as Method has to be used like : 
+Usually many of these method as Method has to be used like :
 
 my $res = $col->Method();
 
@@ -32,7 +32,7 @@ $col->Method();
 Please check the description
 
 =cut
- 
+
 use Bio::SeqFeature::Interaction;
 use Bio::SeqFeature::InteractionIterator;
 
@@ -41,11 +41,11 @@ use Bio::SeqFeature::InteractionIterator;
 
 Bio::SeqFeature::InteractionCollection
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 my $coll = Bio::SeqFeature::InteractionCollection->new(@interactions)
-contains a list of subjects index and  a list of objects index	 
-	 
+contains a list of subjects index and  a list of objects index
+
 =cut
 
 
@@ -55,12 +55,12 @@ sub new {
 	 _subjects => undef,
 	 _objects => undef,
 	}, $pkg;
-	
-	
+
+
 	foreach my $interaction (@_) {
 		#print $interaction," j'ajoute une interaction\n";
-	
-		if ($interaction->isa('Bio::SeqFeature::Interaction')) {			
+
+		if ($interaction->isa('Bio::SeqFeature::Interaction')) {
 			$coll->add_interaction($interaction);# add the interaction to a pointer to the object seqfeature object
 			# add the interaction to a pointer to the subject seqfeature object
 		}
@@ -68,7 +68,7 @@ sub new {
 			carp("you have to give a list of Bio::SeqFeature::Interaction to InteractionCollection");
 		}
 	}
-		
+
   return $coll;
 }
 
@@ -80,7 +80,7 @@ sub new {
 
 Bio::SeqFeature::Interaction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 add an Interaction or a list of interaction in a collection of interactions
 
@@ -104,10 +104,10 @@ sub add_interaction{
 sub _add_interaction_object{
 	my $self = shift;
 	my $interaction = shift;
-	my $object_indx = $interaction->object(); #index 
+	my $object_indx = $interaction->object(); #index
 
-	
-	push (@{$self->{'_objects'}->{$object_indx}}, $interaction); # add the interaction to a pointer to the object seqfeature object	
+
+	push (@{$self->{'_objects'}->{$object_indx}}, $interaction); # add the interaction to a pointer to the object seqfeature object
 }
 
 ### add the subject of the interaction
@@ -116,8 +116,8 @@ sub _add_interaction_subject{
 	my $self = shift;
 	my $interaction = shift;
 	my $subject_indx = $interaction->subject();
-	
-	push (@{$self->{'_subjects'}->{$subject_indx}}, $interaction); 
+
+	push (@{$self->{'_subjects'}->{$subject_indx}}, $interaction);
 }
 
 
@@ -128,15 +128,15 @@ returns a list of Bio::SeqFeature
 
 =head1 DESCRIPTION
 
-this function returns the list of subjects of interactions 
+this function returns the list of subjects of interactions
 
 =cut
 
 sub get_subjects {
 	my $self = shift;
-	
+
 	return  keys %{$self->{'_subjects'}};
-	
+
 }
 
 
@@ -146,37 +146,37 @@ returns a list of Bio::SeqFeature
 
 =head1 DESCRIPTION
 
-this function returns the list of objects of interactions 
+this function returns the list of objects of interactions
 
 =cut
 
 sub get_objects {
 	my $self = shift;
-	
+
 	return  keys %{$self->{'_objects'}};
-	
+
 }
 
 =head1 get_interaction
 
 Bio::SeqFeature
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
-get all Interaction share by an seqfeature 
+get all Interaction share by an seqfeature
 
 the seqfeature can be
 	 object => (1),
 	 subject => (2),
 	 both => (3).
-	 
+
 by defeault the seqfeature can be all the second parameter is 3
 
-if the seqfeature is the object fill 1 for the second parameter 
+if the seqfeature is the object fill 1 for the second parameter
 if the seqfeature is the subject fill 2 for the second parameter
 
 
-$col->get_interaction($feature, 2 ); #look for all interaction shared by $feature and in which $feature is the subject 
+$col->get_interaction($feature, 2 ); #look for all interaction shared by $feature and in which $feature is the subject
 
 note:  if you pass an unrecognized second argument, than the default one will be called (means : all )
 
@@ -193,13 +193,13 @@ sub get_interactions{
 	if ( $option == 2 ){ #want to get all interaction in which the index is the subject
 		$iterator->add( $col->_get_interactions_subject($index ) );
 	}elsif ($option == 1){ #want to get all interaction in which the index is the object
-	
- 
+
+
 		$iterator->add( $col->_get_interactions_object($index ) );
 	}else{ #both
 		$iterator->add( $col->_get_interactions_object($index) ,$col->_get_interactions_subject($index ) );
 	}
-	
+
 	return $iterator;
 }
 
@@ -211,8 +211,8 @@ sub get_interactions{
 sub _getArray_from_hash {
 	my %hash = %{$_[0]};
 	my $cle = $_[1];
-	
- 
+
+
 	if ( _isExist_hash (\%hash, $cle) == 0 ){
 		print " Key not found \n";
 		return undef; #object not found
@@ -233,7 +233,7 @@ sub _isExist_hash {
 
 	return 0;
 }
- 
+
 
 # private method : _get_interactions_object
 # function : look for all interaction having object $object
@@ -241,8 +241,8 @@ sub _isExist_hash {
 sub _get_interactions_object{
 	my $self = shift;
 	my $index = shift;
-	
-	
+
+
 	return ( _getArray_from_hash(\%{$self->{'_objects'}},$index));
 }
 
@@ -251,8 +251,8 @@ sub _get_interactions_object{
 
 sub _get_interactions_subject{
 	my $self = shift;
-	my $index = shift;	
-	
+	my $index = shift;
+
 	return ( _getArray_from_hash(\%{$self->{'_subjects'}},$index));
 }
 
@@ -298,7 +298,7 @@ sub _get_accordingTO_direction {
 	my @tab = @{$_[0]}; # array  of Interactions object
 	my $direction = $_[1];
 	my @array_direction = ();
-	
+
 	#print " __________________________________dans le get AC TO direction  ______ \n";
 	for ( my $i = 0; $i <= $#tab; $i++){
 		#print " dans le for $i \n";
@@ -321,7 +321,7 @@ sub _get_accordingTO_subtype_and_type {
 	for ( my $i = 0; $i <= $#tab; $i++){
 		#print " dans le for $i \n";
 		#print "dois je ajouter : ", $tab[$i]->type ," == ", $type ," && " , $tab[$i]->subtype() ," == ", $subtype," \n";
-		
+
 		if( $tab[$i]->type == $type && $tab[$i]->subtype() == $subtype){
 		#	print "j ajoute car : ", $tab[$i]->type ," == ", $type ," && " , $tab[$i]->subtype() ," == ", $subtype," \n";
 			push(@array_subtype, $tab[$i]);
@@ -336,7 +336,7 @@ sub _get_accordingTO_nested {
 	my @tab = @{$_[0]}; # array  of Interactions object
 	my $nested = $_[1];
 	my @array_nested = ();
-	
+
 	#	print " __________________________________dans le get AC TO nested  ______ \n";
 	for ( my $i = 0; $i <= $#tab; $i++){
 	#	print " dans le for $i \n";
@@ -355,7 +355,7 @@ sub _get_accordingTO_divergent {
 	my @tab = @{$_[0]}; # array  of Interactions object
 	my $divergent = $_[1];
 	my @array_divergent = ();
-	
+
 	#	print " __________________________________dans le get AC TO divergent  ______ \n";
 	for ( my $i = 0; $i <= $#tab; $i++){
 	#	print " dans le for $i \n";
@@ -372,20 +372,20 @@ sub _get_accordingTO_divergent {
 
 Bio::SeqFeature::CollectionInteraction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
-return an BIo::SeqFeature::Iterator object containing interactions 
+return an BIo::SeqFeature::Iterator object containing interactions
 
 =cut
 sub get_all_interactions {
 	my $collection = shift;
  	my $iterator = Bio::SeqFeature::InteractionIterator->new();
- 	
+
  	foreach my $k ( keys (%{$collection->{'_objects'}}) ) {
  		my @array = _getArray_from_hash(\%{$collection->{'_objects'}}, $k);
 
- 		$iterator->add(@array); 	
- 	} 
+ 		$iterator->add(@array);
+ 	}
 	return $iterator;
 }
 
@@ -393,24 +393,28 @@ sub get_all_interactions {
 
 Bio::SeqFeature::CollectionInteraction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
-print all the collection 
+print all the collection
 
 =cut
 
 sub print_all_interactions {
 	my $collection = shift;
 	my @objects=$collection->get_objects();
+
+	#VW: print the header
+	print "isBest\tlncRNA_gene\tlncRNA_transcript\tpartnerRNA_gene\tpartnerRNA_transcript\tdirection\ttype\tdistance\tsubtype\tlocation\n";
+
 	foreach my $object (@objects) {
 		my $best =$collection->get_the_best_interaction($object);
-		$best->printer_mini('best'); 
+		$best->printer_mini('best');
 		foreach my $interaction ($collection->_get_interactions_object($object)) {
 			unless ($interaction->subject() == $best->subject()) {
 				$interaction->printer_mini();
 			}
 		}
-	}  
+	}
 }
 
 
@@ -419,38 +423,38 @@ sub print_all_interactions {
 
 Bio::SeqFeature::CollectionInteraction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 my $interaction = $coll->get_the_best_interaction($feature);
 
-return the best interaction for a particular Feature. This is to say :   
+return the best interaction for a particular Feature. This is to say :
 	- if there is a genic interaction it returns those with the maximal overlap in bp, otherwise it returns the closest
 =cut
 
 sub get_the_best_interaction {
 	my $collection = shift;
 	my $object= shift;
-	
+
 	my $best;
-	
+
 	#print STDERR "obj : $object\n";
 	foreach my $interaction  ($collection->_get_interactions_object($object)) {
 	#	print STDERR "inteearction : $interaction\n";
 			unless (defined $best) {
 				$best= $interaction;
 				next;
-			}	
+			}
 			if ($interaction->isGenic()) {
 				if ($best->isGenic) {
 					if ($interaction->overlap() > $best->overlap()) {
 						$best=$interaction;
-					}				
+					}
 				}
 				else {
 					$best=$interaction;
 				}
 			}
-			
+
 			if ($interaction->isInterGenic) {
 				if ($best->isGenic) {
 					next;
@@ -459,12 +463,12 @@ sub get_the_best_interaction {
 					if ($interaction->distance < $best->distance) {
 						$best=$interaction;
 					}
-				}	
+				}
 			}
 	}
-	
+
 	return $best;
-		
+
 
 }
 
@@ -473,18 +477,18 @@ sub get_the_best_interaction {
 
 Bio::SeqFeature::CollectionInteraction
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
- say if the string type is correct 
+ say if the string type is correct
  return the associated number
  or the opposite
 =cut
 sub sayme_type{
-	
+
 my $type = shift;
-	
+
 	my %TYPES = ( 'intergenic' =>  '0' , 'genic' => '1' , '0' => 'intergenic' , '1' => 'genic');
- 
+
 	if (exists $TYPES{$type}){
 		#print " type: ", $type , "\n";
 		return ( $TYPES{$type} );
@@ -497,7 +501,7 @@ my $type = shift;
 
  return Bio::SeqFeature::InteractionIterator
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 check if interactions corresponding to a list of fixed tags
 better to use get_interactions_with_tags_values
@@ -511,58 +515,58 @@ sub get_interactions_with_tags{
 
 	if(@_){
 		#print "les tags sont : \n";
-		my %args = @_;	
-		
+		my %args = @_;
+
 		#while (my ($cle, $v) = each(%args))  {
 		#	print "cle : $cle , val : $v, _____ $args{$cle} -------\n";
 		#	}
-		
-		
+
+
 		# on wich interaction do we working ?
-		
+
 		### add objects interactions wich have $object as object
-	
+
 		if (exists $args{'-object'}) {
 			if ( !defined ($args{'-object'})){
-				carp(" Warning: Value object not defined \n ");		
+				carp(" Warning: Value object not defined \n ");
 			}else{
 				$iterator = $col->get_interactions($args{'-object'},1)  ;
 				print " tag object set \n";
 			}
 		}elsif (exists $args{'-subject'}) {
 			if ( !defined ($args{'-subject'})){
-				carp(" Warning: Value subject not defined \n ");		
+				carp(" Warning: Value subject not defined \n ");
 			}else{
 				$iterator = $col->get_interactions($args{'-subject'},2)  ;
 				print " tag subject set \n";
 			}
 		}elsif ( exists $args{'-both'} ) {
 			if ( !defined ($args{'-both'}) ){
-				carp(" Warning: Value both not defined \n ");		
+				carp(" Warning: Value both not defined \n ");
 			}else{
 				$iterator = $col->get_interactions( $args{'-both'} ,3)  ;
 				print " tag both set \n";
 			}
 		}else { # you want to work on the complete collection
-			
+
 			$iterator = $col->get_all_interactions();
-			print " Default : work on all collection  \n"; 
+			print " Default : work on all collection  \n";
 		}
-		
+
 		if (_isDefined(@{$iterator->{'_array'}}) == 0){
 			print " Number of interactions : 0 \n";
 			_nointeraction_found();
 			return $iterator;
 		}
 		# we have an iterator on an array of interactions
-	
-	
-### ### add the interactions for tag subtype 
-	
+
+
+### ### add the interactions for tag subtype
+
 		if ( _isExist_hash(\%args,'-subtype') ) {
 			print " subtype  existe! \n";
 			if ( !defined ($args{'-subtype'})){
-				carp(" Warning: Value '-subtype' not defined \n ");		
+				carp(" Warning: Value '-subtype' not defined \n ");
 			}else{
 				print " tag subtype set \n";
 				my ($subtype,$type) = _sayme_subtype_type($args{'-subtype'});
@@ -573,28 +577,28 @@ sub get_interactions_with_tags{
 			print " no tag subtype \n";
 		}
 
-	
-	
-### ### add the interactions for tag direction 
-	
+
+
+### ### add the interactions for tag direction
+
 		if (exists $args{'-direction'}) {
 			if ( !defined ($args{'-direction'})){
-				carp(" Warning: Value '-direction' not defined \n ");		
+				carp(" Warning: Value '-direction' not defined \n ");
 			}else{
 				print " tag direction set \n";
 				#print " \n looking for specific direction interaction  \n";
 				my @array = @{$iterator->{'_array'}};
 				$iterator=Bio::SeqFeature::InteractionIterator->new(_get_accordingTO_direction(\@array,$args{'-direction'}) ) ;
-			
+
 			}
 		}else{
 			print " no tag direction \n";
 		}
-### ### add the interactions for tag type 
-	
+### ### add the interactions for tag type
+
 		if (exists $args{'-type'}) {
 			if ( !defined ($args{'-type'})){
-				carp(" Warning: Value '-type' not defined \n ");		
+				carp(" Warning: Value '-type' not defined \n ");
 			}else{
 				print " tag type set \n";
 				#print " \nlooking for specific type interaction  \n";
@@ -606,27 +610,27 @@ sub get_interactions_with_tags{
 		}else {
 			print " no tag type \n";
 		}
-### ### add the interactions for tag divergent 
-	
+### ### add the interactions for tag divergent
+
 		if (exists $args{'-divergent'}) {
 			if ( !defined ($args{'-divergent'})){
-				carp(" Warning: Value '-divergent' not defined \n ");		
+				carp(" Warning: Value '-divergent' not defined \n ");
 			}else{
 				print " tag divergent set \n";
 				#print " \nlooking for specific divergent interaction  \n";
 				my @array = @{$iterator->{'_array'}};
- 
+
 				$iterator=Bio::SeqFeature::InteractionIterator->new( _get_accordingTO_divergent(\@array, $args{'-divergent'} ))  ;
 			}
 		}else{
 			print " no tag divergent \n";
-		}	
-		
-### ### add the interactions for tag nested 
-	
+		}
+
+### ### add the interactions for tag nested
+
 		if (exists $args{'-nested'}) {
 			if ( !defined ($args{'-nested'})){
-				carp(" Warning: Value '-nested' not defined \n ");		
+				carp(" Warning: Value '-nested' not defined \n ");
 			}else{
 				print " tag nested set \n";
 				#print " \nlooking for specific divergent interaction  \n";
@@ -636,7 +640,7 @@ sub get_interactions_with_tags{
 		}else{
 			print " no tag nested \n";
 		}
-	
+
 	}	#if of %args
 	print " \n";
 	return $iterator;
@@ -647,7 +651,7 @@ sub get_interactions_with_tags{
 
  return Bio::SeqFeature::InteractionIterator
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 whatever are the tags and values, check if interactions corresponding
 see the list of tags in the manual , or using tags_list method
@@ -666,9 +670,9 @@ sub get_interactions_with_tags_values{
 			return $iterator;
 	}
 	my $iterator2 = Bio::SeqFeature::InteractionIterator->new();
-	
 
-	my %args = @_;	
+
+	my %args = @_;
 	while (my ($cle, $v) = each(%args))  {
 		print "cle : $cle , val : $v \n";
 		## inside the  interactions list
@@ -676,17 +680,17 @@ sub get_interactions_with_tags_values{
 			 print " ----",$interaction->get_tag_value($cle) , " == ", $v , "\n";
 			# if ($interaction->type()==0){$interaction->printer();}
 			if ( $interaction->get_tag_value($cle) eq $v ){
-				print  "jadd \n";	
+				print  "jadd \n";
 				$iterator2->add($interaction);
 			}
 		}
 		#aucune gestion de la mémoire
-		$iterator = $iterator2; 
+		$iterator = $iterator2;
 		$iterator2 =  Bio::SeqFeature::InteractionIterator->new();
-		
-	}	
-	
-	return $iterator;	
+
+	}
+
+	return $iterator;
 }
 
 =cut
@@ -694,14 +698,14 @@ sub get_interactions_with_tags_values{
 
  return Bio::SeqFeature::InteractionIterator
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 You might want to have a list of  interaction wich have a specific distance.
-Example : less or equal to 400 bases 
+Example : less or equal to 400 bases
 	$collection->get_with_distance_value(400,'le')
 	eq : equal
 	lt : less than
-	le : less or equal to 
+	le : less or equal to
 	gt : greater than
 	ge : greater or equal to
 =cut
@@ -713,9 +717,9 @@ sub get_with_distance_value{
 	my $operator = shift;
 	my $iterator = $collection->get_all_interactions();
 	my $iterator_output = Bio::SeqFeature::InteractionIterator->new();
-	
-	
-		
+
+
+
 	if (_isDefined($operator) == 0 or $operator eq 'eq' ){
 		$operator = "1";
 	}elsif($operator eq 'le'){
@@ -731,7 +735,7 @@ sub get_with_distance_value{
 	}
 
 	while (my $interaction = $iterator->next()){ # je parcours mon itérateur dans le but de regarder si distance interaction correspond
-		
+
 		if($operator == 1 ){
 			if( $interaction->distance() == $distance ) {
 				$iterator_output->add($interaction);
@@ -763,7 +767,7 @@ sub get_with_distance_value{
 
  return Bio::SeqFeature::InteractionIterator
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 You might want to have a list of interaction having distance within an intervalle
 
@@ -777,52 +781,52 @@ sub get_interactions_with_intervalle {
 	my $iterator_output = Bio::SeqFeature::InteractionIterator->new();
 	my $inf = shift;
 	my $sup = shift;
-	
+
 	my $rejet = 0;
 	my $all = 0;
 	if (_isDefined($inf) == 1 && _isDefined($sup) == 1){
-		while (my $interaction = $iterator->next()){ 
+		while (my $interaction = $iterator->next()){
 			if( $interaction->distance() >= $inf && $interaction->distance() <= $sup ) {
- 
+
 				$iterator_output->add($interaction);
-			
+
 			}else{
- 
+
 				$rejet++;
 			}
 			$all++;
 		}
 	}
-	
+
 	print " Total number of interactions :  ", $all;
-	
+
 	print " Total number of rejected interactions :  ", $rejet;
 	return $iterator_output;
-	
+
 }
 
 
 
-=cut 
+=cut
 =head1 objects_list
 
  return a list of Bio::SeqFeature
 
-=head1 DESCRIPTION 
+=head1 DESCRIPTION
 
 	You might want to know the list of object containing in the collection
-	
-=cut 
+
+=cut
 
 ## hash keys 3rd level
 sub objects_list {
 	my $collection =shift;
 	my @object = keys (%{$collection->{'_objects'}});
 	my @objects;
- 
+
 		foreach my $k (@object){
 			push (@objects, $collection->{'_objects'}->{$k}->[0]->object()); # then we have the object object
- 
+
 		}
 	return @objects;
 }
@@ -837,15 +841,15 @@ sub _sayme_subtype_type{
 	my @in = (2,1);
 	my @ov = (3,1);
 	my %SUBS_and_TYPES = ( 'upstream' =>  \@up , 'downstream' => \@down, 'exonic' => \@ex, 'intronic' => \@in , 'overlapping' => \@ov );
- 
-	
+
+
 	if (exists $SUBS_and_TYPES{$subtype}){
 		return ( @{$SUBS_and_TYPES{$subtype}} );
 	}
 	croak (" Unknow subtype : \" $subtype \". Maybe the syntax is incorrect. \n Please read the manual to know the subtype we used \n") ; # error
 }
 # private method : _nointeraction_found
-# function : message where no interaction are founded 
+# function : message where no interaction are founded
 sub _nointeraction_found{
 	print " Error : I am sorry. We did not detect any interaction. \n";
 	print "         Please be sure the lncRNAs and mRNAs have tag type set to respectively lncRNAs and mRNAs \n";
