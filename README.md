@@ -102,8 +102,8 @@ Add FEELnc scripts to your PATH and add the distribution-specific binary of Kmer
     -b transcript_biotype=protein_coding > candidate_lncRNA.gtf
 
 	# Coding_Potential
-	# Note1 :  as a test, the training is only done on  1000 tx (-n 1000 option)
-	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa -n 1000
+	# Note1: as a test, the training is only done on 1000 mRNA and 1000 intergenic sequences (-n 1000,1000 option)
+	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa -n 1000,1000
 
 	# Classifier
 	FEELnc_classifier.pl -i feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf -a annotation_chr38.gtf > candidate_lncRNA_classes.txt
