@@ -110,7 +110,7 @@ Add FEELnc scripts to your PATH and add the distribution-specific binary of Kmer
 
 
 ### Results on the toy exemple:
-The *results* directory in *test* contain the results files on the toy exemple. For more details, see the specific parts on each modules.
+The *results* directory in *test* contains the results files on the toy exemple. For more details, see the specific parts on each modules.
 
 
 -------------------------
