@@ -240,7 +240,10 @@ sub DoItForMe{
 
 
 	# Make a log file
-	my $logName = rename($lncrna_file, ".feelncclassifier.log");
+	my $logName = Utils::renamefile($lncrna_file, ".feelncclassifier.log");
+
+	print $lncrna_file."\t".$logName."\n";
+
 	# Open the file
 	open FILE, "> $logName" or die "Error! Cannot access log file '". $logName . "': ".$!;
 
@@ -254,7 +257,6 @@ sub DoItForMe{
 	print FILE "#Number of interaction : $nombre \n";
 	print FILE "#Number of lncRNA without interaction : ",scalar(@no_interaction), "\n";
 	print FILE "#List of lncRNA without interaction : ", join (" ", @no_interaction), "\n";
-	print FILE "#INTERACTIONS\n";
 
 	close FILE;
 
