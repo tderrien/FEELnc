@@ -1,7 +1,7 @@
 # FEELnc
  FlExible Extraction of Long non-coding RNAs
 
-*Version (23/11/2015): Update of the classifier output. Now the classifier write a log file containing the line which began with a # before the update. The major output file is now formated as a tabulated matrix with a header.*
+*Version (23/11/2015): Update of the classifier output. Now the classifier write (i) a log file containing statisitcs on the inteactions (i.e the line which began with a # before the update) and (ii) a main output file which is now formated as a tabulated matrix with a header.*
 
 *Version (10/11/2015): Major Update. Correction of bug  during ORF sequences extraction from a GTF containing CDS information (the sequence was containing the RNA sequence in addition to the ORF). If you launched FEELnc analysis with a GTF including CDS information, please re-run your analysis with this new version. Sorry for the inconvenience.*
 
@@ -277,8 +277,8 @@ Options:
 
 The last step of the pipeline consists in classifying new lncRNAs w.r.t to the localisation and the direction of transcription of proximal RNA transcripts
 
-Indeed, classifying lncRNAs with mRNA could help to predict functions for lncRNAs.
-For all newly identified lncRNAs transcripts, a sliding window strategy is used to check for possible overlap with transcripts in the reference annotation.
+Indeed, classifying lncRNAs with mRNAs could help to predict functions for lncRNAs.
+For all newly identified lncRNAs transcripts, a sliding window strategy is used to check for possible overlap with nearest transcripts from the reference annotation.
 
 If an overlap is found, the lncRNAs is considered as **GENIC** otherwise it is **INTERGENIC** (lincRNA) .
 
@@ -297,8 +297,11 @@ Foreach lncRNA interaction, a best lncRNA:mRNA interaction is identified in the 
 
 **- OUTPUT :**
 
+If your input file is called **INPUT**, the classifier will create these output files:
 
-A summary of the number of the input parameters and numbers of interactions is given in the beginning of the file.
+	 - {INPUT}_feelncclassifier.log: general statistics on the number of interactions
+	 - {INPUT}_classes.txt: tabulated-format file with all the interactions
+
 
 The classes are defined as in Derrien et al, Genome Research. 2012, and can be prioritized according to :
 
@@ -325,6 +328,7 @@ Illustration of the classification:
 Example:
 
 ```
+cat {INPUT}_feelncclassifier.log
 #FEELnc Classification
 #lncRNA file :  lncrna : lncRNA_34.gtf
 #mRNA file : 34.gtf
@@ -335,24 +339,28 @@ Example:
 #Number of interaction : 180
 #Number of lncRNA without interaction : 369
 #List of lncRNA without interaction : TCONS_00162422 TCONS_00163593 TCONS_00160948 TCONS_00162636 TCONS_00161917 TCONS_00161884 TCONS_00162654 TCONS_00164153 TCONS_00162630 TCONS_00161117 TCONS_00163030 TCONS_00162985 TCONS_00162306 TCONS_00162438
-#INTERACTIONS
-*lncRNA  XLOC_053965  TCONS_00160885  RNA_partner  ENSCAFG00000025966  ENSCAFT00000040249  antisense  genic       0    Status=containing   Subtype=intronic
-lncRNA   XLOC_053965  TCONS_00160885  RNA_partner  ENSCAFG00000008990  ENSCAFT00000014276  antisense  intergenic  217  Status=divergent    Subtype=upstream
-lncRNA   XLOC_053965  TCONS_00160885  RNA_partner  ENSCAFG00000008997  ENSCAFT00000014283  antisense  intergenic  979  Status=convergent   Subtype=downstream
-lncRNA   XLOC_053965  TCONS_00160885  RNA_partner  ENSCAFG00000008997  ENSCAFT00000014282  antisense  intergenic  979  Status=convergent   Subtype=downstream
-*lncRNA  XLOC_055197  TCONS_00163966  RNA_partner  ENSCAFG00000014726  ENSCAFT00000046107  antisense  genic       0    Status=nested       Subtype=exonic
-lncRNA   XLOC_055197  TCONS_00163966  RNA_partner  ENSCAFG00000014726  ENSCAFT00000023388  antisense  genic       0    Status=overlapping  Subtype=exonic
-*lncRNA  XLOC_054505  TCONS_00162285  RNA_partner  ENSCAFG00000022834  ENSCAFT00000034941  sense      genic       0    Status=containing   Subtype=intronic
-lncRNA   XLOC_054505  TCONS_00162285  RNA_partner  ENSCAFG00000014605  ENSCAFT00000023189  antisense  genic       0    Status=containing   Subtype=intronic
-*lncRNA  XLOC_054288  TCONS_00161746  RNA_partner  ENSCAFG00000013503  ENSCAFT00000043054  antisense  genic       0    Status=overlapping  Subtype=intronic
-lncRNA   XLOC_054288  TCONS_00161746  RNA_partner  ENSCAFG00000032221  ENSCAFT00000046514  sense      genic       0    Status=containing   Subtype=intronic
+```
+
+```
+cat {INPUT}_classes.txt
+isBest  lncRNA_gene  lncRNA_transcript  partnerRNA_gene     partnerRNA_transcript  direction  type        distance  subtype      location
+1       XLOC_090743  TCONS_00232056     ENSCAFG00000013346  ENSCAFT00000021186     antisense  intergenic  377       divergent    upstream
+1       XLOC_090720  TCONS_00231943     ENSCAFG00000026373  ENSCAFT00000040656     sense      intergenic  66670     same_strand  upstream
+1       XLOC_090678  TCONS_00231794     ENSCAFG00000010781  ENSCAFT00000017151     antisense  genic       0         nested       intronic
+0       XLOC_090678  TCONS_00231794     ENSCAFG00000010794  ENSCAFT00000017171     sense      intergenic  8293      same_strand  upstream
+0       XLOC_090678  TCONS_00231794     ENSCAFG00000010781  ENSCAFT00000017154     antisense  genic       0         overlapping  intronic
+1       XLOC_090878  TCONS_00232599     ENSCAFG00000009675  ENSCAFT00000015370     sense      intergenic  19181     same_strand  upstream
+1       XLOC_090974  TCONS_00232971     ENSCAFG00000010842  ENSCAFT00000017240     sense      intergenic  85066     same_strand  downstream
+1       XLOC_090620  TCONS_00231531     ENSCAFG00000009999  ENSCAFT00000015918     antisense  genic       0         overlapping  exonic
+0       XLOC_090620  TCONS_00231531     ENSCAFG00000009970  ENSCAFT00000015870     antisense  intergenic  516       divergent    upstream
+
 ```
 
 Here is showed 4 interactions concerning 3 lncRNAs (TCONS_00160885, TCONS_00161746, TCONS_00162285 and TCONS_00163966) where one lncRNA (TTCONS_00160885) has 4 interactions with a window size of 1,000 nt.
 (The best interactions are marked as ***lncRNA**)
 
 \* **Note1**: At the moment, the interactions are computed with the reference file (-a option).
-Therefore, the possibly newly identified mRNAs in the previous step are not included by default (but you could include them by (cuff)merging with you reference annotation).
+Therefore, the possibly newly identified mRNAs in the previous step are not included by default (but you could include them by merging/pasting it with you reference annotation).
 
 \* **Note2**:  you may see a warning message like this:
 
