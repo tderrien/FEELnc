@@ -276,13 +276,16 @@ Options:
 
 ### 3- FEELnc_classifier.pl
 
+
 The last step of the pipeline consists in classifying new lncRNAs w.r.t to the localisation and the direction of transcription of proximal RNA transcripts because classifying lncRNAs with mRNAs could help to predict functions for lncRNAs.
+
+**- Tpes on interactions:**
 
 For all newly identified lncRNAs transcripts, a sliding window strategy is used to check for possible overlap with nearest transcripts from the reference annotation. 
 A first level of classification disciminates 2 **TYPES** of interactions:
 
-* GENIC  : when the lncRNA gene overlaps an RNA gene from the reference annotation file.
-* INTERGENIC (lincRNA):  otherwise
+* `GENIC`  : when the lncRNA gene overlaps an RNA gene from the reference annotation file.
+* `INTERGENIC` (lincRNA):  otherwise
 
 Then, **subtypes** and **locations** are defined according the orientation of the interactions and the localisation of the interactions (See OUTPUT and last figure for more details):
 
@@ -305,9 +308,11 @@ Then, **subtypes** and **locations** are defined according the orientation of th
 
 Foreach lncRNA interaction, a best lncRNA:RNA_partner interaction is identified in the output file with a value == 1 in the first column **isBest** (0 otherwise). This flag is defined according to the following rule:
 
- - for **INTERGNIC** : the best RNA partner is the closest to the lincRNA
- - for **GENIC**	: the best RNA partner is by rule of priority (exonic, then the fraction of exonic overlap) > intronic > containing.
+ - for `INTERGNIC` : the best RNA partner is the **closest** to the lincRNA
+ - for `GENIC`	: the best RNA partner is by rule of priority **exonic** (then the fraction of exonic overlap) > **intronic** > **containing**.
 
+
+**- Launch the classifier :**
 
 ```
 	FEELnc_classifier.pl -i lncRNA.gtf -a  ref_annotation.GTF > lncRNA_classes.txt
