@@ -294,11 +294,11 @@ Then, **subtypes** and **locations** are defined according the `orientation` of 
    * then `exonic` or `intronic` locations.
 
 * `INTERGENIC` type :
- * `_divergent_` subtype	: the lncRNA is oriented in head to head with the closest RNA partner transcript
+ * `divergent` subtype	: the lncRNA is oriented in head to head with the closest RNA partner transcript
    * then `upstream` or `downstream` locations.
- * `_convergent_` subtype	: the lncRNA is oriented in tail to tail with the closest RNA partner transcript
+ * `convergent` subtype	: the lncRNA is oriented in tail to tail with the closest RNA partner transcript
    * then `upstream` or `downstream` locations.
- * `_same_strand_`subtype	: the lncRNA is transcribed in the same orientation with the closest RNA partner transcript
+ * `same_strand`subtype	: the lncRNA is transcribed in the same orientation with the closest RNA partner transcript
    * then `upstream` or `downstream` locations.
 
 
@@ -322,25 +322,7 @@ If your input file is called **INPUT**, the classifier will create these output 
 
 
 
-- **Intergenic lncRNAs** (i.e lincRNAs)
- - *divergent*  : when the lincRNA is transcribed in an opposite direction (head to head) w.r.t to the closest RNA partner (depending on distance, they could share a bi-directional promoter).
- - *convergent*: when the lincRNA is transcribed in a convergent direction w.r.t to the closest RNA partner.
- - *same_strand*: when the lincRNA is transcribed in a same starnd w.r.t to the closest RNA partner
 
-- **Genic lncRNAs** (lncRNAs overlapping an annotated RNA)
- - *Exonic* :
-    - antisense : at least one lncRNA exon overlaps in antisense an RNA exon
-    - sense :  should correspond to lncRNAs overlapping non protein-coding transcripts (depending on the Filter option) and most probably lncRNAs host transcripts for small ncRNAs (snoRNAs, snRNAs, miRNAs...)
- - *Intronic* :
-    - antisense : lncRNA exon overlaps in antisense RNA introns (but none exons)
-    - sense : lncRNA exon overlaps in sense RNA introns (but none exons)
- - *containing*:
-    - antisense : lncRNA intron overlaps antisense RNA
-    - sense : lncRNA intron overlaps sense RNA exons
-
-Illustration of the classification:
-![ScreenShot](./image/FEELnc_lncRNA_classification_intergenic.png)
-![ScreenShot](./image/FEELnc_lncRNA_classification_genic.png)
 
 Example:
 
@@ -375,6 +357,10 @@ isBest  lncRNA_gene  lncRNA_transcript  partnerRNA_gene     partnerRNA_transcrip
 
 Here is showed 4 interactions concerning 3 lncRNAs (TCONS_00160885, TCONS_00161746, TCONS_00162285 and TCONS_00163966) where one lncRNA (TTCONS_00160885) has 4 interactions with a window size of 1,000 nt.
 (The best interactions are marked as ***lncRNA**)
+
+Illustration of the classification:
+![ScreenShot](./image/FEELnc_lncRNA_classification_intergenic.png)
+![ScreenShot](./image/FEELnc_lncRNA_classification_genic.png)
 
 \* **Note1**: At the moment, the interactions are computed with the reference file (-a option).
 Therefore, the possibly newly identified mRNAs in the previous step are not included by default (but you could include them by merging/pasting it with you reference annotation).
