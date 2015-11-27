@@ -1,4 +1,5 @@
-# FEELnc : FlExible Extraction of Long non-coding RNAs
+# FEELnc : 
+## FlExible Extraction of Long non-coding RNAs
  
 
 *Version (23/11/2015): Update of the classifier output. Now the classifier write (i) a log file containing statisitcs on the inteactions (i.e the line which began with a # before the update) and (ii) a main output file which is now formated as a tabulated matrix with a header.*
@@ -283,7 +284,7 @@ A first level of classification disciminates 2 **TYPES** of interactions:
 * GENIC  : when the lncRNA gene overlaps an RNA gene from the reference annotation file.
 * INTERGENIC (lincRNA):  otherwise
 
-Then, **subtypes** and **locations** are defined according the `orientation` of the interactions and the `localisation` of the interactions (See OUTPUT for full details):
+Then, **subtypes** and **locations** are defined according the orientation of the interactions and the localisation of the interactions (See OUTPUT and last figure for more details):
 
 * `GENIC` type :
  * `overlapping` subtype	: the lncRNA partially overlaps the RNA partner transcript
@@ -358,7 +359,7 @@ isBest  lncRNA_gene  lncRNA_transcript  partnerRNA_gene     partnerRNA_transcrip
 Here is showed 4 interactions concerning 3 lncRNAs (TCONS_00160885, TCONS_00161746, TCONS_00162285 and TCONS_00163966) where one lncRNA (TTCONS_00160885) has 4 interactions with a window size of 1,000 nt.
 (The best interactions are marked as ***lncRNA**)
 
-Illustration of the classification:
+* Illustration of the classification:*
 ![ScreenShot](./image/FEELnc_lncRNA_classification_intergenic.png)
 ![ScreenShot](./image/FEELnc_lncRNA_classification_genic.png)
 
