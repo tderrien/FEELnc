@@ -1,5 +1,5 @@
-# FEELnc
- FlExible Extraction of Long non-coding RNAs
+# FEELnc : FlExible Extraction of Long non-coding RNAs
+ 
 
 *Version (23/11/2015): Update of the classifier output. Now the classifier write (i) a log file containing statisitcs on the inteactions (i.e the line which began with a # before the update) and (ii) a main output file which is now formated as a tabulated matrix with a header.*
 
