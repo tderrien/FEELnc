@@ -286,19 +286,19 @@ A first level of classification disciminates 2 **TYPES** of interactions:
 Then, **subtypes** and **locations** are defined according the orientation of the interactions and the localisation of the interactions (See OUTPUT for full details):
 
 * **GENIC** subtypes :
- * **overlapping**	: the lncRNA partially overlaps the mRNA partner transcript
+ * _overlapping_	: the lncRNA partially overlaps the RNA partner transcript
    * then **exonic** or **intronic** locations.
- * **containing** 	: the lncRNA contains the RNA partner transcript
+ * _containing_ 	: the lncRNA contains the RNA partner transcript
    * then **exonic** or **intronic** locations.
- * **nested**	: the lncRNA is contained in the RNA partner transcript
+ * _nested_	: the lncRNA is contained in the RNA partner transcript
    * then **exonic** or **intronic** locations.
 
 * **INTERGENIC** subtypes :
- * **divergent**
+ * _divergent_ 	: the lncRNA is oriented in head to head with the closest RNA partner transcript
    * then **upstream** or **downstream** locations.
- * **convergent**
+ * _convergent_ 	: the lncRNA is oriented in tail to tail with the closest RNA partner transcript
    * then **upstream** or **downstream** locations.
- * **same_strand**
+ * _same_strand_	the lncRNA is transcribed in the same orientation with the closest RNA partner transcript
    * then **upstream** or **downstream** locations.
 
 
