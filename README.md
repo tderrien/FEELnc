@@ -330,7 +330,7 @@ If your input file is called **INPUT**, the classifier will create these output 
 
 
 
-Example:
+Output examples-:
 
 ```
 cat {INPUT}_feelncclassifier.log
@@ -361,10 +361,11 @@ isBest  lncRNA_gene  lncRNA_transcript  partnerRNA_gene     partnerRNA_transcrip
 
 ```
 
-Here is showed 4 interactions concerning 3 lncRNAs (TCONS_00160885, TCONS_00161746, TCONS_00162285 and TCONS_00163966) where one lncRNA (TTCONS_00160885) has 4 interactions with a window size of 1,000 nt.
-(The best interactions are marked as ***lncRNA**)
+Here is showed 9 interactions concerning 6 lncRNAs where one lncRNA (TCONS_00231794) has 3 interactions with a window size of 1,000 nt.
+(The best interactions are labelled with a 1 in isBest column)
 
-** Illustration of the classification:**
+**- Illustration of the classification :**
+
 ![ScreenShot](./image/FEELnc_lncRNA_classification_intergenic.png)
 ![ScreenShot](./image/FEELnc_lncRNA_classification_genic.png)
 
