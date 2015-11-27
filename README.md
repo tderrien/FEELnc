@@ -283,23 +283,23 @@ A first level of classification disciminates 2 **TYPES** of interactions:
 * GENIC  : when the lncRNA gene overlaps an RNA gene from the reference annotation file.
 * INTERGENIC (lincRNA):  otherwise
 
-Then, **subtypes** and **locations** are defined according the orientation of the interactions and the localisation of the interactions (See OUTPUT for full details):
+Then, **subtypes** and **locations** are defined according the `orientation` of the interactions and the `localisation` of the interactions (See OUTPUT for full details):
 
-* **GENIC** subtypes :
- * _overlapping_	: the lncRNA partially overlaps the RNA partner transcript
-   * then **exonic** or **intronic** locations.
- * _containing_ 	: the lncRNA contains the RNA partner transcript
-   * then **exonic** or **intronic** locations.
- * _nested_	: the lncRNA is contained in the RNA partner transcript
-   * then **exonic** or **intronic** locations.
+* `GENIC` type :
+ * `overlapping` subtype	: the lncRNA partially overlaps the RNA partner transcript
+   * then `exonic` or `intronic` locations.
+ * `containing` subtype	: the lncRNA contains the RNA partner transcript
+   * then `exonic` or `intronic` locations.
+ * `nested` subtype	: the lncRNA is contained in the RNA partner transcript
+   * then `exonic` or `intronic` locations.
 
-* **INTERGENIC** subtypes :
- * **_divergent_** 	: the lncRNA is oriented in head to head with the closest RNA partner transcript
-   * then _upstream_ or _downstream_ locations.
- * **_convergent_** 	: the lncRNA is oriented in tail to tail with the closest RNA partner transcript
-   * then **upstream** or **downstream** locations.
- * **_same_strand_**	the lncRNA is transcribed in the same orientation with the closest RNA partner transcript
-   * then **upstream** or **downstream** locations.
+* `INTERGENIC` type :
+ * `_divergent_` subtype	: the lncRNA is oriented in head to head with the closest RNA partner transcript
+   * then `upstream` or `downstream` locations.
+ * `_convergent_` subtype	: the lncRNA is oriented in tail to tail with the closest RNA partner transcript
+   * then `upstream` or `downstream` locations.
+ * `_same_strand_`subtype	: the lncRNA is transcribed in the same orientation with the closest RNA partner transcript
+   * then `upstream` or `downstream` locations.
 
 
 Foreach lncRNA interaction, a best lncRNA:RNA_partner interaction is identified in the output file with a value == 1 in the first column **isBest** (0 otherwise). This flag is defined according to the following rule:
@@ -321,7 +321,6 @@ If your input file is called **INPUT**, the classifier will create these output 
 	 - {INPUT}_classes.txt: tabulated-format file with all the interactions
 
 
-The classes are defined as in Derrien et al, Genome Research. 2012, and can be prioritized according to :
 
 - **Intergenic lncRNAs** (i.e lincRNAs)
  - *divergent*  : when the lincRNA is transcribed in an opposite direction (head to head) w.r.t to the closest RNA partner (depending on distance, they could share a bi-directional promoter).
