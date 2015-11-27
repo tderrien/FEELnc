@@ -275,19 +275,34 @@ Options:
 
 ### 3- FEELnc_classifier.pl
 
-The last step of the pipeline consists in classifying new lncRNAs w.r.t to the localisation and the direction of transcription of proximal RNA transcripts
+The last step of the pipeline consists in classifying new lncRNAs w.r.t to the localisation and the direction of transcription of proximal RNA transcripts because classifying lncRNAs with mRNAs could help to predict functions for lncRNAs.
 
-Indeed, classifying lncRNAs with mRNAs could help to predict functions for lncRNAs.
-For all newly identified lncRNAs transcripts, a sliding window strategy is used to check for possible overlap with nearest transcripts from the reference annotation.
+For all newly identified lncRNAs transcripts, a sliding window strategy is used to check for possible overlap with nearest transcripts from the reference annotation. 
+A first level of classification disciminates 2 **TYPES** of interactions:
 
-If an overlap is found, the lncRNAs is considered as **GENIC** otherwise it is **INTERGENIC** (lincRNA) .
+	 - **GENIC** : when the lncRNA gene overlaps an RNA gene from the reference annotation file.
+	 - **INTERGENIC** (lincRNA):  otherwise
 
-Then, subclasses are defined according the features and direction of overlap (See OUTPUT for full details).
+Then, **subtypes** and **locations** are defined according the orientation of the interactions and the localisation of the interactions (See OUTPUT for full details):
+	 - **GENIC subtypes** : 
+	 	-- overlapping	: the lncRNA partially overlaps the mRNA partner transcript
+			--- then exonic or intronic **locations**
+		-- containing 	: the lncRNA contains the RNA partner transcript
+			--- then exonic or intronic **locations**
+		-- nested	: the lncRNA is contained in the RNA partner transcript
+			--- then exonic or intronic **locations**
+	 - **INTERGENIC subtypes** 
+	 	-- divergent
+			--- then upstream or downstream **locations**
+		-- convergent
+			--- then upstream or downstream **locations**
+		-- same_strand
+			--- then upstream or downstream **locations**
 
-Foreach lncRNA interaction, a best lncRNA:mRNA interaction is identified in the output file by a line starting with '*' and defined as followed:
+Foreach lncRNA interaction, a best lncRNA:RNA_partner interaction is identified in the output file with a value == 1 in the first column **isBest** (0 otherwise). This flag is defined according to the following rule:
 
  - for **INTERGNIC** : the best RNA partner is the closest to the lincRNA
- - for **GENIC**	: the best RNA partner is by rule of priority (exonic then the fraction of exonicof overlap) then intronic then containing.
+ - for **GENIC**	: the best RNA partner is by rule of priority (exonic, then the fraction of exonic overlap) > intronic > containing.
 
 
 ```
