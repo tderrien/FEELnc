@@ -312,7 +312,7 @@ Foreach lncRNA interaction, a best lncRNA:RNA_partner interaction is identified 
  - for `GENIC`	: the best RNA partner is by rule of priority **exonic** (then the fraction of exonic overlap) > **intronic** > **containing**.
 
 
-**- Launch the classifier :**
+**- USAGE :**
 
 ```
 	FEELnc_classifier.pl -i lncRNA.gtf -a  ref_annotation.GTF > lncRNA_classes.txt
@@ -330,7 +330,7 @@ If your input file is called **INPUT**, the classifier will create these output 
 
 
 
-Output examples-:
+Output examples:
 
 ```
 cat {INPUT}_feelncclassifier.log
