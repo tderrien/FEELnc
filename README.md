@@ -294,11 +294,11 @@ Then, **subtypes** and **locations** are defined according the orientation of th
    * then **exonic** or **intronic** locations.
 
 * **INTERGENIC** subtypes :
- * _divergent_ 	: the lncRNA is oriented in head to head with the closest RNA partner transcript
+ * **_divergent_** 	: the lncRNA is oriented in head to head with the closest RNA partner transcript
+   * then _upstream_ or _downstream_ locations.
+ * **_convergent_** 	: the lncRNA is oriented in tail to tail with the closest RNA partner transcript
    * then **upstream** or **downstream** locations.
- * _convergent_ 	: the lncRNA is oriented in tail to tail with the closest RNA partner transcript
-   * then **upstream** or **downstream** locations.
- * _same_strand_	the lncRNA is transcribed in the same orientation with the closest RNA partner transcript
+ * **_same_strand_**	the lncRNA is transcribed in the same orientation with the closest RNA partner transcript
    * then **upstream** or **downstream** locations.
 
 
