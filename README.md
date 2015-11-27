@@ -285,21 +285,21 @@ A first level of classification disciminates 2 **TYPES** of interactions:
 
 Then, **subtypes** and **locations** are defined according the orientation of the interactions and the localisation of the interactions (See OUTPUT for full details):
 
-* GENIC subtypes :
+* **GENIC** subtypes :
  * overlapping	: the lncRNA partially overlaps the mRNA partner transcript
-  * then exonic or intronic **locations**
+   * then **exonic** or **intronic** locations.
  * containing 	: the lncRNA contains the RNA partner transcript
-  * then exonic or intronic **locations**
+   * then **exonic** or **intronic** locations.
  * nested	: the lncRNA is contained in the RNA partner transcript
-  * then exonic or intronic **locations**
+   * then **exonic** or **intronic** locations.
 
-* INTERGENIC subtypes :
- * divergent
-  * then upstream or downstream **locations**
+* **INTERGENIC** subtypes :
+ * **divergent**
+   * then **upstream** or **downstream** locations.
  * convergent
-  * then upstream or downstream **locations**
+   * then **upstream** or **downstream** locations.
  * same_strand
-  * then upstream or downstream **locations**
+   * then **upstream** or **downstream** locations.
 
 
 Foreach lncRNA interaction, a best lncRNA:RNA_partner interaction is identified in the output file with a value == 1 in the first column **isBest** (0 otherwise). This flag is defined according to the following rule:
