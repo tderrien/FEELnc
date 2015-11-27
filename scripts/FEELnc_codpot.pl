@@ -37,10 +37,10 @@ my $lncRNAfile = undef;
 my %biotype;
 my $man        = 0;
 my $help       = 0;
-my $verbosity  = 0;
+my $verbosity  = 1;
 # my $outputlog;
-my $numtx    = undef;	# VW: number of mRNAs and lncRNAs tx for training separate by a ','. undef or '.'  for all transcripts
-my $minnumtx = 100;	# Min number of tx for training (a too small value will result in a bad learning)
+my $numtx    = undef; # number of mRNAs and lncRNAs tx for training separate by a ','. undef or '.'  for all transcripts
+my $minnumtx = 100;   # Min number of tx for training (a too small value will result in a bad learning)
 
 
 # VW Add a variable to get the kmer size which are used to get the kmer scores
@@ -202,7 +202,7 @@ if($outName eq "")
 
 # For $outDiradd a '/' at the end of the path
 if (-d $outDir ){
-	warn "Warning: Output directory '$outDir' already exists... files might be overwritten!\n";
+	print STDERR "Warning: Output directory '$outDir' already exists... files might be overwritten!\n";
 }elsif (-r $outDir){
 	die "Error: Output directory '$outDir' is a file... aborting!\n";
 } else{
@@ -226,8 +226,8 @@ my $nameTmp = $outTmp."/".$$."_".$outName;
 srand($seed);
 
 # If $numtx is undef, then learning on all transcripts, can be long so print a warning...
-print "You do not have specified a maximum number mRNAs transcripts for the training. Use all the annotation, can be long...\n"  if(!defined $numtxCod);
-print "You do not have specified a maximum number lncRNA transcripts for the training. Use all the annotation, can be long...\n" if(!defined $numtxNon);
+print STDERR "You do not have specified a maximum number mRNAs transcripts for the training. Use all the annotation, can be long...\n"  if(!defined $numtxCod);
+print STDERR "You do not have specified a maximum number lncRNA transcripts for the training. Use all the annotation, can be long...\n" if(!defined $numtxNon);
 
 
 #############################################################
@@ -245,8 +245,6 @@ my $kisPath = Utils::pathProg("KmerInShort");
 my $mRNAfileformat = Utils::guess_format($mRNAfile);
 pod2usage ("- Error: Cannot train the program if lncRNA training file (-l option) is not defined and mRNA file (-a option) is in FASTA format!\nPlease, provide the mRNA/annotation file in .GTF format so that I could extract intergenic sequences for training...\n") if (!defined $lncRNAfile && $mRNAfileformat eq "fasta");
 
-
-print "> Preparing files for random forest...\n";
 
 # Define fasta file names
 my $codFile    = $nameTmp.".coding_rna.fa";
@@ -266,17 +264,18 @@ my $rfout = $outDir.$outName."_RF.txt";
 # add a refhash that will contain the mRNA ID that passed cDNA and ORF steps
 # Will be used to checked for randomization
 my $ref_cDNA_passed;
-## VW modification
 my $refmrna;
 
 # Get cDNA and ORF for coding training file
 if($mRNAfileformat eq "gtf")      # -- if GTF
 {
 
+    print STDERR "> Extract ORFs/cDNAs for mRNAs from a GTF file\n";
     ($ref_cDNA_passed, $refmrna) = ExtractCdnaOrf::CreateORFcDNAFromGTF($mRNAfile, $codFile, $codOrfFile, $numtxCod, $minnumtx, $genome, 'exon,CDS,stop_codon,start_codon', \%biotype, $orfTypeLearn, $verbosity, $kmerMax);
 }
 elsif($mRNAfileformat eq "fasta") # -- if FASTA
 {
+    print STDERR "> Extract ORFs/cDNAs for mRNAs from a FASTA file\n";
     ExtractCdnaOrf::CreateORFcDNAFromFASTA($mRNAfile, $codFile, $codOrfFile, $numtxCod, $minnumtx, $orfTypeLearn, $verbosity, $kmerMax);
 }
 else
@@ -295,10 +294,12 @@ if(defined $lncRNAfile) # -- if file is defined, it means that we do not have to
 
     if ($lncRNAfileformat eq "gtf") # -- if GTF
     {
+	print STDERR "> Extract ORFs/cDNAs for lncRNAs from a GTF file\n";
 	($ref_cDNA_passed, $refmrna) = ExtractCdnaOrf::CreateORFcDNAFromGTF($lncRNAfile, $nonFile, $nonOrfFile, $numtxNon, $minnumtx, $genome, 'exon', undef, $orfTypeLearn, $verbosity, $kmerMax);
     }
     elsif($lncRNAfileformat eq "fasta")
     {
+	print STDERR "> Extract ORFs/cDNAs for lncRNAs from a FASTA file\n";
 	ExtractCdnaOrf::CreateORFcDNAFromFASTA($lncRNAfile, $nonFile, $nonOrfFile, $numtxNon, $minnumtx, $orfTypeLearn, $verbosity, $kmerMax);
     }
     else
@@ -306,13 +307,11 @@ if(defined $lncRNAfile) # -- if file is defined, it means that we do not have to
 	die "Error: Unrecognized format for lncRNA training file '$lncRNAfile'\n";
     }
 }
-else                    # -- if lncRNA training file not defined
+else # -- if lncRNA training file not defined
 {
     # To get mRNA annotation
-    ## VW modification
-    # my $refmrna = Parser::parseGTF($mRNAfile, 'exon,CDS,stop_codon,start_codon', undef , \%biotype , $verbosity);
     # Relocated mRNA sequence in intergenic regions to be used as a training lncRNA file
-    print STDERR "> The lncRNA training file is not set...will extract intergenic region for training (can take a while...)\n";
+    print STDERR "> The lncRNA training file is not set. Extract ORFs/cDNAs for lncRNAs from intergenic regions (can take a while)\n";
     ExtractCdnaOrf::randomizedGTFtoFASTA($refmrna, $ref_cDNA_passed, $nonFile, $nonOrfFile, $genome, $numtxNon, $minnumtx, $sizecorrec, $orfTypeLearn, $maxTries, $maxN, $verbosity, $kmerMax);
 }
 
@@ -323,11 +322,14 @@ else                    # -- if lncRNA training file not defined
 # Get cDNA and ORF for test file
 if(Utils::guess_format($infile) eq "gtf")      # -- if GTF
 {
+    print STDERR "> Extract ORFs/cDNAs for candidates RNAs from a GTF file\n";
     # Use undef for $nbtx/$numtx to get all sequences and ORFs
     ExtractCdnaOrf::CreateORFcDNAFromGTF($infile, $testFile, $testOrfFile, undef, undef, $genome, 'exon,CDS,stop_codon,start_codon', undef, $orfTypeTest, $verbosity, $kmerMax);
 }
 elsif(Utils::guess_format($infile) eq "fasta") # -- if FASTA
 {
+    print STDERR "> Extract ORFs/cDNAs for candidates RNAs from a FASTA file\n";
+    # Use undef for $nbtx/$numtx to get all sequences and ORFs
     ExtractCdnaOrf::CreateORFcDNAFromFASTA($infile, $testFile, $testOrfFile, undef, undef, $orfTypeTest, $verbosity, $kmerMax);
 }
 else
@@ -344,16 +346,16 @@ my @codOrfFileKmRf = ($codOrfFile.".forKmerModel.fa", $codOrfFile.".forRandomFor
 my @nonFileKmRf    = ($nonFile.".forKmerModel.fa",    $nonFile.".forRandomForest.fa");
 my @nonOrfFileKmRf = ($nonOrfFile.".forKmerModel.fa", $nonOrfFile.".forRandomForest.fa");
 
-Utils::divFasta($codFile,    $codFileKmRf[0],    $codFileKmRf[1],    $perc);
-Utils::divFasta($codOrfFile, $codOrfFileKmRf[0], $codOrfFileKmRf[1], $perc);
-Utils::divFasta($nonFile,    $nonFileKmRf[0],    $nonFileKmRf[1],    $perc);
-Utils::divFasta($nonOrfFile, $nonOrfFileKmRf[0], $nonOrfFileKmRf[1], $perc);
+Utils::divFasta($codFile,    $codFileKmRf[0],    $codFileKmRf[1],    $perc, $verbosity);
+Utils::divFasta($codOrfFile, $codOrfFileKmRf[0], $codOrfFileKmRf[1], $perc, $verbosity);
+Utils::divFasta($nonFile,    $nonFileKmRf[0],    $nonFileKmRf[1],    $perc, $verbosity);
+Utils::divFasta($nonOrfFile, $nonOrfFileKmRf[0], $nonOrfFileKmRf[1], $perc, $verbosity);
 
 
 #################################
 # Launch RF on $infile in fasta
 
-print STDERR "> Run random Forest on '$testFile':\n";
+print STDERR "> Run random Forest on '$testFile'\n";
 if(! defined $speThres)
 {
     RandomForest::runRF(\@codFileKmRf, \@codOrfFileKmRf, \@nonFileKmRf, \@nonOrfFileKmRf, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $nameTmp, $keepTmp, $seed, $proc);
@@ -370,29 +372,26 @@ RandomForest::rfPredToOut($infile, $rfout, $outDir, $outName);
 # Check if a TUCp file exists, if there is one so write this message
 if( -e $outDir.$outName.".TUCp.gtf" )
 {
-    print "\nTranscripts of Unknown Coding Potential (TUCps) found: check file '".$outDir.$outName.".TUCp.gtf'.\n";
-    print "\tThese transcripts correspond to transcripts with a coding potential between the mRNA and the lncRNA specificity threshold.\n";
+    print STDERR "\nTranscripts of Unknown Coding Potential (TUCps) found: check file '".$outDir.$outName.".TUCp.gtf'.\n";
+    print STDERR "\tThese transcripts correspond to transcripts with a coding potential between the mRNA and the lncRNA specificity threshold.\n";
 }
 if( -e $outDir.$outName.".TUCp.fa" )
 {
-    print "\nTranscripts of Unknown Coding Potential (TUCps) found: check file '".$outDir.$outName.".TUCp.fa'.\n";
-    print "\tThese transcripts correspond to transcripts with a coding potential between the mRNA and the lncRNA specificity threshold.\n";
+    print STDERR "\nTranscripts of Unknown Coding Potential (TUCps) found: check file '".$outDir.$outName.".TUCp.fa'.\n";
+    print STDERR "\tThese transcripts correspond to transcripts with a coding potential between the mRNA and the lncRNA specificity threshold.\n";
 }
 
 # Check if a noORF file exists, if there is one so write this message
 if( -e $outDir.$outName.".noORF.gtf" )
 {
-    print "\nTranscripts without ORF found: check file '".$outDir.$outName.".noORF.gtf'.\n";
-    print "\tThese transcripts correspond probably to lncRNAs since no ORF was found. You might also want to change the --testorftype option.\n";
+    print STDERR "\nTranscripts without ORF found: check file '".$outDir.$outName.".noORF.gtf'.\n";
+    print STDERR "\tThese transcripts correspond probably to lncRNAs since no ORF was found. You might also want to change the --testorftype option.\n";
 }
 if( -e $outDir.$outName.".noORF.fa" )
 {
-    print "\nTranscripts without ORF found: check file '".$outDir.$outName.".noORF.fa'.\n";
-    print "\tThese transcripts correspond probably to lncRNAs since no ORF was found. You might also want to change the --testorftype option.\n";
+    print STDERR "\nTranscripts without ORF found: check file '".$outDir.$outName.".noORF.fa'.\n";
+    print STDERR "\tThese transcripts correspond probably to lncRNAs since no ORF was found. You might also want to change the --testorftype option.\n";
 }
-
-
-
 
 
 # Cleaning temporary files
@@ -413,10 +412,6 @@ if($keepTmp==0)
     unlink $nonOrfFileKmRf[0];
     unlink $nonOrfFileKmRf[1];
 }
-
-
-
-
 
 
 __END__
@@ -484,7 +479,7 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
 =head2 Debug arguments
 
   --keeptmp=0				To keep the temporary files in a 'tmp' directory the outdir, by default don't keep it (0 value). Any other value than 0 will keep the temporary files
-  --verbosity=0				Which level of information that need to be print [ default 0 ]
+  --verbosity=1				Integer [0,1,2]: which level of information that need to be print [ default 1 ]. Note that that printing is made on STDERR
   --seed=1234				Use to fixe the seed value for the extraction of intergenic DNA region to get lncRNA like sequences and for the random forest [ default 1234 ]
 
 

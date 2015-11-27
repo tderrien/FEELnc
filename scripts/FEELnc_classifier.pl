@@ -16,9 +16,9 @@ use Bio::SeqFeature::InteractionCollection;
 # Global Variables
 my $lncrna_file	="";
 my $mrna_file   ="";
-my $window      = 10000; # 10kb
+my $window      = 10000;  # 10kb
 my $maxwindow   = 100000; # 100kb
-my $verbosity   = 0;
+my $verbosity   = 1;
 my $help        = 0;
 my $man         = 0;
 

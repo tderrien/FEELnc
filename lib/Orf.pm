@@ -19,14 +19,13 @@ $| = 1;
 
 # Select best ORF depending on strict mode (with Met and stop) and relaxed (without) and cutoff size
 sub chooseORF{
-
     my ($seq, $cutoff) = @_;
-    $cutoff ||=0.75; #  strict ORF will be considered if sizeORF_strict/sizeORF_relaxed > this cutoff
+    $cutoff //=0.75; #  strict ORF will be considered if sizeORF_strict/sizeORF_relaxed > this cutoff
 
     die "Orf::chooseORF : Cannot read sequence '$seq'\n..." unless ($seq =~/[actg]/gi);
 
-    my $ostrict		=	longestORF2($seq,".",0,0);
-    my $orelaxed	=	longestORF2($seq,".",1,1);
+    my $ostrict  = longestORF2($seq,".",0,0);
+    my $orelaxed = longestORF2($seq,".",1,1);
 	
     my $orf_selected = $orelaxed;
     
@@ -38,23 +37,19 @@ sub chooseORF{
 		}
 	}
     return $orf_selected;
-
 }
 
 
 # adapted from bioperl example : script/longorf.pl
 # (c) Dan Kortschak
 sub longestORF {
-
     my ($seq, $strand, $allow_no_start, $allow_no_stop, $reverse_strand) = @_;
-    $strand			 	||= "."; 	# to put in ORF object
-    $allow_no_start 	||= 0; 		# 1 to allow longest ORF not starting with Met
-    $allow_no_stop	 	||= 0; 		# 1 to allow longest ORF not finishing with stop_codon
-    $reverse_strand	 	||= 0; 		# 1 if reverse complement input sequence
-
+    $strand         //= "."; # to put in ORF object
+    $allow_no_start //= 0;   # 1 to allow longest ORF not starting with Met
+    $allow_no_stop  //= 0;   # 1 to allow longest ORF not finishing with stop_codon
+    $reverse_strand //= 0;   # 1 if reverse complement input sequence
 
     die "Orf::longestORF: Your input sequence is empty \n" if ($seq eq "");
-
     die "Orf::longestORF: Your input sequence is not DNA \n" if ($seq =~ /!(a|c|t|g)/gi);
 
     #  revcomp sequence
@@ -103,9 +98,6 @@ sub longestORF {
 
     my $bests=0;
     my $beste=0;
-
-    # print Dumper \@starts;
-    # print Dumper \@ends;
 
     # Get longest ORF
     for my $s (@starts) {
@@ -156,18 +148,15 @@ sub longestORF {
 
 
 sub longestORF2{
-
     my ($seq, $strand, $allow_no_start, $allow_no_stop, $reverse_strand, $maxstopskip) = @_;
-    $strand		 	||= "."; 	# to put in ORF object
-    $allow_no_start 	||= 0; 		# 1 to allow longest ORF not starting with Met
-    $allow_no_stop	 	||= 0; 		# 1 to allow longest ORF not finishing with stop_codon
-    $reverse_strand	 	||= 0; 		# 1 if reverse complement input sequence
-    $maxstopskip		||= 1;		# number of stop codon to skip : 1 means we stop ORF at the first stop codon
-
+    $strand         //= "."; # to put in ORF object
+    $allow_no_start //= 0;   # 1 to allow longest ORF not starting with Met
+    $allow_no_stop  //= 0;   # 1 to allow longest ORF not finishing with stop_codon
+    $reverse_strand //= 0;   # 1 if reverse complement input sequence
+    $maxstopskip    //= 1;   # number of stop codon to skip : 1 means we stop ORF at the first stop codon
 
     die "Orf::longestORF: Your input sequence is empty \n" if ($seq eq "");
     die "Orf::longestORF: Your input sequence is not DNA \n" if ($seq =~ /!(a|c|t|g)/gi);
-
 
     #  revcomp sequence
     if ($reverse_strand){
@@ -175,7 +164,6 @@ sub longestORF2{
 	if ($strand eq "+"){$strand = "-"};
 	if ($strand eq "-"){$strand = "+"};
     }
-
 
     # variables
     my $seqlength = length($seq);
@@ -197,12 +185,10 @@ sub longestORF2{
     # Get starts
     while ($seq =~ /atg/gi) {
 	push @starts, $-[0]+1;
-	# 		push @starts, pos($seq)-2;
     }
     # Get stops
     while ($seq =~ /taa|tga|tag/gi) {
 	push @ends, $-[0]+1 ;
-	# 		push @ends,pos($seq)-2;
     }
 
     # no_stop in last 3 nt of the cDNA sequence
@@ -218,9 +204,6 @@ sub longestORF2{
     my $bests=0;
     my $beste=0;
 
-    # print Dumper \@starts;
-    # print Dumper \@ends;
-
     # Get longest ORF
     for my $s (@starts) {
 	my $start_pos_frame = $s % 3;
@@ -229,11 +212,8 @@ sub longestORF2{
 	for my $e (@ends) {
 
 	    if ($e%3==$s%3 && $e>$s) {
-		# print STDERR "start:$s - e:$e  - frame : $start_pos_frame\n";
 
 		if ($s > $last_delete_pos{$start_pos_frame}){ #only count each stop once.
-
-		    # print STDERR "\tstart:$s - e:$e  - frame : $start_pos_frame et $e > $last_delete_pos{$start_pos_frame} : oldbest $best vs ",$e-$s,"\n";
 
 		    if ($e-$s>$best) {
 			$best=$e-$s;
@@ -299,10 +279,10 @@ sub longestORF2{
 }
 
 sub orfSeq2orfOb{
-    my ($seq, $strand, $verbosity)	= @_;
-
-    $strand ||= ".";
-
+    my ($seq, $strand, $verbosity) = @_;
+    $strand    //= ".";
+    $verbosity //= 1;
+    
     # Test parsing i.e empty reafarray
     die "Orf::orfSeq2orfOb => $seq is weird...\n" if (not defined $seq || $seq eq "");
 
@@ -315,12 +295,12 @@ sub orfSeq2orfOb{
     my $checkstop  = check_stop_codon($seqprot);
 
     # Put all data in hash
-    my %orfobj =(start		=> undef,
-		 end			=> undef,
-		 seqlength 	=> undef, # we do not known the length of the mRNA
-		 cds_seq 	=> $seq,
-		 prot_seq 	=> $seqprot,
-		 strand 		=> $strand,
+    my %orfobj =(start       => undef,
+		 end         => undef,
+		 seqlength   => undef, # we do not known the length of the mRNA
+		 cds_seq     => $seq,
+		 prot_seq    => $seqprot,
+		 strand      => $strand,
 		 check_start => $checkstart,
 		 check_stop  => $checkstop
 	);
@@ -330,8 +310,9 @@ sub orfSeq2orfOb{
 
 sub checkDnaStartStop {
     my ($seq, $verbosity) = @_;
-
-    print STDERR "Orf::checkDnaStartStop => Sequence is empty" if ($seq eq "" && $verbosity >10);
+    $verbosity //= 1;
+    
+    print STDERR "Orf::checkDnaStartStop => Sequence is empty" if ($seq eq "" && $verbosity > 1);
 
     if (defined ($seq) && $seq=~m/^ATG/i && $seq =~m/TAA$|TAG$|TGA$/i){
 	return 1;
@@ -388,3 +369,5 @@ sub check_stop_codon_dna{
 	return 0;
     }
 }
+
+1;
