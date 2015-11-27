@@ -295,11 +295,11 @@ Then, **subtypes** and **locations** are defined according the orientation of th
    * then `exonic` or `intronic` locations.
 
 * `INTERGENIC` type :
- * `divergent` subtype	: the lncRNA is oriented in head to head with the closest RNA partner transcript
+ * `divergent` subtype	: the lncRNA is transcribed in head to head orientation with RNA_partner
    * then `upstream` or `downstream` locations.
- * `convergent` subtype	: the lncRNA is oriented in tail to tail with the closest RNA partner transcript
+ * `convergent` subtype	: the lncRNA is oriented in tail to tail with orientation with RNA_partner
    * then `upstream` or `downstream` locations.
- * `same_strand`subtype	: the lncRNA is transcribed in the same orientation with the closest RNA partner transcript
+ * `same_strand`subtype	: the lncRNA is transcribed in the same orientation orientation with RNA_partner
    * then `upstream` or `downstream` locations.
 
 
@@ -359,7 +359,7 @@ isBest  lncRNA_gene  lncRNA_transcript  partnerRNA_gene     partnerRNA_transcrip
 Here is showed 4 interactions concerning 3 lncRNAs (TCONS_00160885, TCONS_00161746, TCONS_00162285 and TCONS_00163966) where one lncRNA (TTCONS_00160885) has 4 interactions with a window size of 1,000 nt.
 (The best interactions are marked as ***lncRNA**)
 
-* Illustration of the classification:*
+** Illustration of the classification:**
 ![ScreenShot](./image/FEELnc_lncRNA_classification_intergenic.png)
 ![ScreenShot](./image/FEELnc_lncRNA_classification_genic.png)
 
