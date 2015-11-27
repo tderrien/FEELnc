@@ -250,7 +250,7 @@ Options:
       -n,--numtx=undef                      Number of transcripts required for the training and for all transcripts in the annotation use undef [ default undef ]
       -r,--rfcut=[0-1]                      Random forest voting cutoff [ default undef i.e will compute best cutoff ]
       --spethres=undef                      Two specificity threshold based on the 10-fold cross-validation, first one for mRNA and the second for lncRNA, need to be in ]0,1[ on separated by a ','
-      -k,--kmer="3,6,9"                     Kmer size list with sizes separated by ',' as string [ default "3,6,9" ], the maximum value for one size is '15'
+      -k,--kmer="1,2,3,6,9,12"                     Kmer size list with sizes separated by ',' as string [ default "3,6,9" ], the maximum value for one size is '15'
       -o,--outname="./"                     Output filename [ default infile_name ]
       --outdir="./"                         Output directory [ default current directory ]
       -s,--sizeinter=0.75                   Ratio between mRNA sequence and non-coding intergenic extracted region sizes [default 0.75 ]
@@ -284,19 +284,33 @@ A first level of classification disciminates 2 **TYPES** of interactions:
 	 - **INTERGENIC** (lincRNA):  otherwise
 
 Then, **subtypes** and **locations** are defined according the orientation of the interactions and the localisation of the interactions (See OUTPUT for full details):
+
 	 - **GENIC subtypes** : 
+
 	 	-- overlapping	: the lncRNA partially overlaps the mRNA partner transcript
+
 			--- then exonic or intronic **locations**
+
 		-- containing 	: the lncRNA contains the RNA partner transcript
+
 			--- then exonic or intronic **locations**
+
 		-- nested	: the lncRNA is contained in the RNA partner transcript
+
 			--- then exonic or intronic **locations**
+
 	 - **INTERGENIC subtypes** 
+
 	 	-- divergent
+
 			--- then upstream or downstream **locations**
+
 		-- convergent
+
 			--- then upstream or downstream **locations**
+
 		-- same_strand
+
 			--- then upstream or downstream **locations**
 
 Foreach lncRNA interaction, a best lncRNA:RNA_partner interaction is identified in the output file with a value == 1 in the first column **isBest** (0 otherwise). This flag is defined according to the following rule:
