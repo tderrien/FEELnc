@@ -51,7 +51,7 @@ GetOptions(
     'monoex=i'         => \$monoexonic,
     'l|linconly!'      => \$linconly,    
     'p|proc=i'         => \$proc,
-    "b|biotype=s"      => \%biotype,	
+    'b|biotype=s'      => \%biotype,	
     "o|outlog=s"       => \$outputlog,	
     'v|verbosity=i'    => \$verbosity,
     'help|?'           => \$help,
@@ -212,81 +212,78 @@ ExtractFromHash::printGTF($reflnc, 'all',  $verbosity)
 
 
 
-    __END__
-    
-    =pod
-    
-    =encoding UTF-8
-    
-    =head1 NAME
+__END__
 
-    FEELnc_filter.pl - Extract, filter candidate long non-coding RNAs
+=encoding UTF-8
 
-    =head1 VERSION
+=pod
 
-    version 0.01
+=head1 NAME
 
-    =head1 SYNOPSIS
+FEELnc_filter.pl - Extract, filter candidate long non-coding RNAs
 
-    FEELnc_filter.pl -i candidate.gtf -a mRNA.gtf  > candidate_lncRNA.gtf
+version 0.01
 
-    =head1 DESCRIPTION
+=head1 SYNOPSIS
 
-    FEELnc (Fast and Effective Extraction of Long non-coding RNAs) is dedicated to the annotation of lncRNAs 
-    based on a set of transcripts as input (basically a cufflink transcripts.gtf file)
-    The first step if the pipeline (FEELnc_filter) is to filter unwanted/spurious transcripts and/or transcripts
+FEELnc_filter.pl -i candidate.gtf -a mRNA.gtf  > candidate_lncRNA.gtf
+
+=head1 DESCRIPTION
+
+FEELnc (Fast and Effective Extraction of Long non-coding RNAs) is dedicated to the annotation of lncRNAs 
+based on a set of transcripts as input (basically a cufflink transcripts.gtf file)
+The first step if the pipeline (FEELnc_filter) is to filter unwanted/spurious transcripts and/or transcripts
 overlapping in sense exons of the reference annotation.
 
 =head1 OPTIONS
 
 =head2 General
 
-  --help                Print this help
-  --man                 Open man page
-  --verbosity		Level of verbosity 0, 1 and 2 [default 1]
+    --help			Print this help
+    --man			Open man page
+    --verbosity			Level of verbosity 0, 1 and 2 [default 1]
   
 
 =head2 Mandatory arguments
 
-  -i,--infile=file.gtf		Specify the GTF file to be filtered (such as a cufflinks transcripts/merged .GTF file) 
+    -i,--infile=file.gtf	Specify the GTF file to be filtered (such as a cufflinks transcripts/merged .GTF file)
     -a,--mRNAfile=file.gtf	Specify the annotation GTF file to be filtered on based on sense exon overlap (file of protein coding annotation)
     
+=head2 Filtering arguments
 
-    =head2 Filtering arguments
-
-    -s,--size=200			Keep transcript with a minimal size (default 200)
-    -b,--biotype			Only consider transcript(s) from the reference annotation having this(these) biotype(s) (e.g : -b transcript_biotype=protein_coding,pseudogene) [default undef i.e all transcripts]
-    -l,--linconly			Keep only long intergenic/interveaning ncRNAs [default FALSE]. 
+    -s,--size=200		Keep transcript with a minimal size (default 200)
+    -b,--biotype		Only consider transcript(s) from the reference annotation having this(these) biotype(s) (e.g : -b transcript_biotype=protein_coding,pseudogene) [default undef i.e all transcripts]
+    -l,--linconly		Keep only long intergenic/interveaning ncRNAs [default FALSE]
     --monoex=-1|0|1		Keep monoexonic transcript(s): mode to be selected from : -1 keep monoexonic antisense (for RNASeq stranded protocol), 1 keep all monoexonic, 0 remove all monoexonic	[default 0]
     --biex=25			Discard biexonic transcripts having one exon size lower to this value (default 25)
     
-    =head2 Overlapping specification 
+=head2 Overlapping specification 
 
 
-    -f,--minfrac_over=0		minimal fraction out of the candidate lncRNA size to be considered for overlap [default 0 i.e 1nt]
-    -p,--proc=4			number of thread for computing overlap [default 4]
+    -f,--minfrac_over=0		Minimal fraction out of the candidate lncRNA size to be considered for overlap [default 0 i.e 1nt]
+    -p,--proc=4			Number of thread for computing overlap [default 4]
 
 
-    =head2 Log output
+=head2 Log output
 
     -o,--outlog=file.log		Specify the log file of output which [default infile.log]
 
 
 
-    =head1 AUTHORS
+=head1 AUTHORS
 
-    =over 4
+=over 4
 
-    =item - Valentin WUCHER <vwucher@univ-rennes1.fr>
+=item - Valentin WUCHER <vwucher@univ-rennes1.fr>
 
-    =item - Thomas DERRIEN <tderrien@univ-rennes1.fr>
+=item - Thomas DERRIEN <tderrien@univ-rennes1.fr>
 
-    =item - Fabrice Legeai <fabrice.legeai@inria.fr>
+=item - Fabrice Legeai <fabrice.legeai@inria.fr>
 
-    =back
+=back
 
-    =head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT AND LICENSE
 
     This software is Copyright (c) 2014 by IGDR - CNRS
 
-    =cut
+=cut

@@ -105,7 +105,6 @@ GetOptions(
     'seed=i'         => \$seed,
     'help|?'         => \$help,
     'man'            => \$man
-    # 	"o|outlog=s"     => \$outputlog,
     ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -442,9 +441,9 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
 
 =head2 General
 
-  --help                Print this help
-  --man                 Open man page
-  --verbosity		Level of verbosity
+  --help				Print this help
+  --man					Open man page
+  --verbosity				Level of verbosity
 
 
 =head2 Mandatory arguments
@@ -461,9 +460,9 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
   -n,--numtx=undef			Number of mRNA and lncRNA transcripts required for the training. mRNAs and lncRNAs numbers need to be separate by a ',': i.e. 1500,1000 for 1500 mRNAs and 1000 lncRNAs. For all the annotation, let it blank [ default undef, all the two annotations ]
   -r,--rfcut=[0-1]			Random forest voting cutoff [ default undef i.e will compute best cutoff ]
   --spethres=undef			Two specificity threshold based on the 10-fold cross-validation, first one for mRNA and the second for lncRNA, need to be in ]0,1[ on separated by a ','
-  -k,--kmer=1,2,3,6,9,12			Kmer size list with size separate by ',' as string [ default "1,2,3,6,9,12" ], the maximum value for one size is '15'
-  -o,--outname={INFILENAME}			Output filename [ default infile_name ]
-  --outdir="feelnc_codpot_out/"				Output directory [ default "./feelnc_codpot_out/" ]
+  -k,--kmer=1,2,3,6,9,12		Kmer size list with size separate by ',' as string [ default "1,2,3,6,9,12" ], the maximum value for one size is '15'
+  -o,--outname={INFILENAME}		Output filename [ default infile_name ]
+  --outdir="feelnc_codpot_out/"		Output directory [ default "./feelnc_codpot_out/" ]
   -s,--sizeinter=0.75			Ratio between mRNA sequence lengths and non coding intergenic region sequence lengths as, by default, ncInter = mRNA * 0.75
   --learnorftype=1			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 1 ] for learning data set.
 					If the CDS is annotated in the .GTF, then the CDS is considered as the longest ORF, whatever the --orftype value.
