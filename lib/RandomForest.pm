@@ -43,7 +43,7 @@ getKmerRatio: Get one kmer ratio between coding and non coding fasta training fi
 
 =item .
 
-scoreORF: Scores ORF test file
+scoreSeq: Score a sequence according to a list of kmer scores
 
 =item .
 
@@ -214,7 +214,7 @@ sub getKmerRatio
 #	$step      = step for the counting of kmer
 #	$proc      = number of proc to be use for kis
 #	$verbosity = value to define the verbosity
-sub scoreORF
+sub scoreSeq
 {
     my($orfFile, $modFile, $outFile, $kmerSize, $step, $proc, $verbosity) = @_;
     $orfFile   //= undef;
@@ -637,17 +637,17 @@ sub runRF
 	## Coding
 	$kmerFile = $nameTmp.".coding_sequencesKmer_".$kmerList[$i]."_ScoreValues.tmp";
 	push(@kmerScoreCodLearnFileList, $kmerFile);
-	scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
+	scoreSeq($codLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
 
 	## Non coding
 	$kmerFile = $nameTmp.".noncoding_sequencesKmer_".$kmerList[$i]."_ScoreValues.tmp";
 	push(@kmerScoreNonLearnFileList, $kmerFile);
-	scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
+	scoreSeq($nonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
 
 	# Test
 	$kmerFile = $nameTmp.".test_sequencesKmer_".$kmerList[$i]."_ScoreValues.tmp";
 	push(@kmerScoreTestFileList, $kmerFile);
-	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
+	scoreSeq($testFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
     }
 
 
@@ -702,9 +702,6 @@ sub runRF
 	unlink $outModTest;
     }
 }
-
-
-
 
 
 # With a .GTF/FASTA and a result file from a random forest, write 2 or 3 (if TUCps) .GTF/.FASTA file, each one respectively for coding and non coding genes plus one for sequences with no ORF. Unlink $outTuc and $noOrf if they are empty
@@ -774,19 +771,19 @@ sub rfPredToOut
     if(Utils::guess_format($testFile) eq "gtf")
     {
 	# Read the GTF file and put the line in the right file depending on which tab the transcript is
-	my $outNon = $outDir.$outName.".lncRNA.gtf";
-	my $outCod = $outDir.$outName.".mRNA.gtf";
-	my $outTuc = $outDir.$outName.".TUCp.gtf";
-	my $noOrf  = $outDir.$outName.".noORF.gtf";
-	my $line   = "";
-	my $name   = "";
+	my $outNon   = $outDir.$outName.".lncRNA.gtf";
+	my $outCod   = $outDir.$outName.".mRNA.gtf";
+	my $outTuc   = $outDir.$outName.".TUCp.gtf";
+	my $smallSeq = $outDir.$outName.".smallSeq.gtf";
+	my $line     = "";
+	my $name     = "";
 
 	print STDERR "> Writing the GTF output files\n";
 	open FILE,  "$testFile" or die "Error! Cannot access to the GTF input for new transcripts '". $testFile . "': ".$!;
 	open LNC, "> $outNon"   or die "Error! Cannot access to the lncRNA GTF output file '". $outNon . "': ".$!;
 	open RNA, "> $outCod"   or die "Error! Cannot access to the mRNA GTF output file '". $outCod . "': ".$!;
 	open TUC, "> $outTuc"   or die "Error! Cannot access to the TUCp GTF output file '". $outTuc . "': ".$!;
-	open NO,  "> $noOrf"    or die "Error! Cannot access to the no ORF GTF output file '". $noOrf . "': ".$!;
+	open NO,  "> $smallSeq" or die "Error! Cannot access to the small sequences GTF output file '". $smallSeq . "': ".$!;
 
 	while(<FILE>)
 	{
@@ -819,23 +816,23 @@ sub rfPredToOut
 	close NO;
 
 	# Delete $outTuc and $noOrf if they are empty
-	unlink $outTuc if( ! (-s $outTuc) );
-	unlink $noOrf  if( ! (-s $noOrf) );
+	unlink $outTuc   if( ! (-s $outTuc) );
+	unlink $smallSeq if( ! (-s $smallSeq) );
     }
     else # if FASTA format
     {
 	# Read the FASTA file and put the line in the right file depending on which tab the transcript is
-	my $outNon = $outDir.$outName.".lncRNA.fa";
-	my $outCod = $outDir.$outName.".mRNA.fa";
-	my $outTuc = $outDir.$outName.".TUCp.fa";
-	my $noOrf  = $outDir.$outName.".noORF.fa";
+	my $outNon   = $outDir.$outName.".lncRNA.fa";
+	my $outCod   = $outDir.$outName.".mRNA.fa";
+	my $outTuc   = $outDir.$outName.".TUCp.fa";
+	my $smallSeq = $outDir.$outName.".smallSeq.fa";
 
 	print STDERR "> Writing the FASTA output files\n";
-	my $multiFasta = new Bio::SeqIO(-file => "$testFile", '-format' => 'Fasta');
-	my $lnc        = new Bio::SeqIO(-file => "> $outNon", '-format' => 'Fasta');
-	my $rna        = new Bio::SeqIO(-file => "> $outCod", '-format' => 'Fasta');
-	my $tuc        = new Bio::SeqIO(-file => "> $outTuc", '-format' => 'Fasta');
-	my $noorf      = new Bio::SeqIO(-file => "> $noOrf",  '-format' => 'Fasta');
+	my $multiFasta = new Bio::SeqIO(-file => "$testFile",   '-format' => 'Fasta');
+	my $lnc        = new Bio::SeqIO(-file => "> $outNon",   '-format' => 'Fasta');
+	my $rna        = new Bio::SeqIO(-file => "> $outCod",   '-format' => 'Fasta');
+	my $tuc        = new Bio::SeqIO(-file => "> $outTuc",   '-format' => 'Fasta');
+	my $smallseq   = new Bio::SeqIO(-file => "> $smallSeq", '-format' => 'Fasta');
 
 	my @seqTab;
 	my $seq;
@@ -856,13 +853,13 @@ sub rfPredToOut
 	    }
 	    else
 	    {
-		$noorf->write_seq($seq);
+		$smallseq->write_seq($seq);
 	    }
 	}
 
 	# Delete $outTuc and $noOrf if they are empty
-	unlink $outTuc if( ! (-s $outTuc) );
-	unlink $noOrf  if( ! (-s $noOrf) );
+	unlink $outTuc   if( ! (-s $outTuc) );
+	unlink $smallSeq if( ! (-s $smallSeq) );
     }
 }
 
@@ -927,9 +924,9 @@ Return value: Return the array of the log ratio value
 
 ##############################################################################
 
-=head2 scoreORF
+=head2 scoreSeq
 
-Temporary function to compute the scoring function of a multifasta file of ORF
+Function to compute the score for mutliple sequences in a multifasta file
 
 =over
 

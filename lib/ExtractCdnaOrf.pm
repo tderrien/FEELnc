@@ -61,10 +61,10 @@ sub compOrfLen
     return( (undef, undef) );
 }
 
-# Return $typeOrf if there is an ORF extracted, -1 if no ORF found (regarding the parameters)
+
 sub getTypeOrf
 {
-    my ($name, $seq, $str, $refOrf, $type, $kmerMax) = @_;
+    my ($name, $seq, $str, $refOrf, $type) = @_;
     my $orfob0;
     my $orfob1;
     my $orfob2;
@@ -82,180 +82,56 @@ sub getTypeOrf
     # Type 0
     if($type==0)
     {
-	$orfob0 = Orf::longestORF2($seq,$str, 0, 0, undef, 1);
+	$orfob0 = Orf::longestORF3($seq,$str, 0, 0, undef, 1);
 
-	if(defined $orfob0 && $orfob0->{'orflength'} >= 2*$kmerMax)
-	{
-	    $flag0 = 1;
-	}
-
-	if($flag0==1)
-	{
-
-	    $refOrf->{$name} = $orfob0->{'cds_seq'};
-	    return(0);
-	}
-	else
-	{
-	    return(-1);
-	}
+	$refOrf->{$name} = $orfob0->{'cds_seq'};
+	return(0);
     }
 
     # Type 1
     if($type==1)
     {
-	$orfob0 = Orf::longestORF2($seq,$str, 0, 0, undef, 1);
-	$orfob1 = Orf::longestORF2($seq,$str, 0, 1, undef, 1);
+	$orfob0 = Orf::longestORF3($seq,$str, 0, 0, undef, 1);
+	$orfob1 = Orf::longestORF3($seq,$str, 0, 1, undef, 1);
 
-	if(defined $orfob0 && $orfob0->{'orflength'} >= 2*$kmerMax)
-	{
-	    $flag0 = 1;
-	}
-	if(defined $orfob1 && $orfob1->{'orflength'} >= 2*$kmerMax)
-	{
-	    $flag1 = 1;
-	}
-
-	if($flag0==1 && $flag1==1)
-	{
-	    ($best, $bestTy) = &compOrfLen($orfob0, 0, $orfob1, 1);
-	    $refOrf->{$name} = $best->{'cds_seq'};
-	    return($bestTy);
-	}
-	elsif($flag0==1 && $flag1==0)
-	{
-	    $refOrf->{$name} = $orfob0->{'cds_seq'};
-	    return(0);
-	}
-	elsif($flag0==0 && $flag1==1)
-	{
-	    $refOrf->{$name} = $orfob1->{'cds_seq'};
-	    return(1);
-	}
-	else
-	{
-	    return(-1);
-	}
+	($best, $bestTy) = &compOrfLen($orfob0, 0, $orfob1, 1);
+	$refOrf->{$name} = $best->{'cds_seq'};
+	return($bestTy);
     }
 
     # Type 2
     if($type==2)
     {
-	$orfob0 = Orf::longestORF2($seq,$str, 0, 0, undef, 1);
-	$orfob2 = Orf::longestORF2($seq,$str, 1, 0, undef, 1);
-	if(defined $orfob0 && $orfob0->{'orflength'} >= 2*$kmerMax)
-	{
-	    $flag0 = 1;
-	}
-	if(defined $orfob2 && $orfob2->{'orflength'} >= 2*$kmerMax)
-	{
-	    $flag2 = 1;
-	}
+	$orfob0 = Orf::longestORF3($seq,$str, 0, 0, undef, 1);
+	$orfob2 = Orf::longestORF3($seq,$str, 1, 0, undef, 1);
 
-	if($flag0==1 && $flag2==1)
-	{
-	    ($best, $bestTy) = &compOrfLen($orfob0, 0, $orfob2, 2);
-	    $refOrf->{$name} = $best->{'cds_seq'};
-	    return($bestTy);
-	}
-	elsif($flag0==1 && $flag2==0)
-	{
-	    $refOrf->{$name} = $orfob0->{'cds_seq'};
-	    return(0);
-	}
-	elsif($flag0==0 && $flag2==1)
-	{
-	    $refOrf->{$name} = $orfob2->{'cds_seq'};
-	    return(2);
-	}
-	else
-	{
-	    return(-1);
-	}
+	($best, $bestTy) = &compOrfLen($orfob0, 0, $orfob2, 2);
+	$refOrf->{$name} = $best->{'cds_seq'};
+	return($bestTy);
     }
 
     # Type 3 or 4
     if($type==3 || $type==4)
     {
-	$orfob0 = Orf::longestORF2($seq,$str, 0, 0, undef, 1);
-	$orfob1 = Orf::longestORF2($seq,$str, 0, 1, undef, 1);
-	$orfob2 = Orf::longestORF2($seq,$str, 1, 0, undef, 1);
-	if(defined $orfob0 && $orfob0->{'orflength'} >= 2*$kmerMax)
+	$orfob0 = Orf::longestORF3($seq,$str, 0, 0, undef, 1);
+	$orfob1 = Orf::longestORF3($seq,$str, 0, 1, undef, 1);
+	$orfob2 = Orf::longestORF3($seq,$str, 1, 0, undef, 1);
+	
+	($best, $bestTy) = &compOrfLen($orfob0, 0, $orfob1, 1, $orfob2, 2);
+	if($type==3 || $best->{'orflength'}!=0)
 	{
-	    $flag0 = 1;
-	}
-	if(defined $orfob1 && $orfob1->{'orflength'} >= 2*$kmerMax)
-	{
-	    $flag1 = 1;
-	}
-	if(defined $orfob2 && $orfob2->{'orflength'} >= 2*$kmerMax)
-	{
-	    $flag2 = 1;
-	}
-
-	if($flag0==1 && $flag1==1 && $flag2==1)
-	{
-	    ($best, $bestTy) = &compOrfLen($orfob0, 0, $orfob1, 1, $orfob2, 2);
 	    $refOrf->{$name} = $best->{'cds_seq'};
 	    return($bestTy);
-	}
-	elsif($flag0==1 && $flag1==1 && $flag2==0)
-	{
-	    ($best, $bestTy) = &compOrfLen($orfob0, 0, $orfob1, 1);
-	    $refOrf->{$name} = $best->{'cds_seq'};
-	    return($bestTy);
-	}
-	elsif($flag0==1 && $flag1==0 && $flag2==1)
-	{
-	    ($best, $bestTy) = &compOrfLen($orfob0, 0, $orfob2, 2);
-	    $refOrf->{$name} = $best->{'cds_seq'};
-	    return($bestTy);
-	}
-	elsif($flag0==0 && $flag1==1 && $flag2==1)
-	{
-	    ($best, $bestTy) = &compOrfLen($orfob1, 1, $orfob2, 2);
-	    $refOrf->{$name} = $best->{'cds_seq'};
-	    return($bestTy);
-	}
-	elsif($flag0==1 && $flag1==0 && $flag2==0)
-	{
-	    $refOrf->{$name} = $orfob0->{'cds_seq'};
-	    return(0);
-	}
-	elsif($flag0==0 && $flag1==1 && $flag2==0)
-	{
-	    $refOrf->{$name} = $orfob1->{'cds_seq'};
-	    return(1);
-	}
-	elsif($flag0==0 && $flag1==0 && $flag2==1)
-	{
-	    $refOrf->{$name} = $orfob2->{'cds_seq'};
-	    return(2);
-	}
-	elsif($type==3 && $flag0==0 && $flag1==0 && $flag2==0)
-	{
-	    return(-1);
 	}
     }
 
     # Type 4
     if($type==4)
     {
-	$orfob4 = Orf::longestORF2($seq,$str, 1, 1, undef, 1);
-	if(defined $orfob4 && $orfob4->{'orflength'} >= 2*$kmerMax)
-	{
-	    $flag4 = 1;
-	}
+	$orfob4 = Orf::longestORF3($seq,$str, 1, 1, undef, 1);
 
-	if($flag4==1)
-	{
-	    $refOrf->{$name} = $orfob4->{'cds_seq'};
-	    return(4);
-	}
-	else
-	{
-	    return(-1);
-	}
+	$refOrf->{$name} = $orfob4->{'cds_seq'};
+	return(4);
     }
 
     return(-1);
@@ -303,42 +179,32 @@ sub CreateORFcDNAFromGTF
 	my $cdnaseq   = ExtractFromFeature::feature2seq($refmrna->{$tr}->{'feature'}, $genome, $chr , $strand, $filterforCDS, $verbosity);
 	if (!defined $cdnaseq)
 	{
-	    print STDERR "Warning: Tx '$tr' returns an empty sequence... Skipping this transcripts\n" if ($verbosity > 1);
+	    print STDERR "Warning: Transcript '$tr' returns an empty sequence... Skipping this transcript\n" if ($verbosity > 1);
 	    next;
 	}
 
+	if(length($cdnaseq) < 2*$kmerMax)
+	{
+	    print STDERR "Warning: Transcript '$tr' returns a sequence shorter than 2*$kmerMax... Skipping this transcript\n" if ($verbosity > 1);
+	    next;
+	}
+	
 	### Get ORF
 	my $containCDS = ExtractFromFeature::checkCDS($refmrna->{$tr}->{'feature'});
 	if (! $containCDS )
 	{
-	    $orfFlag = &getTypeOrf($tr, $cdnaseq, $strand, \%h_orf, $orfType, $kmerMax);
+	    $orfFlag = &getTypeOrf($tr, $cdnaseq, $strand, \%h_orf, $orfType);
 
-	    # Print accordingly to getTypeOrf result
-	    if ($orfFlag != -1)
-	    {
-		# Get the sequence only if an ORF is found
-		$h_cdna{$tr} = $cdnaseq;
-		$countseqok++;
-		print STDERR "\tExtracting ORFs/cDNAs ", $countseqok,"/$nbtx...\r"                 if( defined $nbtx);
-		print STDERR "\tExtracting ORFs/cDNAs ", $countseqok,"/".keys(%{$refmrna})."...\r" if(!defined $nbtx);
-	    }
-	    else
-	    {
-		print STDERR "No ORF found for transcript $tr... Skipping this transcript\n" if ($verbosity > 1);
-		next; # next if ORF is not OK
-	    }
+	    $h_cdna{$tr} = $cdnaseq;
+	    $countseqok++;
+	    print STDERR "\tExtracting ORFs/cDNAs ", $countseqok,"/$nbtx...\r"                 if( defined $nbtx);
+	    print STDERR "\tExtracting ORFs/cDNAs ", $countseqok,"/".keys(%{$refmrna})."...\r" if(!defined $nbtx);
 	}
 	else
 	{
 	    $filterforCDS = 1; # we activate filter to get only CDS and stop codon DNA sequence
 	    my $orfseq    = ExtractFromFeature::feature2seq($refmrna->{$tr}->{'feature'}, $genome, $chr , $strand, $filterforCDS, $verbosity);
-	    # Check if the length of the orf is greater than 2*kmerMax, if not then skip it
-	    if(length($orfseq) < 2*$kmerMax)
-	    {
-		print STDERR "ORF found on transcript $tr is smaller than 2*$kmerMax... Skipping this transcript\n" if ($verbosity > 1);
-		next; # next if ORF is not OK
-	    }
-	    # we create an ORF hash
+
 	    $orfob        = Orf::orfSeq2orfOb($orfseq, $strand, $verbosity);
 	    $h_orf{$tr}   = $orfob->{'cds_seq'};
 	    $h_cdna{$tr}  = $cdnaseq;
@@ -355,7 +221,7 @@ sub CreateORFcDNAFromGTF
     }
 
     my $sizehorf = keys(%h_orf);
-    die "The number of complete ORF found with computeORF mode is *$sizehorf* transcripts... That's not enough to train the program\n" if ($sizehorf < $minnumtx);
+    die "The number of sequences found is *$sizehorf* transcripts... That's not enough to train the program\n" if ($sizehorf < $minnumtx);
 
     if(!defined $nbtx)
     {
@@ -398,25 +264,22 @@ sub CreateORFcDNAFromFASTA
 
     # Go through each sequences
     while(my $seq = $seqin->next_seq()) {
-
+	
 	my $tr = $seq->id();
 
-	$orfFlag = &getTypeOrf($tr, $seq->seq(), $strand, \%h_orf, $orfType, $kmerMax);
+	# Check sequence length regarding the max size of kmers
+	if(length($seq->seq()) < 2*$kmerMax)
+	{
+	    print STDERR "Warning: Transcript '$tr' returns a sequence shorter than 2*$kmerMax... Skipping this transcript\n" if ($verbosity > 1);
+	    next;
+	}
+	
+	$orfFlag = &getTypeOrf($tr, $seq->seq(), $strand, \%h_orf, $orfType);
 
-	# Print according to getTypeOrf result
-	if ($orfFlag != -1)
-	{
-	    # Add cDNA only if an ORF is found
-	    $h_cdna{$tr} = $seq->seq();
-	    $countseqok++;
-	    print STDERR "\tExtracting ORFs/cDNAs ", $countseqok,"/$nbtx...\r"  if( defined $nbtx);
-	    print STDERR "\tExtracting ORFs/cDNAs ", $countseqok,"/$nbseq...\r" if(!defined $nbtx);
-	}
-	else
-	{
-	    print STDERR "No ORF found for transcript $tr... Skipping this transcript\n" if ($verbosity > 1);
-	    next; # next if ORF is not OK
-	}
+	$h_cdna{$tr} = $seq->seq();
+	$countseqok++;
+	print STDERR "\tExtracting ORFs/cDNAs ", $countseqok,"/$nbtx...\r"  if( defined $nbtx);
+	print STDERR "\tExtracting ORFs/cDNAs ", $countseqok,"/$nbseq...\r" if(!defined $nbtx);
 
 	# Check if nbtx is reached
 	if (defined $nbtx && $countseqok == $nbtx)
@@ -428,7 +291,7 @@ sub CreateORFcDNAFromFASTA
 
     # Final Check if the number of complete ORF is ok
     my $sizehorf = keys(%h_orf);
-    die "The number of complete ORF found with computeORF mode is *$sizehorf*... That's not enough to train the program\n" if (defined $nbtx && $sizehorf < $minnumtx);
+    die "The number of sequences found is *$sizehorf*... That's not enough to train the program\n" if (defined $nbtx && $sizehorf < $minnumtx);
 
     if(!defined $nbtx)
     {
@@ -467,13 +330,12 @@ sub write2fastafile{
     my $seq1 = Bio::SeqIO ->new(-format => 'fasta', -file => '>'.$filename1, -alphabet =>'dna');
     # ORF
     my $seq2 = Bio::SeqIO ->new(-format => 'fasta', -file => '>'.$filename2, -alphabet =>'dna');
-    # foreach my $id (sort keys %{$h}){
     foreach my $id ( shuffle( sort( keys(%{$h1}) ) ) )
     {
-	my $new_seq1 = Bio::Seq->new(-id => $id, -seq => $h1->{$id});
+	my $new_seq1 = Bio::Seq->new(-id => $id, -seq => $h1->{$id}, -alphabet =>'dna');
 	$seq1->write_seq($new_seq1);
 
-	my $new_seq2 = Bio::Seq->new(-id => $id, -seq => $h2->{$id});
+	my $new_seq2 = Bio::Seq->new(-id => $id, -seq => $h2->{$id}, -alphabet =>'dna');
 	$seq2->write_seq($new_seq2);
     }
 
@@ -531,7 +393,7 @@ sub randomizedGTFtoFASTA{
 	}
 
 	# While there is an overlap with known annotation, N in seq or no ORF
-	while ($overlap || $includeN || $orfFlag==-1){
+	while ($overlap || $includeN){
 
 	    # maxTries
 	    $countTries++;
@@ -556,7 +418,7 @@ sub randomizedGTFtoFASTA{
 		next;
 	    }
 
-	    # If the final length is < 200bp (smaller than lncRNA definition), then the size is set to 200
+	    # If the final length is < 200bp (shorter than lncRNA definition), then the size is set to 200
 	    if($end - $beg < 200)
 	    {
 		$end = $beg + 200;
@@ -598,8 +460,6 @@ sub randomizedGTFtoFASTA{
 	$i++;
 	if ($verbosity > 0)
 	{
-	    # Utils::showProgress($nbtx,                          $i, "Print ".$tx.": ") if(defined $nbtx);
-	    # Utils::showProgress(scalar(keys(%{$refannotsize})), $i, "Print ".$tx.": ") if(!defined $nbtx);
 	    Utils::showProgress($nbtx,                          $i, "Extracting intergenic sequences: ") if(defined $nbtx);
 	    Utils::showProgress(scalar(keys(%{$refannotsize})), $i, "Extracting intergenic sequences: ") if(!defined $nbtx);
 	}
