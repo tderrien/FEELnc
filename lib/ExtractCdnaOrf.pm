@@ -303,7 +303,7 @@ sub CreateORFcDNAFromGTF
 	my $cdnaseq   = ExtractFromFeature::feature2seq($refmrna->{$tr}->{'feature'}, $genome, $chr , $strand, $filterforCDS, $verbosity);
 	if (!defined $cdnaseq)
 	{
-	    print STDERR "Warning: Tx '$tr' returns an empty sequence... Skipping this transcripts\n" if ($verbosity > 1);
+	    print STDERR "Warning: Transcript '$tr' returns an empty sequence... Skipping this transcripts\n" if ($verbosity > 1);
 	    next;
 	}
 
