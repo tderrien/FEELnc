@@ -52,7 +52,7 @@ GetOptions(
     'l|linconly!'      => \$linconly,    
     'p|proc=i'         => \$proc,
     'b|biotype=s'      => \%biotype,	
-    "o|outlog=s"       => \$outputlog,	
+    'o|outlog=s'       => \$outputlog,	
     'v|verbosity=i'    => \$verbosity,
     'help|?'           => \$help,
     'man'              => \$man
