@@ -613,7 +613,7 @@ sub runRF
     my @kmerScoreTestFileList;
     my $kmerFile;
     my $kmerSize;
-    my $codStep       = 1;
+    my $codStep       = 3;
     my $nonStep       = 1;
     my $lenKmerList   = @kmerList;
     my $i             = 0;
@@ -624,7 +624,7 @@ sub runRF
 	push(@kmerRatioFileList, $kmerFile);
 
 	# Get the score as coding_kmer_ratio/(coding_kmer_ratio+noncoding_kmer_ratio)
-	&getKmerRatio($REFcodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $nameTmp, $keepTmp);
+	&getKmerRatio($REForfCodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $nameTmp, $keepTmp);
     }
 
     # 3. Compute the kmer score for each kmer size on learning and test ORF and for each type
