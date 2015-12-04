@@ -324,12 +324,12 @@ sub divFasta
     my $nbr2   = $nbrSeq - $nbr1;
 
     # Open input file
-    my $inputFasta = new Bio::SeqIO(-file => "$input", '-format' => 'fasta', -alphabet =>'dna');
+    my $inputFasta = new Bio::SeqIO(-file => "$input", '-format' => 'fasta');
     my $seq;
     
     # Open output files
-    my $out1 = new Bio::SeqIO(-file => "> $name1" , '-format' => 'fasta', -alphabet =>'dna');
-    my $out2 = new Bio::SeqIO(-file => "> $name2" , '-format' => 'fasta', -alphabet =>'dna');
+    my $out1 = new Bio::SeqIO(-file => "> $name1" , '-format' => 'fasta');
+    my $out2 = new Bio::SeqIO(-file => "> $name2" , '-format' => 'fasta');
 
     print STDERR "\t\tDividing $input ($nbrSeq seq) file into two learning files ($nbr1 and $nbr2 seq)\n" if($verbosity > 1);
     # Write the first $nbr1 sequences into $out1

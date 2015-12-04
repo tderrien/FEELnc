@@ -246,10 +246,10 @@ pod2usage ("- Error: Cannot train the program if lncRNA training file (-l option
 
 
 # Define fasta file names
-my $codFile     = $nameTmp.".coding_rna.fa";
-my $codOrfFile  = $nameTmp.".coding_orf.fa";
-my $nonFile     = $nameTmp.".noncoding_rna.fa";
-my $nonOrfFile  = $nameTmp.".noncoding_orf.fa";
+my $codFile    = $nameTmp.".coding_rna.fa";
+my $codOrfFile = $nameTmp.".coding_orf.fa";
+my $nonFile    = $nameTmp.".noncoding_rna.fa";
+my $nonOrfFile = $nameTmp.".noncoding_orf.fa";
 my $testFile    = $nameTmp.".test_rna.fa";
 my $testOrfFile = $nameTmp.".test_orf.fa";
 
@@ -371,7 +371,7 @@ RandomForest::rfPredToOut($infile, $rfout, $outDir, $outName);
 # Check if a TUCp file exists, if there is one so write this message
 if( -e $outDir.$outName.".TUCp.gtf" )
 {
-    print STDERR "\n==> Transcripts of Unknown Coding Potential (TUCps) found: check file '".$outDir.$outName.".TUCp.gtf'.\n";
+    print STDERR "\nTranscripts of Unknown Coding Potential (TUCps) found: check file '".$outDir.$outName.".TUCp.gtf'.\n";
     print STDERR "\tThese transcripts correspond to transcripts with a coding potential between the mRNA and the lncRNA specificity threshold.\n";
 }
 if( -e $outDir.$outName.".TUCp.fa" )
@@ -380,14 +380,16 @@ if( -e $outDir.$outName.".TUCp.fa" )
     print STDERR "\tThese transcripts correspond to transcripts with a coding potential between the mRNA and the lncRNA specificity threshold.\n";
 }
 
-# Check if a smallSeq file exists, if there is one so write this message
-if( -e $outDir.$outName.".smallSeq.gtf" )
+# Check if a noORF file exists, if there is one so write this message
+if( -e $outDir.$outName.".noORF.gtf" )
 {
-    print STDERR "\n==> Transcripts found with a sequence shorter than 2*$kmerMax: check file '".$outDir.$outName.".smallSeq.gtf'.\n";
+    print STDERR "\nTranscripts without ORF found: check file '".$outDir.$outName.".noORF.gtf'.\n";
+    print STDERR "\tThese transcripts correspond probably to lncRNAs since no ORF was found. You might also want to change the --testorftype option.\n";
 }
-if( -e $outDir.$outName.".smallSeq.fa" )
+if( -e $outDir.$outName.".noORF.fa" )
 {
-    print STDERR "\n==> Transcripts found with a sequence shorter than 2*$kmerMax: check file '".$outDir.$outName.".smallSeq.fa'.\n";
+    print STDERR "\nTranscripts without ORF found: check file '".$outDir.$outName.".noORF.fa'.\n";
+    print STDERR "\tThese transcripts correspond probably to lncRNAs since no ORF was found. You might also want to change the --testorftype option.\n";
 }
 
 
