@@ -507,7 +507,7 @@ sub _print_finfo{
 # 1 <=> anti direction
 sub _conversion_direction {
 	my $i= shift;
-	my %direction = ("1","sense","-1","antisense","0","strand(s) unknow");
+	my %direction = ("1","sense","-1","antisense","0","strand_unknow");
 	if (exists $direction{$i} ) {
 		return ($direction{$i});
 	}else{ return "$i unknow direction";}
