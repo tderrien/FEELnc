@@ -20,8 +20,8 @@ if(length(args)!=2)
 testFile <- args[1]
 rfFile   <- args[2]
 
-matTest <- read.table(file=testFile, header=TRUE, sep="\t")
-matRf   <- read.table(file=rfFile,   header=TRUE, sep="\t")
+matTest <- read.table(file=testFile, header=TRUE, sep="\t", comment.char="")
+matRf   <- read.table(file=rfFile,   header=TRUE, sep="\t", comment.char="")
 
 rownames(matTest) <- toupper(matTest[,1])
 rownames(matRf)   <- toupper(matRf[,1])

@@ -63,9 +63,9 @@ set.seed(seed)
 ###########################
 
 ## Read files
-codMat  <- read.table(file=codFile,  header=TRUE, sep="\t")
-nonMat  <- read.table(file=nonFile,  header=TRUE, sep="\t")
-testMat <- read.table(file=testFile, header=TRUE, sep="\t")
+codMat  <- read.table(file=codFile,  header=TRUE, sep="\t", comment.char="")
+nonMat  <- read.table(file=nonFile,  header=TRUE, sep="\t", comment.char="")
+testMat <- read.table(file=testFile, header=TRUE, sep="\t", comment.char="")
 
 ## Modification of codMat and nonMat to add a label value (0: non coding; 1: coding)
 codMat <- cbind(codMat, label=rep(x=1, length.out=nrow(codMat)))
