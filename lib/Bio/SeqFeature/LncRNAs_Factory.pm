@@ -134,6 +134,7 @@ sub create_interaction{
 	- database
 	- type (mRNA , transcript etc.)
 	- size of window (pb)
+        - biotype: if the user want the biotype in the output
 	optional but going together:
 	two files :
 				 - a gtf file from bedtools merged containing your LncRNAs ;
@@ -149,9 +150,10 @@ sub DoItForMe{
 	my $lncrna_file = shift;
 	my $mrna_file = shift;
 	my $max_window = shift;
+	my $biotype = shift;
 	my $verbosity = shift;
 
-	print STDERR "window : $window - max window : $max_window - lncrna : $lncrna_file - mrna : $mrna_file\n";
+	print STDERR "window : $window - max window : $max_window - lncrna : $lncrna_file - mrna : $mrna_file - biotype: $biotype\n";
 	my $db_lnc = Bio::SeqFeature::database_part->new();
 	my $db_mrna = Bio::SeqFeature::database_part->new();
 

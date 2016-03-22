@@ -368,7 +368,10 @@ print short interaction informations
 sub printer_mini {
 	my $self = shift;
 	my $best=shift;
-	$self->SUPER::printer_mini($best);
+	my $biotype = shift;
+
+	#VW: for the biotype printing
+	$self->SUPER::printer_mini($best, $biotype);
 
 	# print "\t Status=",$self->status();
 	# print "\t Subtype=", $self->subtype(),"\n";

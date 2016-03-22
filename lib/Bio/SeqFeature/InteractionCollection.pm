@@ -401,17 +401,26 @@ print all the collection
 
 sub print_all_interactions {
 	my $collection = shift;
+	my $biotype    = shift;
 	my @objects=$collection->get_objects();
 
 	#VW: print the header
-	print "isBest\tlncRNA_gene\tlncRNA_transcript\tpartnerRNA_gene\tpartnerRNA_transcript\tdirection\ttype\tdistance\tsubtype\tlocation\n";
+	if($biotype)
+	{
+	    print "isBest\tlncRNA_gene\tlncRNA_transcript\tlncRNA_biotype\tpartnerRNA_gene\tpartnerRNA_transcript\tpartnerRNA_biotype\tdirection\ttype\tdistance\tsubtype\tlocation\n";
+	}
+	else
+	{
+	    print "isBest\tlncRNA_gene\tlncRNA_transcript\tpartnerRNA_gene\tpartnerRNA_transcript\tdirection\ttype\tdistance\tsubtype\tlocation\n";
+	}
 
 	foreach my $object (@objects) {
 		my $best =$collection->get_the_best_interaction($object);
-		$best->printer_mini('best');
+		$best->printer_mini('best',$biotype);
 		foreach my $interaction ($collection->_get_interactions_object($object)) {
 			unless ($interaction->subject() == $best->subject()) {
-				$interaction->printer_mini();
+			    #VW: set the first arg as undef, i.e. not the best interaction
+			    $interaction->printer_mini(undef,$biotype);
 			}
 		}
 	}

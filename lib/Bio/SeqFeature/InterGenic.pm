@@ -290,7 +290,10 @@ Bio::SeqFeature:Interaction
 sub printer_mini {
 	my $self = shift;
 	my $best=shift;
-	$self->SUPER::printer_mini($best);
+	my $biotype = shift;
+
+	#VW: for the biotype printing
+	$self->SUPER::printer_mini($best,$biotype);
 	# print "\t Status=",_print_divergent($self->_get_divergent());
 	# print "\t Subtype=",_print_subtype($self->subtype()),"\n";
 	#VW modif
