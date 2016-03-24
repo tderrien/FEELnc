@@ -1,6 +1,7 @@
 # FEELnc : 
 ## FlExible Extraction of Long non-coding RNAs
  
+*Version (24/03/2016): Adding an option for the classifier: -b/--biotype. Using this option, the classifier write the biotype of the lncRNA and the RNA partner. If no biotype, write "none" instead.*
 
 *Version (23/11/2015): Update of the classifier output. Now the classifier write (i) a log file containing statisitcs on the inteactions (i.e the line which began with a # before the update) and (ii) a main output file which is now formated as a tabulated matrix with a header.*
 
@@ -381,6 +382,7 @@ Depending on your filtering options, this may correspond to a non-protein-coding
 
 ```
     General:
+      -b, --biotype         Print the biotype of each transcripts in the output
       --help                Print this help
       --man                 Open man page
       --verbosity           Level of verbosity
