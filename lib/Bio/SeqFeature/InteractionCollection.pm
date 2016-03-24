@@ -477,8 +477,6 @@ sub get_the_best_interaction {
 	}
 
 	return $best;
-
-
 }
 
 
