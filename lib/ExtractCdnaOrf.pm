@@ -270,7 +270,7 @@ sub CreateORFcDNAFromGTF
     # add default value for minnumtx otherwise error when launchin without option numtx
     $minnumtx  //= 100;
     $verbosity //= 1;
-    
+
     # die if genome not specified
     pod2usage("Error: Cannot read your genome file '$genome' (-g option)...\nFor help, run with --help option\n") if (! -r $genome && !-d $genome);
 
@@ -280,9 +280,9 @@ sub CreateORFcDNAFromGTF
 
     # Die if not enough transcript for training
     die "Not enough to train the program with the '--nbtx|n $nbtx' option (minimum == 100)...\n" if ( defined $nbtx && ($nbtx <  $minnumtx) );
-    die "Your input mRNA file '", basename($gtfFile),"' contains only *$sizeh* transcripts !\n Not enough to train the program (minimum == 100)...\n " if ( $sizeh < $minnumtx);
+    die "Your input GTF file '", basename($gtfFile),"' contains only *$sizeh* transcripts !\n Not enough to train the program (minimum == 100)...\n " if ( $sizeh < $minnumtx);
 
-    print STDERR "\tYour input training file '", basename($gtfFile),"' contains *$sizeh* transcripts\n" if ($verbosity > 0 );
+    print STDERR "\tYour input GTF file '", basename($gtfFile),"' contains *$sizeh* transcripts\n" if ($verbosity > 0 );
 
     my $orfob;
     my %h_orf;              # for storing and printing ORF sequence
@@ -361,7 +361,7 @@ sub CreateORFcDNAFromGTF
     {
 	print STDERR "\n\tExtracted '$countseqok' ORF/cDNAs sequences on '".keys(%{$refmrna})."'.\n";
     }
-    
+
     # Write output FASTA files
     &write2fastafile(\%h_cdna, $cdnaFile, \%h_orf,  $orfFile, $verbosity);
 
@@ -374,7 +374,7 @@ sub CreateORFcDNAFromFASTA
     my ($fastaFile, $cdnaFile, $orfFile, $nbtx, $minnumtx, $orfType, $verbosity, $kmerMax) = @_;
     # If $nbtx is undef, extract all sequences
     $verbosity //= 1;
-    
+
     print STDERR "Extract ORF/cDNA from fasta file '$fastaFile'..\n";
 
     my %h_orf;       # for storing and printing ORF sequence
@@ -443,7 +443,7 @@ sub CreateORFcDNAFromFASTA
 sub writefastafile{
     my ($h, $filename, $verbosity) = @_;
     $verbosity //= 1;
-    
+
     print STDERR "\tWriting FASTA file '$filename'\n" if ($verbosity > 1);
 
     # cDNA
@@ -626,7 +626,7 @@ sub randomizedGTFtoFASTA{
 sub overlapwithH{
     my ($chr,$start,$end, $rehchr, $count, $verbosity)	= @_;
     $verbosity //= 1;
-    
+
     my $overlap = 0;
     if (exists $rehchr->{$chr}){ # for the chromosome in the annotation test overlap
 
@@ -667,7 +667,7 @@ sub overlapwithH{
 sub getPropN{
     my ($chr,$start,$end, $db, $nucleotide, $verbosity) = @_;
     $verbosity //= 1;
-    
+
     my $propN = -1; # default values
     my $seq   = "";
 
