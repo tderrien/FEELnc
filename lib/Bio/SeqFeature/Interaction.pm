@@ -406,9 +406,6 @@ sub printer_mini {
 	# VW: modif
 	if (defined $best) {$bestVal = 1}
 
-	# print 	join ("\t", $self->object()->primary_tag(),  $self->object()->get_tag_values("gene_id"),  $self->object()->get_tag_values("transcript_id"),  $self->subject()->primary_tag(), $self->subject()->get_tag_values("gene_id"), $self->subject()->get_tag_values("transcript_id"),  _conversion_direction($self->direction()), _conversion_type($self->type()), $self->distance());
-	# print 	join ("\t", $self->object()->primary_tag(),  $self->object()->get_tag_values("gene_id"),  $self->object()->get_tag_values("transcript_id"),  "RNA_partner", $self->subject()->get_tag_values("gene_id"), $self->subject()->get_tag_values("transcript_id"),  _conversion_direction($self->direction()), _conversion_type($self->type()), $self->distance());
-
 	# VW: if the transcripts get a biotype print it
 	if($biotype)
 	{
