@@ -458,6 +458,9 @@ sub get_the_best_interaction {
 					if ($interaction->overlap() > $best->overlap()) {
 						$best=$interaction;
 					}
+					if ($interaction->overlap() == $best->overlap() && $interaction->subject()->get_tag_values("transcript_id") < $best->subject()->get_tag_values("transcript_id")) {
+						$best=$interaction;
+					}
 				}
 				else {
 					$best=$interaction;
@@ -470,6 +473,9 @@ sub get_the_best_interaction {
 				}
 				else {
 					if ($interaction->distance < $best->distance) {
+						$best=$interaction;
+					}
+					if ($interaction->distance == $best->distance && $interaction->subject()->get_tag_values("transcript_id") < $best->subject()->get_tag_values("transcript_id")) {
 						$best=$interaction;
 					}
 				}
