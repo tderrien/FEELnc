@@ -36,7 +36,7 @@ my $monoexonic   = 0;  # -1 keep monoexonicAS, 1 keep all monoexonic, 0 remove a
 my $linconly     = 0;  # bool : 1 to only extract intergenic tx
 my $biexonicsize = 25; # minimum size of an exon in bp for transcript having 2 exons
 my $minfrac_over = 0;  # min proportion of overlap to remove candidate lncRNAs
-my $strandedmode = 1;  # default stranded 
+my $strandedmode = 1;  # default stranded
 my $proc         = 4;
 my $outputlog;
 
@@ -44,15 +44,15 @@ my $outputlog;
 ## or if usage was explicitly requested.
 GetOptions(
     'i|infile=s'       => \$infile,
-    'a|mRNAfile=s'     => \$mRNAfile,	
+    'a|mRNAfile=s'     => \$mRNAfile,
     's|size=i'         => \$minsize,
-    'biex=i'           => \$biexonicsize,    
+    'biex=i'           => \$biexonicsize,
     'f|minfrac_over=f' => \$minfrac_over,
     'monoex=i'         => \$monoexonic,
-    'l|linconly!'      => \$linconly,    
+    'l|linconly!'      => \$linconly,
     'p|proc=i'         => \$proc,
-    'b|biotype=s'      => \%biotype,	
-    'o|outlog=s'       => \$outputlog,	
+    'b|biotype=s'      => \%biotype,
+    'o|outlog=s'       => \$outputlog,
     'v|verbosity=i'    => \$verbosity,
     'help|?'           => \$help,
     'man'              => \$man
@@ -103,21 +103,21 @@ foreach my $tx (keys %{$reflnc}){
         delete $reflnc->{$tx};
         next;
     }
-    
+
     # nb exon
     my $nbexon = ExtractFromFeature::features2nbExon($txfeatures, 0);
-    if ($nbexon == 1){ 
-    	
+    if ($nbexon == 1){
+
     	# if 0                    => we remove all monoexonic tx
     	# if -1 and strand is "." => we also remove the transcript (not strans information)
     	if ($monoexonic == 0 || ($monoexonic == -1 &&  ($reflnc->{$tx}->{'strand'} eq "."))) {
 	    print LOG "Filter monoexonic (option $monoexonic): $tx =  $nbexon exon (with strand ",$reflnc->{$tx}->{'strand'},")...\n";
     	    $ctmonoexonic++;
-	    delete $reflnc->{$tx};    
+	    delete $reflnc->{$tx};
 	    next;
 	}
     }
-    
+
     # dubious biexonic
     my $dubious = ExtractFromFeature::features2dubExon($txfeatures, $biexonicsize, 0);
     if ($dubious && $nbexon == 2){
@@ -170,9 +170,9 @@ print STDERR "Computing overlap (exon level) with reference annotation...\n" if 
 foreach my $chrlnc (keys %{$reflncchr} ) {
 
     my %lnctorm; # hash tmp storing tx IDs to remove, the correct hash is : $refhchild
-    
+
     if (! exists $refmRNAchr->{$chrlnc} ) {
-	
+
 	# if user wants monoexonic antisense and the lncRNA chr does not belong to the annotation, we remove all monoexonic the lncRNA associated-chr
 	if ($monoexonic == -1){
 	    my %h_mono = ExtractFromHash::getMonoExonicFromGtfHash( $reflncchr->{$chrlnc});
@@ -181,17 +181,17 @@ foreach my $chrlnc (keys %{$reflncchr} ) {
 	    delete @{$reflnc}{@idstorm};
     	}
     } elsif (exists $refmRNAchr->{$chrlnc}) { # else we check for overlap
-	
+
 	print STDERR "$chrlnc\n";
 	# start fork
 	my $pid = $pm->start($chrlnc) and next;
-     	
+
      	# get ref on hash per chromosome
         %lnctorm = Intersect::getOverlapping($reflncchr->{$chrlnc}, $refmRNAchr->{$chrlnc}, $strandedmode, $minfrac_over, $monoexonic, $linconly, $verbosity);
 
     }
     $pm->finish(0, \%lnctorm);
-    
+
 }
 
 # wait all sub process
@@ -201,8 +201,10 @@ $pm->wait_all_children;
 # remove matching transcripts from hash of process chr
 foreach my $thread (keys %refhchild){
     my @idstorm =  keys %{$refhchild{$thread}};
-    print LOG "Filter overlap ($minfrac_over-$monoexonic-$linconly): $_ overlap ${$refhchild{$thread}}{$_}...\n" for (@idstorm);
-    delete @{$reflnc}{@idstorm} ;  
+    # VW: modification
+    # print LOG "Filter overlap ($minfrac_over-$monoexonic-$linconly): $_ overlap ${$refhchild{$thread}}{$_}...\n" for (@idstorm);
+    print LOG "Filter overlap ($minfrac_over-$monoexonic-$linconly): $_ ${$refhchild{$thread}}{$_}...\n" for (@idstorm);
+    delete @{$reflnc}{@idstorm} ;
 }
 
 
@@ -230,7 +232,7 @@ FEELnc_filter.pl -i candidate.gtf -a mRNA.gtf  > candidate_lncRNA.gtf
 
 =head1 DESCRIPTION
 
-FEELnc (Fast and Effective Extraction of Long non-coding RNAs) is dedicated to the annotation of lncRNAs 
+FEELnc (Fast and Effective Extraction of Long non-coding RNAs) is dedicated to the annotation of lncRNAs
 based on a set of transcripts as input (basically a cufflink transcripts.gtf file)
 The first step if the pipeline (FEELnc_filter) is to filter unwanted/spurious transcripts and/or transcripts
 overlapping in sense exons of the reference annotation.
@@ -242,13 +244,13 @@ overlapping in sense exons of the reference annotation.
     --help			Print this help
     --man			Open man page
     --verbosity			Level of verbosity 0, 1 and 2 [default 1]
-  
+
 
 =head2 Mandatory arguments
 
     -i,--infile=file.gtf	Specify the GTF file to be filtered (such as a cufflinks transcripts/merged .GTF file)
     -a,--mRNAfile=file.gtf	Specify the annotation GTF file to be filtered on based on sense exon overlap (file of protein coding annotation)
-    
+
 =head2 Filtering arguments
 
     -s,--size=200		Keep transcript with a minimal size (default 200)
@@ -256,8 +258,8 @@ overlapping in sense exons of the reference annotation.
     -l,--linconly		Keep only long intergenic/interveaning ncRNAs [default FALSE]
     --monoex=-1|0|1		Keep monoexonic transcript(s): mode to be selected from : -1 keep monoexonic antisense (for RNASeq stranded protocol), 1 keep all monoexonic, 0 remove all monoexonic	[default 0]
     --biex=25			Discard biexonic transcripts having one exon size lower to this value (default 25)
-    
-=head2 Overlapping specification 
+
+=head2 Overlapping specification
 
 
     -f,--minfrac_over=0		Minimal fraction out of the candidate lncRNA size to be considered for overlap [default 0 i.e 1nt]
