@@ -2,13 +2,13 @@
 ## FlExible Extraction of Long non-coding RNAs
  
 
+This document is intended to give a (minimal) description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs).
+For a more general overview of lncRNAs annotation using RNASeq and FEELnc specific advantages, you could point to [this  document](http://tools.genouest.org/data/tderrien/FEELnc_shortdesc.doc).
+
 Please note that FEELnc project is still in working progress. But feel free to use it and send any comments/bug/suggestions. Thanks!
 
 
 ## Introduction
-
-This document is intended to give a (minimal) description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs).
-For a more general overview of lncRNAs annotation using RNASeq and FEELnc specific advantages, you could point to [this  document](http://tools.genouest.org/data/tderrien/FEELnc_shortdesc.doc).
 
 
 Currently, FEELnc is composed of 3 modules (See *Launch FEELnc 3-step pipeline* for more details):
