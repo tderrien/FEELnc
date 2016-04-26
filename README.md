@@ -1,16 +1,6 @@
 # FEELnc : 
 ## FlExible Extraction of Long non-coding RNAs
  
-*Version (24/03/2016): Adding an option for the classifier: -b/--biotype. Using this option, the classifier write the biotype of the lncRNA and the RNA partner. If no biotype, write "none" instead.*
-
-*Version (23/11/2015): Update of the classifier output. Now the classifier write (i) a log file containing statisitcs on the inteactions (i.e the line which began with a # before the update) and (ii) a main output file which is now formated as a tabulated matrix with a header.*
-
-*Version (10/11/2015): Major Update. Correction of bug  during ORF sequences extraction from a GTF containing CDS information (the sequence was containing the RNA sequence in addition to the ORF). If you launched FEELnc analysis with a GTF including CDS information, please re-run your analysis with this new version. Sorry for the inconvenience.*
-
-*Version (05/11/2015): Major update, replace ORF length feature by ORF coverage feature (ORF length divided by RNA length)*
-
-*Version (26/05/2015): Major update includes the use of RandomForest for FEELnc_codpot*
-
 
 Please note that FEELnc project is still in working progress. But feel free to use it and send any comments/bug/suggestions. Thanks!
 
@@ -411,5 +401,18 @@ Can't call method "close" on an undefined value Bio/DB/SeqFeature/Store/berkeley
  - Fabrice Legeai
  - Thomas Derrien
 
-## Acknowledgments
+## Versions
 
+*Version (24/03/2016): Adding an option for the classifier: -b/--biotype. Using this option, the classifier write the biotype of the lncRNA and the RNA partner. If no biotype, write "none" instead.*
+
+*Version (23/11/2015): Update of the classifier output. Now the classifier write (i) a log file containing statisitcs on the inteactions (i.e the line which began with a # before the update) and (ii) a main output file which is now formated as a tabulated matrix with a header.*
+
+*Version (10/11/2015): Major Update. Correction of bug  during ORF sequences extraction from a GTF containing CDS information (the sequence was containing the RNA sequence in addition to the ORF). If you launched FEELnc analysis with a GTF including CDS information, please re-run your analysis with this new version. Sorry for the inconvenience.*
+
+*Version (05/11/2015): Major update, replace ORF length feature by ORF coverage feature (ORF length divided by RNA length)*
+
+*Version (26/05/2015): Major update includes the use of RandomForest for FEELnc_codpot*
+
+
+## Acknowledgments
+To the users of FEELnc and to [GenOuest Bioinformatics core facility](http://www.genouest.org).
