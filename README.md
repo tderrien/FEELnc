@@ -18,6 +18,8 @@ Please note that FEELnc project is still in working progress. But feel free to u
 ## Introduction
 
 This document is intended to give a (minimal) description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs).
+For a more general overview of lncRNAs annotation using RNASeq and FEELnc specific advantages, you could point to [this  document](http://tools.genouest.org/data/tderrien/FEELnc_shortdesc.doc).
+
 
 Currently, FEELnc is composed of 3 modules (See *Launch FEELnc 3-step pipeline* for more details):
 
@@ -39,7 +41,7 @@ The formats used to describe genes, transcripts, exon is **.GTF** and **.FASTA**
 
 Basically, FEELnc users should have the following minimal input files:
 
-	- Infile.GTF          (-i,--infile)   : input GTF file (e.g cufflinks transcripts.GTF)
+	- Infile.GTF          (-i,--infile)   : input GTF file (e.g cufflinks/stringtie transcripts.GTF)
 	- ref_annotation.GTF  (-a,--mRNAfile) : GTF annotation file*
 	- ref_genome.FASTA    (-g,--genome)   : genome FASTA file or directory with individual chrom FASTA files
 
@@ -59,7 +61,7 @@ The following software and libraries must be installed on your machine:
 
 - [Perl5+](https://www.perl.org/) : tested with version 5.18.2
  * [Bioperl](http://www.bioperl.org/wiki/Main_Page)  : tested with version BioPerl-1.6.924
- * [Parralell::ForkManager](http://search.cpan.org/~szabgab/Parallel-ForkManager-1.07/lib/Parallel/ForkManager.pm) : tested with version 1.07
+ * [Parralell::ForkManager](http://search.cpan.org/perldoc/Parallel::ForkManager) : tested with version 1.07
 - R [Rscript](http://cran.r-project.org): tested with version 3.1.0.
  * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) test with version 1.0-5
  * [randomForest](http://cran.r-project.org/web/packages/randomForest/index.html) tested with version 4.6-10
@@ -83,7 +85,7 @@ Export PERL5LIB and FEELNCPATH variables
 	export FEELNCPATH=${PWD}
 	export PERL5LIB=$PERL5LIB:${FEELNCPATH}/lib/
 
-Add FEELnc scripts to your PATH and add the distribution-specific binary of KmerInShort to your PATH or copy it to your bin directory
+Add FEELnc scripts to your PATH and add the distribution-specific binary of KmerInShort (or KIS developped by Guillaume Rizk) to your PATH or copy it to your bin directory
 
 	export PATH=$PATH:${FEELNCPATH}/scripts/
 
