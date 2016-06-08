@@ -22,7 +22,7 @@ To get help on each module, you can type :
 
 	FEELnc_filter.pl --help
 	# Or
-    FEELnc_filter.pl --man
+        FEELnc_filter.pl --man
 
 
 ## Input files
@@ -55,6 +55,9 @@ The following software and libraries must be installed on your machine:
 - R [Rscript](http://cran.r-project.org): tested with version 3.1.0.
  * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) test with version 1.0-5
  * [randomForest](http://cran.r-project.org/web/packages/randomForest/index.html) tested with version 4.6-10
+
+- If you want to use the **shuffle** mode:
+ * [fasta_ushuffle](https://github.com/agordon/fasta_ushuffle)
 
 * Note: R librairies should be installed automatically when running FEELnc. In case it does not work, please type in a R session:
 	install.packages('ROCR')
@@ -89,6 +92,8 @@ Add FEELnc scripts to your PATH and add the distribution-specific binary of Kmer
 	# or
 	cp ${FEELNCPATH}/bin/LINUX/ ~/bin/
 
+If you want to use the **shuffle** mode, please check that the **fasta_ushuffle** binary is in your PATH.
+
 ### Test with toy example:
 
 	cd test/
@@ -99,7 +104,7 @@ Add FEELnc scripts to your PATH and add the distribution-specific binary of Kmer
 
 	# Coding_Potential
 	# Note1: as a test, the training is only done on 1000 mRNA and 1000 intergenic sequences (-n 1000,1000 option)
-	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa -n 1000,1000
+	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa --mode=intergenic -n 1000,1000
 
 	# Classifier
 	FEELnc_classifier.pl -i feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf -a annotation_chr38.gtf > candidate_lncRNA_classes.txt
@@ -184,17 +189,19 @@ If you have a set of known lncRNAs, you could run the module like:
 	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -l known_lncRNA.gtf
 
 However, for most organisms, the set of known_lncRNA transcripts is not known and thus
-a set of genomic intergenic regions are automatically extracted as the lncRNA training set.
-In this case, the reference genome file is required (ref_genome.FA)
+a set of genomic intergenic regions can be extracted as the lncRNA training set.
+In this case, the reference genome file is required (ref_genome.FA) and the mode of
+the lncRNA sequences simulation have to been set to **intergenic**.
 
-    FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -g ref_genome.FA
+    FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -g ref_genome.FA --mode=intergenic
 
 
 As in the previous module, if your reference annotation file  ("*ref_annotation.GTF*") contains additionnal fields such **transcript_biotype** and/or **transcript_status** in the [GENCODE annotation](http://www.gencodegenes.org/gencodeformat.html) or [ENSEMBL](http://www.ensembl.org), you can extract them manually or by using the **-b option** (as  to get the best training set of known mRNAs.
 
     FEELnc_codpot.pl -i candidate_lncRNA.gtf -a ref_annotation.GTF \
     -g ref_genome.FA \
-    -b transcript_biotype=protein_coding -b transcript_status=KNOWN
+    -b transcript_biotype=protein_coding -b transcript_status=KNOWN \
+    --mode=intergenic
 
 
 
@@ -247,6 +254,9 @@ Options:
       -k,--kmer="1,2,3,6,9,12"                     Kmer size list with sizes separated by ',' as string [ default "3,6,9" ], the maximum value for one size is '15'
       -o,--outname="./"                     Output filename [ default infile_name ]
       --outdir="./"                         Output directory [ default current directory ]
+      -m,--mode                             The mode of the lncRNA sequences simulation if no lncRNA sequences have been provided. The mode can be:
+                                                    'shuffle'   : make a permutation of mRNA sequences while preserving the 7mer count. Can be done on either FASTA and GTF input file;
+                                                    'intergenic': extract intergenic sequences. Can be done *only* on GTF input file.
       -s,--sizeinter=0.75                   Ratio between mRNA sequence and non-coding intergenic extracted region sizes [default 0.75 ]
       --learnorftype=1                      Integer [0,1,2,3,4] to specify the type of longest ORF computation [ default: 1 ] for learning data set. If the CDS is annotated in the .GTF, then the CDS is considered as the longest ORF, whatever the --orftype value.
                                                     '0': ORF with start and stop codon;
