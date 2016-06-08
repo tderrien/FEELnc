@@ -95,7 +95,7 @@ Add FEELnc scripts to your PATH and add the distribution-specific binary of Kmer
 
 If you want to use the **shuffle** mode, please check that the **fasta_ushuffle** binary is in your PATH
 
-	export PATH=$PATH:*PATH_TO_FASTA_USHUFFLE_BIN*
+	export PATH=$PATH:PATH_TO_FASTA_USHUFFLE_BIN
 
 ### Test with toy example:
 
