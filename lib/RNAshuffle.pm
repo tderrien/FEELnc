@@ -59,15 +59,15 @@ sub runFastaUshuffle
     {
 	chop;
 	# If first line
-	if($flag=0)
+	if($flag==0)
 	{
-	    print ONELINE "$_\t";
+	    print ONELINE "$_\n";
 	    $flag = 1
 	}
 	# Else if the line is the name of a sequence
 	elsif($_ =~ /^>/)
 	{
-	    print ONELINE "\n$_\t";
+	    print ONELINE "\n$_\n";
 	}
 	# Else the line is a sequence line
 	else
@@ -81,9 +81,9 @@ sub runFastaUshuffle
     # Use best values get on human gencode
     my $kmerSizePerm = 7;
     my $nbrPerm      = 3;
+    my $shufflePath  = Utils::pathProg("fasta_ushuffle");
+    my $cmd          = "";
     
-    my $shufflePath = Utils::pathProg("fasta_ushuffle");
-
     $cmd = "$shufflePath -k $kmerSizePerm -s $seed -n $nbrPerm < $oneLine > $permOut";
     print STDERR "\t\tRun fasta_ushuffle:\n\t\t$cmd.\n" if($verbosity > 1);
     system($cmd);
@@ -127,22 +127,29 @@ sub getPermutSeq
     my $countseqok = 0;
     my $orfFlag    = 0;
     my $nbseq      = 0;
+    my $tr         = "";
     my %h_orf;          # for storing and printing ORF sequence
     my %h_cdna;         # for storing and printing cDNA sequence
 
     # Count the number of sequences if $nbtx is not defined
     if(!defined $nbtx)
     {
-	$nbseq++ while( my $seq = $seqin->next_seq());
-	die "Your input FASTA '$fastaFile' contains only *$nbseq* sequences.\nNot enough to train the program (default option --ntx|-n)\n" if (defined $minnumtx && $nbseq < $minnumtx);
+	$nbseq++ while( my $seq = $multiFasta->next_seq());
+	die "Your permuted FASTA '$permOut' contains only *$nbseq* sequences.\nNot enough to train the program (default option --ntx|-n)\n" if (defined $minnumtx && $nbseq < $minnumtx);
+	$multiFasta    = new Bio::SeqIO(-file  => $permOut);
     }
 
     # Get valid sequences
     while($seq = $multiFasta->next_seq())
     {
-	if( $seq->seq() !(exists keys(%codSeq)) )
+	$tr = $seq->id();
+
+	if( exists $codSeq{$seq->seq()} )
 	{
-	    my $tr = $seq->id();
+	    print STDERR "$tr has not been successfully shuffled... Skip it\n" if ($verbosity > 1);	    
+	}
+	else
+	{
 
 	    # Get the ORF for the sequence
 	    $orfFlag = ExtractCdnaOrf::getTypeOrf($tr, $seq->seq(), ".", \%h_orf, $orfType, $kmerMax);
@@ -174,6 +181,10 @@ sub getPermutSeq
     my $sizehorf = keys(%h_orf);
     die "The number of complete ORF found with computeORF mode is *$sizehorf*... That's not enough to train the program\n" if (defined $nbtx && $sizehorf < $minnumtx);
 
+    if(defined $nbtx && $countseqok != $nbtx)
+    {
+	print STDERR "\n\t'$countseqok' shuffled sequences have been successfully validated.\n";
+    }    
     if(!defined $nbtx)
     {
 	print STDERR "\n\tExtracted '$countseqok' ORF/cDNAs sequences on '$nbseq'.\n";
