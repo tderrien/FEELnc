@@ -22,7 +22,7 @@ To get help on each module, you can type :
 
 	FEELnc_filter.pl --help
 	# Or
-        FEELnc_filter.pl --man
+	FEELnc_filter.pl --man
 
 
 ## Input files
