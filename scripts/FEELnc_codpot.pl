@@ -267,7 +267,7 @@ if($mode eq "shuffle")
 
 # Die if lnc training file is not set and mRNA file is in FASTA: no possibility of intergenic extraction
 my $mRNAfileformat = Utils::guess_format($mRNAfile);
-pod2usage ("- Error: Cannot train the program if lncRNA training file (-l option) is not defined and mRNA file (-a option) is in FASTA format!\nPlease, provide the mRNA/annotation file in .GTF format so that I could extract intergenic sequences for training...\n") if (!defined $lncRNAfile && $mRNAfileformat eq "fasta");
+pod2usage ("- Error: Cannot train the program if lncRNA training file (-l option) is not defined and mRNA file (-a option) is in FASTA format!\nPlease, provide the mRNA/annotation file in .GTF format so that I could extract intergenic sequences for training...\n") if (!defined $lncRNAfile && $mRNAfileformat eq "fasta" && $mode ne "shuffle");
 
 
 # Define fasta file names
