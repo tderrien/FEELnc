@@ -342,7 +342,7 @@ elsif($mode eq "intergenic")
 # VW: if mode shuffle
 elsif($mode eq "shuffle")
 {
-    print STDERR "> The lncRNA training file is not set. Get ORFs/cDNAs for lncRNAs by shuffling mRNA sequences (can take a while)\n";
+    print STDERR "> The lncRNA training file is not set. Get ORFs/cDNAs for lncRNAs by shuffling mRNA sequences\n";
     RNAshuffle::makePerm($codFile, $nonFile, $nonOrfFile, $numtxNon, $minnumtx, $orfTypeLearn, $verbosity, $kmerMax, $nameTmp, $seed);
 }
 
