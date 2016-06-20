@@ -57,8 +57,8 @@ my $speThres     = undef;
 my @speThresList = undef;
 
 # VW Add option to select the calculate orf for learning and test data sets
-my $orfTypeLearn = 1;
-my $orfTypeTest  = 1;
+my $orfTypeLearn = 3;
+my $orfTypeTest  = 3;
 
 # VW Add an option to specify the output directory, default current directoryand an out name
 my $outDir  = "./feelnc_codpot_out";
@@ -500,14 +500,14 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
                                                 'shuffle'   : make a permutation of mRNA sequences while preserving the 7mer count. Can be done on either FASTA and GTF input file;
                                                 'intergenic': extract intergenic sequences. Can be done *only* on GTF input file.
   -s,--sizeinter=0.75			Ratio between mRNA sequence lengths and non coding intergenic region sequence lengths as, by default, ncInter = mRNA * 0.75
-  --learnorftype=1			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 1 ] for learning data set.
+  --learnorftype=3			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 3 ] for learning data set.
 					If the CDS is annotated in the .GTF, then the CDS is considered as the longest ORF, whatever the --orftype value.
 						'0': ORF with start and stop codon;
 						'1': same as '0' and ORF with only a start codon, take the longest;
 						'2': same as '1' but with a stop codon;
 						'3': same as '0' and ORF with a start or a stop, take the longest (see '1' and '2');
 						'4': same as '3' but if no ORF is found, take the input sequence as ORF.
-  --testorftype=1			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 1 ] for test data set. See --learnortype description for more informations.
+  --testorftype=3			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 3 ] for test data set. See --learnortype description for more informations.
   --ntree				Number of trees used in random forest [ default 500 ]
   --percentage=0.1			Percentage of the training file use for the training of the kmer model. What remains will be used to train the random forest
 
