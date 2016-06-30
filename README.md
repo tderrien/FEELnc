@@ -270,7 +270,7 @@ Options:
 ### 3- FEELnc_classifier.pl
 
 
-The last step of the pipeline consists in classifying new lncRNAs w.r.t to the localisation and the direction of transcription of proximal RNA transcripts because classifying lncRNAs with mRNAs could help to predict functions for lncRNAs.
+The last step of the pipeline consists in classifying new lncRNAs w.r.t to the localisation and the direction of transcription of proximal RNA transcripts because classifying lncRNAs with mRNAs (or other ncRNAs) could help to predict functions for lncRNAs.
 
 **- Tpes on interactions:**
 
