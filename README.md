@@ -106,8 +106,8 @@ If you want to use the **shuffle** mode, please check that the **fasta_ushuffle*
     -b transcript_biotype=protein_coding > candidate_lncRNA.gtf
 
 	# Coding_Potential
-	# Note1: as a test, the candidate_lncRNA.gtf only contains 293 mRNA transcripts.
-	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa --mode=shuffle
+	# Note1: as a test, the *annotation_chr38.gtf* learning file only contains 254 mRNA transcripts.
+	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf --biotype=protein_coding -g genome_chr38.fa --mode=shuffle
 
 	# Classifier
 	FEELnc_classifier.pl -i feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf -a annotation_chr38.gtf > candidate_lncRNA_classes.txt
