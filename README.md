@@ -202,9 +202,9 @@ If you want to use the **shuffle** mode, please check that the **fasta_ushuffle*
     or
     FEELnc_codpot.pl -i candidate_lncRNA.fa -a known_mRNA.fa --mode=shuffle
 
-    # Note: if you use the **shuffle** mode, the each mRNA sequence is shuffled 3 times.
+    # Note: if you use the shuffle mode, each mRNA sequence is shuffled 3 times.
             If you want to use all the permuations and you fixe the number of sequences
-            used in the training (**-n** option, see FEELnc_codpot.pl full options
+            used in the training (-n option, see FEELnc_codpot.pl full options
             list below), don't set a limit number of lncRNA sequences.
 
 Another more naive approach called **intergenic** consists in extracting random
