@@ -1,6 +1,6 @@
-# FEELnc : 
+# FEELnc :
 ## FlExible Extraction of Long non-coding RNAs
- 
+
 
 This document is intended to give a (minimal) description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs).
 For a more general overview of lncRNAs annotation using RNASeq and FEELnc specific advantages, you could point to [this  document](http://tools.genouest.org/data/tderrien/FEELnc_shortdesc.doc).
@@ -106,8 +106,8 @@ If you want to use the **shuffle** mode, please check that the **fasta_ushuffle*
     -b transcript_biotype=protein_coding > candidate_lncRNA.gtf
 
 	# Coding_Potential
-	# Note1: as a test, the training is only done on 1000 mRNA and 1000 intergenic sequences (-n 1000,1000 option)
-	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa --mode=intergenic -n 1000,1000
+	# Note1: as a test, the training is only done on 1000 mRNA and 1000 shuffled mRNA sequences (-n 1000,1000 option)
+	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa --mode=shuffle -n 1000,1000
 
 	# Classifier
 	FEELnc_classifier.pl -i feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf -a annotation_chr38.gtf > candidate_lncRNA_classes.txt
@@ -191,13 +191,26 @@ If you have a set of known lncRNAs, you could run the module like:
 
 	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -l known_lncRNA.gtf
 
-However, for most organisms, the set of known_lncRNA transcripts is not known and thus
-a set of genomic intergenic regions can be extracted as the lncRNA training set.
+In the absence of species-specific lncRNAs set, machine-learning strategies require to
+simulate non-coding RNA sequences to train the model.
+
+A first approach involves that lncRNAs derived from "debris" of protein-coding
+genes (Duret *et al.* 2006). For this strategy that we called **shuffle**, the set of mRNAs are taken and shuffled while preserving 7-mer frequencies using Ushuffle.
+If you want to use the **shuffle** mode, please check that the **fasta_ushuffle** binary is in your PATH
+
+    FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -g ref_genome.FA --mode=shuffle
+or
+    FEELnc_codpot.pl -i candidate_lncRNA.fa -a known_mRNA.fa --mode=shuffle
+
+
+Another more naive approach called **intergenic** consists in extracting random
+sequences from the genome of interest to model species-specific noncoding sequences.
 In this case, the reference genome file is required (ref_genome.FA) and the mode of
 the lncRNA sequences simulation have to been set to **intergenic**.
 
     FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -g ref_genome.FA --mode=intergenic
 
+For more details and a comparaison between these two lncRNA simulations, please see the FEELnc publication.
 
 As in the previous module, if your reference annotation file  ("*ref_annotation.GTF*") contains additionnal fields such **transcript_biotype** and/or **transcript_status** in the [GENCODE annotation](http://www.gencodegenes.org/gencodeformat.html) or [ENSEMBL](http://www.ensembl.org), you can extract them manually or by using the **-b option** (as  to get the best training set of known mRNAs.
 
@@ -273,10 +286,7 @@ Options:
   Debug arguments:
       --keeptmp                           To keep the temporary files in a 'tmp' directory the outdir, by default don't keep it (0 value). Any other value than 0 will keep the temporary files
       -v,--verbosity=0                         Which level of information that need to be print [ default 0 ]
-      --seed=1234                           Used to fixe the seed value for the extraction of intergenic DNA region to get lncRNA like sequences and for the random forest [ default 1234 ]
-
-  Intergenic lncrna extraction:
-            -to be added
+      --seed=1234                           Used to fixe the seed value for the randomisation of mRNA sequences by Ushuffle, the extraction of intergenic DNA region to get lncRNA like sequences and for the random forest [ default 1234 ]
 
 ```
 
@@ -287,7 +297,7 @@ The last step of the pipeline consists in classifying new lncRNAs w.r.t to the l
 
 **- Tpes on interactions:**
 
-For all newly identified lncRNAs transcripts, a sliding window strategy is used to check for possible overlap with nearest transcripts from the reference annotation. 
+For all newly identified lncRNAs transcripts, a sliding window strategy is used to check for possible overlap with nearest transcripts from the reference annotation.
 A first level of classification disciminates 2 **TYPES** of interactions:
 
 * `GENIC`  : when the lncRNA gene overlaps an RNA gene from the reference annotation file.
