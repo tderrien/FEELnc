@@ -106,8 +106,8 @@ If you want to use the **shuffle** mode, please check that the **fasta_ushuffle*
     -b transcript_biotype=protein_coding > candidate_lncRNA.gtf
 
 	# Coding_Potential
-	# Note1: as a test, the training is only done on 1000 mRNA and 1000 shuffled mRNA sequences (-n 1000,1000 option)
-	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa --mode=shuffle -n 1000,1000
+	# Note1: as a test, the candidate_lncRNA.gtf only contains 291 transcripts.
+	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa --mode=shuffle
 
 	# Classifier
 	FEELnc_classifier.pl -i feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf -a annotation_chr38.gtf > candidate_lncRNA_classes.txt
@@ -202,6 +202,7 @@ If you want to use the **shuffle** mode, please check that the **fasta_ushuffle*
 or
     FEELnc_codpot.pl -i candidate_lncRNA.fa -a known_mRNA.fa --mode=shuffle
 
+# Note: if you use the **shuffle** mode, the each mRNA sequence is shuffled 3 times. If you want to use all the permuations and you fixe the number of sequences used in the training (**-n** option, see FEELnc_codpot.pl full options list below), don't set a limit number of lncRNA sequences
 
 Another more naive approach called **intergenic** consists in extracting random
 sequences from the genome of interest to model species-specific noncoding sequences.
