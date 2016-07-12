@@ -1,6 +1,6 @@
-# FEELnc : 
+# FEELnc :
 ## FlExible Extraction of Long non-coding RNAs
- 
+
 
 This document is intended to give a (minimal) description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs).
 For a more general overview of lncRNAs annotation using RNASeq and FEELnc specific advantages, you could point to [this  document](http://tools.genouest.org/data/tderrien/FEELnc_shortdesc.doc).
@@ -22,7 +22,7 @@ To get help on each module, you can type :
 
 	FEELnc_filter.pl --help
 	# Or
-    FEELnc_filter.pl --man
+	FEELnc_filter.pl --man
 
 
 ## Input files
@@ -55,6 +55,10 @@ The following software and libraries must be installed on your machine:
 - R [Rscript](http://cran.r-project.org): tested with version 3.1.0.
  * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) test with version 1.0-5
  * [randomForest](http://cran.r-project.org/web/packages/randomForest/index.html) tested with version 4.6-10
+
+- If you want to use the **shuffle** mode, you need to instal the [fasta_ushuffle](https://github.com/agordon/fasta_ushuffle) software:
+ * uShuffle: A useful tool for shuffling biological sequences while preserving the k-let counts;
+   M. Jiang, J. Anderson, J. Gillespie and M. Mayne; BMC Bioinformatics 2008, [9:192 doi:10.1186/1471-2105-9-192](http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-192).
 
 * Note: R librairies should be installed automatically when running FEELnc. In case it does not work, please type in a R session:
 	install.packages('ROCR')
@@ -89,6 +93,10 @@ Add FEELnc scripts to your PATH and add the distribution-specific binary of Kmer
 	# or
 	cp ${FEELNCPATH}/bin/LINUX/ ~/bin/
 
+If you want to use the **shuffle** mode, please check that the **fasta_ushuffle** binary is in your PATH
+
+	export PATH=$PATH:PATH_TO_FASTA_USHUFFLE_BIN
+
 ### Test with toy example:
 
 	cd test/
@@ -98,8 +106,8 @@ Add FEELnc scripts to your PATH and add the distribution-specific binary of Kmer
     -b transcript_biotype=protein_coding > candidate_lncRNA.gtf
 
 	# Coding_Potential
-	# Note1: as a test, the training is only done on 1000 mRNA and 1000 intergenic sequences (-n 1000,1000 option)
-	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -g genome_chr38.fa -n 1000,1000
+	# Note1: as a test, the *annotation_chr38.gtf* learning file only contains 254 mRNA transcripts.
+	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf --biotype=protein_coding -g genome_chr38.fa --mode=shuffle
 
 	# Classifier
 	FEELnc_classifier.pl -i feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf -a annotation_chr38.gtf > candidate_lncRNA_classes.txt
@@ -183,18 +191,37 @@ If you have a set of known lncRNAs, you could run the module like:
 
 	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -l known_lncRNA.gtf
 
-However, for most organisms, the set of known_lncRNA transcripts is not known and thus
-a set of genomic intergenic regions are automatically extracted as the lncRNA training set.
-In this case, the reference genome file is required (ref_genome.FA)
+In the absence of species-specific lncRNAs set, machine-learning strategies require to
+simulate non-coding RNA sequences to train the model.
 
-    FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -g ref_genome.FA
+A first approach involves that lncRNAs derived from "debris" of protein-coding
+genes (Duret *et al.* 2006). For this strategy that we called **shuffle**, the set of mRNAs are taken and shuffled while preserving 7-mer frequencies using Ushuffle.
+If you want to use the **shuffle** mode, please check that the **fasta_ushuffle** binary is in your PATH
 
+    FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -g ref_genome.FA --mode=shuffle
+    or
+    FEELnc_codpot.pl -i candidate_lncRNA.fa -a known_mRNA.fa --mode=shuffle
+
+    # Note: if you use the shuffle mode, each mRNA sequence is shuffled 3 times.
+            If you want to use all the permuations and you fixe the number of sequences
+            used in the training (-n option, see FEELnc_codpot.pl full options
+            list below), don't set a limit number of lncRNA sequences.
+
+Another more naive approach called **intergenic** consists in extracting random
+sequences from the genome of interest to model species-specific noncoding sequences.
+In this case, the reference genome file is required (ref_genome.FA) and the mode of
+the lncRNA sequences simulation have to been set to **intergenic**.
+
+    FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -g ref_genome.FA --mode=intergenic
+
+For more details and a comparaison between these two lncRNA simulations, please see the FEELnc publication.
 
 As in the previous module, if your reference annotation file  ("*ref_annotation.GTF*") contains additionnal fields such **transcript_biotype** and/or **transcript_status** in the [GENCODE annotation](http://www.gencodegenes.org/gencodeformat.html) or [ENSEMBL](http://www.ensembl.org), you can extract them manually or by using the **-b option** (as  to get the best training set of known mRNAs.
 
     FEELnc_codpot.pl -i candidate_lncRNA.gtf -a ref_annotation.GTF \
     -g ref_genome.FA \
-    -b transcript_biotype=protein_coding -b transcript_status=KNOWN
+    -b transcript_biotype=protein_coding -b transcript_status=KNOWN \
+    --mode=intergenic
 
 
 
@@ -247,6 +274,9 @@ Options:
       -k,--kmer="1,2,3,6,9,12"                     Kmer size list with sizes separated by ',' as string [ default "3,6,9" ], the maximum value for one size is '15'
       -o,--outname="./"                     Output filename [ default infile_name ]
       --outdir="./"                         Output directory [ default current directory ]
+      -m,--mode                             The mode of the lncRNA sequences simulation if no lncRNA sequences have been provided. The mode can be:
+                                                    'shuffle'   : make a permutation of mRNA sequences while preserving the 7mer count. Can be done on either FASTA and GTF input file;
+                                                    'intergenic': extract intergenic sequences. Can be done *only* on GTF input file.
       -s,--sizeinter=0.75                   Ratio between mRNA sequence and non-coding intergenic extracted region sizes [default 0.75 ]
       --learnorftype=1                      Integer [0,1,2,3,4] to specify the type of longest ORF computation [ default: 1 ] for learning data set. If the CDS is annotated in the .GTF, then the CDS is considered as the longest ORF, whatever the --orftype value.
                                                     '0': ORF with start and stop codon;
@@ -260,10 +290,7 @@ Options:
   Debug arguments:
       --keeptmp                           To keep the temporary files in a 'tmp' directory the outdir, by default don't keep it (0 value). Any other value than 0 will keep the temporary files
       -v,--verbosity=0                         Which level of information that need to be print [ default 0 ]
-      --seed=1234                           Used to fixe the seed value for the extraction of intergenic DNA region to get lncRNA like sequences and for the random forest [ default 1234 ]
-
-  Intergenic lncrna extraction:
-            -to be added
+      --seed=1234                           Used to fixe the seed value for the randomisation of mRNA sequences by Ushuffle, the extraction of intergenic DNA region to get lncRNA like sequences and for the random forest [ default 1234 ]
 
 ```
 
@@ -274,7 +301,7 @@ The last step of the pipeline consists in classifying new lncRNAs w.r.t to the l
 
 **- Tpes on interactions:**
 
-For all newly identified lncRNAs transcripts, a sliding window strategy is used to check for possible overlap with nearest transcripts from the reference annotation. 
+For all newly identified lncRNAs transcripts, a sliding window strategy is used to check for possible overlap with nearest transcripts from the reference annotation.
 A first level of classification disciminates 2 **TYPES** of interactions:
 
 * `GENIC`  : when the lncRNA gene overlaps an RNA gene from the reference annotation file.

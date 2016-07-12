@@ -25,6 +25,7 @@ use Utils;
 use Orf;
 use RandomForest;
 use ExtractCdnaOrf;
+use RNAshuffle;
 
 # Program name
 my $progname = basename($0);
@@ -56,8 +57,8 @@ my $speThres     = undef;
 my @speThresList = undef;
 
 # VW Add option to select the calculate orf for learning and test data sets
-my $orfTypeLearn = 1;
-my $orfTypeTest  = 1;
+my $orfTypeLearn = 3;
+my $orfTypeTest  = 3;
 
 # VW Add an option to specify the output directory, default current directoryand an out name
 my $outDir  = "./feelnc_codpot_out";
@@ -74,6 +75,10 @@ my $proc = 1;
 
 # VW Add a percentage to get two learning file
 my $perc = 0.1;
+
+# VW Add the mode option to known if FEELnc need to extract intergenic sequences or shuffle mRNAs sequences
+# if there is no input lncRNAs
+my $mode = "";
 
 # Intergenic extraction:
 my $maxTries   = 10;
@@ -92,6 +97,7 @@ GetOptions(
     'r|rfcut=f'      => \$rfcut,
     'spethres=s'     => \$speThres,
     'k|kmer=s'       => \$kmerList,
+    'm|mode=s'       => \$mode,
     's|sizeinter=f'  => \$sizecorrec,
     'learnorftype=i' => \$orfTypeLearn,
     'testorftype=i'  => \$orfTypeTest,
@@ -125,6 +131,19 @@ pod2usage ("- Error: --nTree option '$nTree' should be strictly positive\n") unl
 pod2usage ("- Error: --rfcut and --spethres specified, only one of the two options can be used (default one threshold defined on a 10-fold cross-validation)\n") if((defined $rfcut) && (defined $speThres));
 pod2usage ("- Error: -p/--processor option '$proc' should be a positive integer\n") unless ($proc >= 1);
 pod2usage ("- Error: --percentage option '$perc' should be a number in ]0;1[\n") unless ($perc>0 && $perc<1);
+
+# If -m|--mode is set, check if the value is either intergenic or shuffle
+pod2usage ("- Error: the value set for the -m|--mode option is not valide. It need to be either 'shuffle' or 'intergenic'\n") if ( ($mode ne "") && ($mode !~ /shuffle|intergenic/) );
+
+# If no lncRNA sequences and any option between --intergenic and --shuffle have been choosen, quit
+pod2usage ("- Error: no lncRNA sequences have been given in input and the lncRNA sequences simulation mode have not been set. If no lncRNA, please choose a mode between 'shuffle' or 'intergenic'\n") if ( (!defined $lncRNAfile) && ($mode eq "") );
+
+# If a mode have been set and a lncRNA file have been provided
+if( (defined $lncRNAfile) && ($mode ne "") )
+{
+    print STDERR "\nWarning: you ask for a mode of lncRNA sequences simulation but you provided a lncRNA sequences file. Use the lncRNA sequences file.\n\n";
+    $mode = "";
+}
 
 
 # Check the max kmersize
@@ -239,10 +258,16 @@ die "Error: The environnment variable FEELNCPATH does not reach the 'utils/codpo
 # KIS path
 my $kisPath = Utils::pathProg("KmerInShort");
 
+# VW if mode is shuffle, then test the ushuffle path
+if($mode eq "shuffle")
+{
+    my $shufflePath = Utils::pathProg("fasta_ushuffle");
+    die "Error: You ask to shuffle sequence using 'fasta_ushuffle' but your \$PATH environnment variable does not reach it. Please, check is 'fasta_ushuffle' is instal and in your \$PATH.\n" unless (-r $shufflePath);
+}
 
 # Die if lnc training file is not set and mRNA file is in FASTA: no possibility of intergenic extraction
 my $mRNAfileformat = Utils::guess_format($mRNAfile);
-pod2usage ("- Error: Cannot train the program if lncRNA training file (-l option) is not defined and mRNA file (-a option) is in FASTA format!\nPlease, provide the mRNA/annotation file in .GTF format so that I could extract intergenic sequences for training...\n") if (!defined $lncRNAfile && $mRNAfileformat eq "fasta");
+pod2usage ("- Error: Cannot train the program if lncRNA training file (-l option) is not defined and mRNA file (-a option) is in FASTA format!\nPlease, provide the mRNA/annotation file in .GTF format so that I could extract intergenic sequences for training...\n") if (!defined $lncRNAfile && $mRNAfileformat eq "fasta" && $mode ne "shuffle");
 
 
 # Define fasta file names
@@ -306,13 +331,21 @@ if(defined $lncRNAfile) # -- if file is defined, it means that we do not have to
 	die "Error: Unrecognized format for lncRNA training file '$lncRNAfile'\n";
     }
 }
-else # -- if lncRNA training file not defined
+# VW modification, add the option --intergenic 
+elsif($mode eq "intergenic")
 {
     # To get mRNA annotation
     # Relocated mRNA sequence in intergenic regions to be used as a training lncRNA file
     print STDERR "> The lncRNA training file is not set. Extract ORFs/cDNAs for lncRNAs from intergenic regions (can take a while)\n";
     ExtractCdnaOrf::randomizedGTFtoFASTA($refmrna, $ref_cDNA_passed, $nonFile, $nonOrfFile, $genome, $numtxNon, $minnumtx, $sizecorrec, $orfTypeLearn, $maxTries, $maxN, $verbosity, $kmerMax);
 }
+# VW: if mode shuffle
+elsif($mode eq "shuffle")
+{
+    print STDERR "> The lncRNA training file is not set. Get ORFs/cDNAs for lncRNAs by shuffling mRNA sequences\n";
+    RNAshuffle::makePerm($codFile, $nonFile, $nonOrfFile, $numtxNon, $minnumtx, $orfTypeLearn, $verbosity, $kmerMax, $nameTmp, $seed);
+}
+
 
 
 ##########################################################
@@ -463,15 +496,18 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
   -k,--kmer=1,2,3,6,9,12		Kmer size list with size separate by ',' as string [ default "1,2,3,6,9,12" ], the maximum value for one size is '15'
   -o,--outname={INFILENAME}		Output filename [ default infile_name ]
   --outdir="feelnc_codpot_out/"		Output directory [ default "./feelnc_codpot_out/" ]
+  -m,--mode                             The mode of the lncRNA sequences simulation if no lncRNA sequences have been provided. The mode can be:
+                                                'shuffle'   : make a permutation of mRNA sequences while preserving the 7mer count. Can be done on either FASTA and GTF input file;
+                                                'intergenic': extract intergenic sequences. Can be done *only* on GTF input file.
   -s,--sizeinter=0.75			Ratio between mRNA sequence lengths and non coding intergenic region sequence lengths as, by default, ncInter = mRNA * 0.75
-  --learnorftype=1			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 1 ] for learning data set.
+  --learnorftype=3			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 3 ] for learning data set.
 					If the CDS is annotated in the .GTF, then the CDS is considered as the longest ORF, whatever the --orftype value.
 						'0': ORF with start and stop codon;
 						'1': same as '0' and ORF with only a start codon, take the longest;
 						'2': same as '1' but with a stop codon;
 						'3': same as '0' and ORF with a start or a stop, take the longest (see '1' and '2');
 						'4': same as '3' but if no ORF is found, take the input sequence as ORF.
-  --testorftype=1			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 1 ] for test data set. See --learnortype description for more informations.
+  --testorftype=3			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 3 ] for test data set. See --learnortype description for more informations.
   --ntree				Number of trees used in random forest [ default 500 ]
   --percentage=0.1			Percentage of the training file use for the training of the kmer model. What remains will be used to train the random forest
 
