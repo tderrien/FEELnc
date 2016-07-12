@@ -430,6 +430,8 @@ Can't call method "close" on an undefined value Bio/DB/SeqFeature/Store/berkeley
 
 ## Versions
 
+*Version (12/07/2016): Update FEELnc by adding the -m/--mode option. Now the simulation of the lncRNA dataset can be done either by shuffling mRNA sequences, either by extracting intergenic sequences.*
+
 *Version (24/03/2016): Adding an option for the classifier: -b/--biotype. Using this option, the classifier write the biotype of the lncRNA and the RNA partner. If no biotype, write "none" instead.*
 
 *Version (23/11/2015): Update of the classifier output. Now the classifier write (i) a log file containing statisitcs on the inteactions (i.e the line which began with a # before the update) and (ii) a main output file which is now formated as a tabulated matrix with a header.*
