@@ -51,7 +51,7 @@ The following software and libraries must be installed on your machine:
 
 - [Perl5+](https://www.perl.org/) : tested with version 5.18.2
  * [Bioperl](http://www.bioperl.org/wiki/Main_Page)  : tested with version BioPerl-1.6.924
- * [Parralell::ForkManager](http://search.cpan.org/perldoc/Parallel::ForkManager) : tested with version 1.07
+ * [Paralell::ForkManager](http://search.cpan.org/perldoc/Parallel::ForkManager) : tested with version 1.07
 - R [Rscript](http://cran.r-project.org): tested with version 3.1.0.
  * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) test with version 1.0-5
  * [randomForest](http://cran.r-project.org/web/packages/randomForest/index.html) tested with version 4.6-10
