@@ -50,11 +50,16 @@ In doing so, you will not remove lncRNAs overlapping other non-coding RNAs or ps
 The following software and libraries must be installed on your machine:
 
 - [Perl5+](https://www.perl.org/) : tested with version 5.18.2
- * [Bioperl](http://www.bioperl.org/wiki/Main_Page)  : tested with version BioPerl-1.6.924
- * [Paralell::ForkManager](http://search.cpan.org/perldoc/Parallel::ForkManager) : tested with version 1.07
+ * [Bioperl](http://www.bioperl.org/wiki/Main_Page)  : tested with version BioPerl-1.6.924;
+ * [Paralell::ForkManager](http://search.cpan.org/perldoc/Parallel::ForkManager) : tested with version 1.07.
+
 - R [Rscript](http://cran.r-project.org): tested with version 3.1.0.
- * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) test with version 1.0-5
- * [randomForest](http://cran.r-project.org/web/packages/randomForest/index.html) tested with version 4.6-10
+ * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) test with version 1.0-5;
+ * [randomForest](http://cran.r-project.org/web/packages/randomForest/index.html) tested with version 4.6-10.
+
+- [KmerInShort](https://github.com/rizkg/KmerInShort) developped by Guillaume Rizk:
+ * Linux and MAC executables in FEELnc bin directory;
+ * If any trouble using supplied executables, please download and compile from sources.
 
 - If you want to use the **shuffle** mode, you need to instal the [fasta_ushuffle](https://github.com/agordon/fasta_ushuffle) software:
  * uShuffle: A useful tool for shuffling biological sequences while preserving the k-let counts;
@@ -79,7 +84,7 @@ Export PERL5LIB and FEELNCPATH variables
 	export FEELNCPATH=${PWD}
 	export PERL5LIB=$PERL5LIB:${FEELNCPATH}/lib/
 
-Add FEELnc scripts to your PATH and add the distribution-specific binary of KmerInShort (or KIS developped by Guillaume Rizk) to your PATH or copy it to your bin directory
+Add FEELnc scripts to your PATH and add the distribution-specific binary of KmerInShort (or KIS developped by Guillaume Rizk) to your PATH or copy it to your bin directory or compile from sources ([KmerInShort](https://github.com/rizkg/KmerInShort)).
 
 	export PATH=$PATH:${FEELNCPATH}/scripts/
 
