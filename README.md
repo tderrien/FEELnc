@@ -123,7 +123,12 @@ The *results* directory in *test* contains the results files on the toy exemple.
 
 
 ### Note:
-A bash script *${FEELNC_PATH}/utils/FEELnc_pipeline.sh* is provided to run the three steps in one command line. This script is made to be used on a GTF file without lncRNA file, filter candidates only on mRNA annotation and using the shuffle mode. Feel free to modifie it at your convenience.
+A bash script *${FEELNC_PATH}/utils/FEELnc_pipeline.sh* is provided to run the three steps in one command line. This script is made to be used on a GTF file without lncRNA file, filter candidates only on mRNA annotation and using the shuffle mode. Feel free to modify it at your convenience. To run the toy example:
+
+	cd test/
+
+	FEELnc_pipeline.sh --candidate=transcript_chr38.gtf --reference=annotation_chr38.gtf --refSequence=genome_chr38.fa --outname=test_on_toy_example --outdir=./
+
 
 -------------------------
 ## Launch the 3-step pipeline
