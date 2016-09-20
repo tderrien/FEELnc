@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ### Script to run the FEELnc pipeline in one command line using shuffle mRNA
-### Usage: FEELnc_pipeline.sh --candidate=<TRANSCRIPT_MODEL_GTF> --reference=<REFERENCE_GTF> --refSequence=<REFERENCE_SEQUENCE_FASTA> --name=<ANALYSIS_NAME>
+### Usage: FEELnc_pipeline.sh --candidate=<TRANSCRIPT_MODEL_GTF> --reference=<REFERENCE_GTF> --genome=<GENOME_SEQUENCE_FASTA> --name=<ANALYSIS_NAME>
 ###        These options are mandatories
 
 
@@ -11,7 +11,7 @@ command -v FEELnc_codpot.pl     >/dev/null 2>&1 || { echo -e >&2 "FEELnc_codpot.
 command -v FEELnc_classifier.pl >/dev/null 2>&1 || { echo -e >&2 "FEELnc_classifier.pl is not in accessible, please modify your \$PATH variable accordingly\nExit"; exit 1;}
 
 
-usage="Usage: FEELnc_pipeline.sh --candidate=<TRANSCRIPT_MODEL_GTF> --reference=<REFERENCE_GTF> --refSequence=<REFERENCE_SEQUENCE_FASTA> --outname=<OUTPUT_NAME> --outdir=<OUTPUT_DIRECTORY>\nThese options are mandatories"
+usage="Usage: FEELnc_pipeline.sh --candidate=<TRANSCRIPT_MODEL_GTF> --reference=<REFERENCE_GTF> --genome=<GENOME_SEQUENCE_FASTA> --outname=<OUTPUT_NAME> --outdir=<OUTPUT_DIRECTORY>\nThese options are mandatories"
 
 for opt in "$@"
 do
@@ -24,8 +24,8 @@ do
 	    reference="${opt#*=}"
 	    shift # past argument=value
 	    ;;
-	--refSequence=*)
-	    refSequence="${opt#*=}"
+	--genome=*)
+	    genome="${opt#*=}"
 	    shift # past argument=value
 	    ;;
 	--outname=*)
@@ -44,7 +44,7 @@ do
 done
 
 
-### Test if candidate, reference and refSequence options are provided
+### Test if candidate, reference and genome options are provided
 if [[ $candidate == "" ]]
 then
     echo -e "Option --candidate is empty, it is mandatory\nExit\n$usage"
@@ -55,9 +55,9 @@ then
     echo -e "Option --reference is empty, it is mandatory\nExit\n$usage"
     exit 1
 fi
-if [[ $refSequence == "" ]]
+if [[ $genome == "" ]]
 then
-    echo -e "Option --refSequence is empty, it is mandatory\nExit\n$usage"
+    echo -e "Option --genome is empty, it is mandatory\nExit\n$usage"
     exit 1
 fi
 if [[ $outname == "" ]]
@@ -72,7 +72,7 @@ then
 fi
 
 
-### Test if candidate, reference and refSequence files are exist/are provided
+### Test if candidate, reference and genome files are exist/are provided
 if [[ ! (-s $candidate) ]]
 then
     echo -e "The candidate file: '$candidate' didn't exists or is empty\nExit\n$usage"
@@ -83,9 +83,9 @@ then
     echo -e "The reference file: '$reference' didn't exists or is empty\nExit\n$usage"
     exit 1
 fi
-if [[ ! (-s $refSequence) ]]
+if [[ ! (-s $genome) ]]
 then
-    echo -e "The refSequence file: '$refSequence' didn't exists or is empty\nExit\n$usage"
+    echo -e "The genome file: '$genome' didn't exists or is empty\nExit\n$usage"
     exit 1
 fi
    
@@ -121,10 +121,10 @@ mkdir -p $codpotdir
 
 afterCodpot="$outname.codpot"
 
-cmd="FEELnc_codpot.pl --infile=$afterFilter --mRNAfile=$reference --genome=$refSequence -b transcript_biotype=protein_coding --mode=shuffle --outname=$afterCodpot --outdir=$codpotdir"
+cmd="FEELnc_codpot.pl --infile=$afterFilter --mRNAfile=$reference --genome=$genome -b transcript_biotype=protein_coding --mode=shuffle --outname=$afterCodpot --outdir=$codpotdir"
 echo -e "\ncommande line:\n\t$cmd\n"
 
-FEELnc_codpot.pl --infile=$afterFilter --mRNAfile=$reference --genome=$refSequence -b transcript_biotype=protein_coding --mode=shuffle --outname=$afterCodpot --outdir=$codpotdir
+FEELnc_codpot.pl --infile=$afterFilter --mRNAfile=$reference --genome=$genome -b transcript_biotype=protein_coding --mode=shuffle --outname=$afterCodpot --outdir=$codpotdir
 echo
 
 
