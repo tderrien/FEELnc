@@ -124,7 +124,7 @@ The *results* directory in *test* contains the results files on the toy exemple.
 
 
 ### Note:
-A bash script *utils/FEELnc_pipeline.sh* is provided to run the three steps in one command line. This script is made to be used on a GTF file without lncRNA file, filter candidates only on mRNA annotation and using the shuffle mode. Feel free to modify it at your convenience. To run the toy example:
+A bash script *utils/FEELnc_pipeline.sh* is provided to run the three steps in one command line. This script is made to be used on a GTF file without lncRNA file. It filters candidates only on mRNA annotation, keeps antisense monoexonic transcripts and uses the shuffle mode. Feel free to modify it at your convenience. To run on the toy example:
 
 	cd test/
 
