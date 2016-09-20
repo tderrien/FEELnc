@@ -84,9 +84,10 @@ Export PERL5LIB and FEELNCPATH variables
 	export FEELNCPATH=${PWD}
 	export PERL5LIB=$PERL5LIB:${FEELNCPATH}/lib/
 
-Add FEELnc scripts to your PATH and add the distribution-specific binary of KmerInShort (or KIS developped by Guillaume Rizk) to your PATH or copy it to your bin directory or compile from sources ([KmerInShort](https://github.com/rizkg/KmerInShort)).
+Add FEELnc scripts and utils to your PATH and add the distribution-specific binary of KmerInShort (or KIS developped by Guillaume Rizk) to your PATH or copy it to your bin directory or compile from sources ([KmerInShort](https://github.com/rizkg/KmerInShort)).
 
 	export PATH=$PATH:${FEELNCPATH}/scripts/
+	export PATH=$PATH:${FEELNCPATH}/utils/
 
 	# for MAC
 	export PATH=$PATH:${FEELNCPATH}/bin/MAC/
@@ -128,7 +129,7 @@ A bash script *${FEELNC_PATH}/utils/FEELnc_pipeline.sh* is provided to run the t
 	cd test/
 
 	FEELnc_pipeline.sh --candidate=transcript_chr38.gtf --reference=annotation_chr38.gtf \
-	                   --refSequence=genome_chr38.fa --outname=test_on_toy_example --outdir=./
+			   --refSequence=genome_chr38.fa --outname=testOnToyExample --outdir=test_on_toy_example
 
 
 -------------------------
