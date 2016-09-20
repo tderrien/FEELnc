@@ -283,13 +283,13 @@ Options:
                                                     'shuffle'   : make a permutation of mRNA sequences while preserving the 7mer count. Can be done on either FASTA and GTF input file;
                                                     'intergenic': extract intergenic sequences. Can be done *only* on GTF input file.
       -s,--sizeinter=0.75                   Ratio between mRNA sequence and non-coding intergenic extracted region sizes [default 0.75 ]
-      --learnorftype=1                      Integer [0,1,2,3,4] to specify the type of longest ORF computation [ default: 1 ] for learning data set. If the CDS is annotated in the .GTF, then the CDS is considered as the longest ORF, whatever the --orftype value.
+      --learnorftype=3                      Integer [0,1,2,3,4] to specify the type of longest ORF computation [ default: 1 ] for learning data set. If the CDS is annotated in the .GTF, then the CDS is considered as the longest ORF, whatever the --orftype value.
                                                     '0': ORF with start and stop codon;
                                                     '1': same as '0' and ORF with only a start codon, take the longest;
                                                     '2': same as '0' and ORF with only a stop codon,  take the longest;
                                                     '3': same as '0' and ORF with a start or a stop,  take the longest (see '1' and '2');
                                                     '4': same as '3' but if no ORF is found, take the input sequence as ORF.
-      --testorftype=1                       Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 1 ] for test data set. See --learnortype description for more informations.
+      --testorftype=3                       Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 1 ] for test data set. See --learnortype description for more informations.
       --ntree                               Number of trees used in random forest [ default 500 ]
 
   Debug arguments:
