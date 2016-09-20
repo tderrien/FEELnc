@@ -113,7 +113,7 @@ If you want to use the **shuffle** mode, please check that the **fasta_ushuffle*
 
 	# Coding_Potential
 	# Note1: as a test, the *annotation_chr38.gtf* learning file only contains 254 mRNA transcripts.
-	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf --biotype=protein_coding -g genome_chr38.fa --mode=shuffle
+	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -b transcript_biotype=protein_coding -g genome_chr38.fa --mode=shuffle
 
 	# Classifier
 	FEELnc_classifier.pl -i feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf -a annotation_chr38.gtf > candidate_lncRNA_classes.txt
@@ -124,12 +124,12 @@ The *results* directory in *test* contains the results files on the toy exemple.
 
 
 ### Note:
-A bash script *utils/FEELnc_pipeline.sh* is provided to run the three steps in one command line. This script is made to be used on a GTF file without lncRNA file. It filters candidates only on mRNA annotation, keeps antisense monoexonic transcripts and uses the shuffle mode. Feel free to modify it at your convenience. To run on the toy example:
+A bash script *utils/FEELnc_pipeline.sh* is provided to run the three steps in one command line. As an example, this script is made to be used on a GTF file without lncRNA file. It filters candidates only on mRNA annotation, keeps antisense monoexonic transcripts and uses the shuffle mode. Feel free to modify it at your convenience. To run on the toy example:
 
 	cd test/
 
 	FEELnc_pipeline.sh --candidate=transcript_chr38.gtf --reference=annotation_chr38.gtf \
-			   --refSequence=genome_chr38.fa --outname=testOnToyExample --outdir=test_on_toy_example
+	                   --refSequence=genome_chr38.fa --outname=testOnToyExample --outdir=test_on_toy_example
 
 
 -------------------------
