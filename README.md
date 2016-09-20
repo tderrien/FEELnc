@@ -127,7 +127,8 @@ A bash script *${FEELNC_PATH}/utils/FEELnc_pipeline.sh* is provided to run the t
 
 	cd test/
 
-	FEELnc_pipeline.sh --candidate=transcript_chr38.gtf --reference=annotation_chr38.gtf --refSequence=genome_chr38.fa --outname=test_on_toy_example --outdir=./
+	FEELnc_pipeline.sh --candidate=transcript_chr38.gtf --reference=annotation_chr38.gtf \
+	                   --refSequence=genome_chr38.fa --outname=test_on_toy_example --outdir=./
 
 
 -------------------------
