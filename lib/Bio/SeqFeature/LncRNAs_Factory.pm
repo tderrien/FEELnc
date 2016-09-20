@@ -149,6 +149,7 @@ sub DoItForMe{
 	my $window = shift;
 	my $lncrna_file = shift;
 	my $mrna_file = shift;
+	my $logName = shift;
 	my $max_window = shift;
 	my $biotype = shift;
 	my $verbosity = shift;
@@ -247,7 +248,10 @@ sub DoItForMe{
 
 
 	# Make a log file
-	my $logName = Utils::renamefile($lncrna_file, ".feelncclassifier.log");
+	if($logName eq "")
+	{
+	    $logName = Utils::renamefile($lncrna_file, ".feelncclassifier.log");
+	}
 
 	# Open the file
 	open FILE, "> $logName" or die "Error! Cannot access log file '". $logName . "': ".$!;

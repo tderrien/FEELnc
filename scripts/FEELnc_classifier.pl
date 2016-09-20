@@ -16,6 +16,7 @@ use Bio::SeqFeature::InteractionCollection;
 # Global Variables
 my $lncrna_file	="";
 my $mrna_file   ="";
+my $logName     ="";
 my $window      = 10000;  # 10kb
 my $maxwindow   = 100000; # 100kb
 my $biotype     = 0;
@@ -29,6 +30,7 @@ GetOptions(
     "window|w=i"    => \$window,
     "lncrna|i=s"    => \$lncrna_file,
     "mrna|a=s"      => \$mrna_file,
+    "log|l=s"       => \$logName,
     "maxwindow|m=i" => \$maxwindow,
     "biotype|b"     => \$biotype,
     "verbosity|v=i" => \$verbosity,
@@ -48,7 +50,7 @@ pod2usage("Error: Cannot read your input annotation file '$mrna_file'...\nFor he
 
 unless (defined $maxwindow) {$maxwindow=$window};
 
-my $collection =  Bio::SeqFeature::LncRNAs_Factory->DoItForMe($window,$lncrna_file,$mrna_file,$maxwindow,$biotype,$verbosity);
+my $collection =  Bio::SeqFeature::LncRNAs_Factory->DoItForMe($window,$lncrna_file,$mrna_file,$logName,$maxwindow,$biotype,$verbosity);
 
 $collection->print_all_interactions($biotype);
 exit(0);
@@ -107,6 +109,7 @@ The last step if the pipeline (FEELnc_classifier) consists in classifying new ln
 =head2 General
 
   -b, --biotype         Print the biotype of each transcripts in the output
+  -l,--log=file	        Specify the name for the log file
   --help                Print this help
   --man                 Open man page
   -v,--verbosity	Level of verbosity
@@ -120,8 +123,8 @@ The last step if the pipeline (FEELnc_classifier) consists in classifying new ln
 
 =head2 Filtering arguments
 
-  -w, --window=10000		Size of the window around the lncRNA to compute interactions/classification [default 10000]
-  -m, --maxwindow=100000	Maximal size of the window during the expansion process [default 10000]
+  -w,--window=10000		Size of the window around the lncRNA to compute interactions/classification [default 10000]
+  -m,--maxwindow=100000		Maximal size of the window during the expansion process [default 10000]
 
 =head1 AUTHORS
 

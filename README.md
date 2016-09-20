@@ -406,7 +406,8 @@ Depending on your filtering options, this may correspond to a non-protein-coding
 
 ```
     General:
-      -b, --biotype         Print the biotype of each transcripts in the output
+      -b,--biotype          Print the biotype of each transcripts in the output
+      -l,--log              Specify the name for the log file
       --help                Print this help
       --man                 Open man page
       --verbosity           Level of verbosity
@@ -417,7 +418,7 @@ Depending on your filtering options, this may correspond to a non-protein-coding
 
     Filtering arguments:
       -w,--window=200               Size of the window around the lncRNA to compute interactins/classification [default 10000]
-      -m, --maxwindow=10000 Maximal size of the window during the expansion process [default 10000]
+      -m,--maxwindow=10000          Maximal size of the window during the expansion process [default 10000]
 ```
 
 ## Warnings
