@@ -195,7 +195,7 @@ sub getKmerRatio
     close FILENON;
     close FILEOUT;
 
-    # Delete the temporary files if keepTmp != 0
+    # Delete the temporary files if keepTmp == 0
     if($keepTmp == 0)
     {
 	unlink $codOut;
@@ -572,7 +572,7 @@ sub getRunModel
 #	$keepTmp         = keep or not the temporary files
 sub runRF
 {
-    my ($REFcodLearnFile, $REForfCodLearnFile, $REFnonLearnFile, $REForfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $nTree, $outDir, $verbosity, $nameTmp, $keepTmp, $seed, $proc) = @_;
+    my ($REFcodLearnFile, $REForfCodLearnFile, $REFnonLearnFile, $REForfNonLearnFile, $testFile, $orfTestFile, $outFile, $kmerListString, $thres, $nTree, $outDir, $wholeSeq, $verbosity, $nameTmp, $keepTmp, $seed, $proc) = @_;
     $kmerListString //= "3,6,9";
     $verbosity      //= 1;
     $proc           //= 1;
@@ -613,23 +613,54 @@ sub runRF
     my @kmerScoreTestFileList;
     my $kmerFile;
     my $kmerSize;
-    my $codStep       = 3;
-    my $nonStep       = 1;
     my $lenKmerList   = @kmerList;
     my $i             = 0;
 
+    my $codStep       = 3;
+    my $nonStep       = 1;
+    if($wholeSeq!=0) # If we want the score on the whole sequence, use a step of 1
+    {
+	$codStep = 1;
+    }
+    
     foreach $kmerSize ( @kmerList )
     {
 	$kmerFile = $nameTmp.".kmerScoreValues_size$kmerSize.tmp";
 	push(@kmerRatioFileList, $kmerFile);
 
 	# Get the score as coding_kmer_ratio/(coding_kmer_ratio+noncoding_kmer_ratio)
-	&getKmerRatio($REForfCodLearnFile->[0], $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $nameTmp, $keepTmp);
+	my $toScore;
+	if($wholeSeq==0) # If the score is calculate on the ORF
+	{
+	    $toScore=$REForfCodLearnFile->[0];
+	}
+	else # If the score is done on the whole sequence
+	{
+	    $toScore=$REFcodLearnFile->[0];
+	}
+	&getKmerRatio($toScore, $REFnonLearnFile->[0], $kmerFile, $kmerSize, $codStep, $nonStep, $proc, $verbosity, $nameTmp, $keepTmp);
     }
 
     # 3. Compute the kmer score for each kmer size on learning and test ORF and for each type
-    print STDERR "\t3. Compute the kmer score for each kmer size on learning and test ORF\n" if($verbosity > 0);
+    print STDERR "\t3. Compute the kmer score for each kmer size on learning and test\n" if($verbosity > 0);
     $kmerFile = "";
+
+    # Check if the score have to be done on the ORF or the whole sequence
+    my $codToScore;
+    my $nonToScore;
+    my $testToScore;
+    if($wholeSeq==0)
+    {
+	$codToScore  = $orfCodLearnFile;
+	$nonToScore  = $orfNonLearnFile;
+	$testToScore = $orfTestFile;
+    }
+    else
+    {
+	$codToScore  = $codLearnFile;
+	$nonToScore  = $nonLearnFile;
+	$testToScore = $testFile;
+    }
     for($i=0; $i<$lenKmerList; $i++)
     {
 	print STDERR "\t\t- kmer size: $kmerList[$i]\n" if($verbosity > 1);
@@ -637,17 +668,17 @@ sub runRF
 	## Coding
 	$kmerFile = $nameTmp.".coding_sequencesKmer_".$kmerList[$i]."_ScoreValues.tmp";
 	push(@kmerScoreCodLearnFileList, $kmerFile);
-	scoreORF($orfCodLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
+	scoreORF($codToScore, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
 
 	## Non coding
 	$kmerFile = $nameTmp.".noncoding_sequencesKmer_".$kmerList[$i]."_ScoreValues.tmp";
 	push(@kmerScoreNonLearnFileList, $kmerFile);
-	scoreORF($orfNonLearnFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
+	scoreORF($nonToScore, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
 
 	# Test
 	$kmerFile = $nameTmp.".test_sequencesKmer_".$kmerList[$i]."_ScoreValues.tmp";
 	push(@kmerScoreTestFileList, $kmerFile);
-	scoreORF($orfTestFile, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
+	scoreORF($testToScore, $kmerRatioFileList[$i], $kmerFile, $kmerList[$i], $codStep, $proc, $verbosity);
     }
 
 

@@ -80,6 +80,10 @@ my $perc = 0.1;
 # if there is no input lncRNAs
 my $mode = "";
 
+# VW Add the option to get the stats and the model on the whole sequence with a step of 1
+# instead of step 3 on ORF
+my $wholeSeq = 0;
+
 # Intergenic extraction:
 my $maxTries   = 10;
 my $maxN       = 5;
@@ -98,6 +102,7 @@ GetOptions(
     'spethres=s'     => \$speThres,
     'k|kmer=s'       => \$kmerList,
     'm|mode=s'       => \$mode,
+    'w|wholeSeq'     => \$wholeSeq,
     's|sizeinter=f'  => \$sizecorrec,
     'learnorftype=i' => \$orfTypeLearn,
     'testorftype=i'  => \$orfTypeTest,
@@ -390,11 +395,11 @@ Utils::divFasta($nonOrfFile, $nonOrfFileKmRf[0], $nonOrfFileKmRf[1], $perc, $ver
 print STDERR "> Run random Forest on '$testFile'\n";
 if(! defined $speThres)
 {
-    RandomForest::runRF(\@codFileKmRf, \@codOrfFileKmRf, \@nonFileKmRf, \@nonOrfFileKmRf, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $verbosity, $nameTmp, $keepTmp, $seed, $proc);
+    RandomForest::runRF(\@codFileKmRf, \@codOrfFileKmRf, \@nonFileKmRf, \@nonOrfFileKmRf, $testFile, $testOrfFile, $rfout, $kmerList, $rfcut, $nTree, $outDir, $wholeSeq, $verbosity, $nameTmp, $keepTmp, $seed, $proc);
 }
 else
 {
-    RandomForest::runRF(\@codFileKmRf, \@codOrfFileKmRf, \@nonFileKmRf, \@nonOrfFileKmRf, $testFile, $testOrfFile, $rfout, $kmerList, $speThres, $nTree, $outDir, $verbosity, $nameTmp, $keepTmp, $seed, $proc);
+    RandomForest::runRF(\@codFileKmRf, \@codOrfFileKmRf, \@nonFileKmRf, \@nonOrfFileKmRf, $testFile, $testOrfFile, $rfout, $kmerList, $speThres, $nTree, $outDir, $wholeSeq, $verbosity, $nameTmp, $keepTmp, $seed, $proc);
 }
 
 # Parse RF result
