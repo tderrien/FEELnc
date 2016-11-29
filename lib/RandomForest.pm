@@ -263,7 +263,7 @@ sub scoreORF
 #	$keepTmp      = keep or not temporary files
 sub mergeKmerScoreSize
 {
-    my ($RefKmerFileList, $orfSizeFile, $rnaSizeFile, $outFile, $keepTmp) = @_;
+    my ($RefKmerFileList, $orfSizeFile, $rnaSizeFile, $outFile, $wholeSeq, $keepTmp) = @_;
     $RefKmerFileList //= undef;
     $orfSizeFile     //= undef;
     $rnaSizeFile     //= undef;
@@ -271,12 +271,15 @@ sub mergeKmerScoreSize
 
     # Check if mendatory arguments have been given
     die "Merging kmer scores and size files: list of kmer scores files is not defined... exiting\n"   if(!defined $RefKmerFileList);
-    die "Merging kmer scores and size files: ORF size file is not defined... exiting\n"               if(!defined $orfSizeFile);
+    die "Merging kmer scores and size files: ORF size file is not defined... exiting\n"               if(!defined $orfSizeFile && $wholeSeq==0);
     die "Merging kmer scores and size files: mRNA size file is not defined... exiting\n"              if(!defined $rnaSizeFile);
     die "Merging kmer scores and size files: output file for the merging is not defined... exiting\n" if(!defined $outFile);
 
     # empty
-    die "Merging kmer scores and size files: ORF size file '$orfSizeFile' is empty... exiting\n"  unless(-s $orfSizeFile);
+    if($wholeSeq==0)
+    {
+	die "Merging kmer scores and size files: ORF size file '$orfSizeFile' is empty... exiting\n"  unless(-s $orfSizeFile);
+    }
     die "Merging kmer scores and size files: mRNA size file '$rnaSizeFile' is empty... exiting\n" unless(-s $rnaSizeFile);
 
 
@@ -317,32 +320,36 @@ sub mergeKmerScoreSize
 	unlink $file unless($keepTmp != 0);
     }
 
-    # Read ORF size
-    $flag = 0;
-    open FILE, "$orfSizeFile" or die "Error! Cannot access ORF size file '". $orfSizeFile . "': ".$!;
-    while(<FILE>)
+    # If the option --wholeSeq is OFF
+    if($wholeSeq==0)
     {
-	chop;
-	my($name, $orfSize) = split(/\t/);
-
-	if($flag != 0)
+	# Read ORF size
+	$flag = 0;
+	open FILE, "$orfSizeFile" or die "Error! Cannot access ORF size file '". $orfSizeFile . "': ".$!;
+	while(<FILE>)
 	{
-	    if(!exists $seq{$name})
+	    chop;
+	    my($name, $orfSize) = split(/\t/);
+
+	    if($flag != 0)
 	    {
-		die "Error at merge ORF size step! '$name' is not in the kmer score files: ".$!;
+		if(!exists $seq{$name})
+		{
+		    die "Error at merge ORF size step! '$name' is not in the kmer score files: ".$!;
+		}
+
+		push(@{$seq{$name}}, $orfSize);
 	    }
-
-	    push(@{$seq{$name}}, $orfSize);
+	    else
+	    {
+		push(@head, $orfSize);
+		$flag = 1;
+	    }
 	}
-	else
-	{
-	    push(@head, $orfSize);
-	    $flag = 1;
-	}
+	close FILE;
+	unlink $orfSizeFile unless($keepTmp != 0);
     }
-    close FILE;
-    unlink $orfSizeFile unless($keepTmp != 0);
-
+    
     # Read mRNA size
     $flag = 0;
     open FILE, "$rnaSizeFile" or die "Error! Cannot access mRNA size file '". $rnaSizeFile . "': ".$!;
@@ -583,7 +590,7 @@ sub runRF
     my $nonLearnFile    = $REFnonLearnFile->[1];
     my $orfNonLearnFile = $REForfNonLearnFile->[1];
 
-    # 1. Compute the size of each sequence and ORF
+    # 1. Compute the size of each sequence and ORF if --wholeSeq is OFF
     print STDERR "\t1. Compute the size of each sequence and ORF\n" if($verbosity > 0);
     my $sizeCodLearnFile     = $nameTmp.".coding_rnaSize.tmp";
     my $coverOrfCodLearnFile = $nameTmp.".coding_orfCover.tmp";
@@ -593,16 +600,34 @@ sub runRF
     my $coverOrfTestFile     = $nameTmp.".test_orfCover.tmp";
     my $rnaSizeRef;
 
+    # Get RNA size
     # Learning
     ## Coding
     $rnaSizeRef = &getSizeFastaFile($codLearnFile, $sizeCodLearnFile, "RNA_size");
-    &getOrfCoverage($orfCodLearnFile, $coverOrfCodLearnFile, "ORF_cover", $rnaSizeRef);
     ## Non coding
     $rnaSizeRef = &getSizeFastaFile($nonLearnFile, $sizeNonLearnFile, "RNA_size");
-    &getOrfCoverage($orfNonLearnFile, $coverOrfNonLearnFile, "ORF_cover", $rnaSizeRef);
     # Test
     $rnaSizeRef = &getSizeFastaFile($testFile,     $sizeTestFile,     "RNA_size");
-    &getOrfCoverage($orfTestFile, $coverOrfTestFile, "ORF_cover", $rnaSizeRef);
+
+    # Special cases for the ORF coverage files depending on the --wholeSeq option:
+    # If the option is OFF, then the coverage is calculate
+    # If the option is ON,  then the file are undef
+    if($wholeSeq==0)
+    {
+	# Learning
+	## Coding
+	&getOrfCoverage($orfCodLearnFile, $coverOrfCodLearnFile, "ORF_cover", $rnaSizeRef);
+	## Non coding
+	&getOrfCoverage($orfNonLearnFile, $coverOrfNonLearnFile, "ORF_cover", $rnaSizeRef);
+	# Test
+	&getOrfCoverage($orfTestFile, $coverOrfTestFile, "ORF_cover", $rnaSizeRef);
+    }
+    else
+    {
+	$coverOrfCodLearnFile = undef;
+	$coverOrfNonLearnFile = undef;
+	$coverOrfTestFile     = undef;
+    }
 
     # 2. Compute the kmer ratio for each kmer and put the output file name in a list
     print STDERR "\t2. Compute the kmer ratio for each kmer and put the output file name in a list\n" if($verbosity > 0);
@@ -688,14 +713,15 @@ sub runRF
     my $outModNonLearn = $nameTmp.".modelNonCoding.out";
     my $outModTest     = $nameTmp.".modelTest.out";
 
+    # For the merging, made it without the ORF coverage if --wholeSeq option is ON
+    # because the ORF coverage file name variables are undef
     # Learning
     ## Coding
-    &mergeKmerScoreSize(\@kmerScoreCodLearnFileList, $coverOrfCodLearnFile, $sizeCodLearnFile, $outModCodLearn, $keepTmp);
+    &mergeKmerScoreSize(\@kmerScoreCodLearnFileList, $coverOrfCodLearnFile, $sizeCodLearnFile, $outModCodLearn, $wholeSeq, $keepTmp);
     ## Non coding
-    &mergeKmerScoreSize(\@kmerScoreNonLearnFileList, $coverOrfNonLearnFile, $sizeNonLearnFile, $outModNonLearn, $keepTmp);
+    &mergeKmerScoreSize(\@kmerScoreNonLearnFileList, $coverOrfNonLearnFile, $sizeNonLearnFile, $outModNonLearn, $wholeSeq, $keepTmp);
     # Test
-    &mergeKmerScoreSize(\@kmerScoreTestFileList,     $coverOrfTestFile,     $sizeTestFile,     $outModTest,     $keepTmp);
-
+    &mergeKmerScoreSize(\@kmerScoreTestFileList,     $coverOrfTestFile,     $sizeTestFile,     $outModTest,     $wholeSeq, $keepTmp);
 
     # 5. Make the model on learning sequences and apply it on test sequences
     print STDERR "\t5. Make the model on learning sequences and apply it on test sequences\n" if($verbosity > 0);
@@ -707,11 +733,11 @@ sub runRF
     {
 	my $file = "";
 	unlink $sizeCodLearnFile;
-	unlink $coverOrfCodLearnFile;
+	unlink $coverOrfCodLearnFile if(defined $coverOrfCodLearnFile); # If --wholeSeq is ON
 	unlink $sizeNonLearnFile;
-	unlink $coverOrfNonLearnFile;
+	unlink $coverOrfNonLearnFile if(defined $coverOrfNonLearnFile); # If --wholeSeq is ON
 	unlink $sizeTestFile;
-	unlink $coverOrfTestFile;
+	unlink $coverOrfTestFile     if(defined $coverOrfTestFile);     # If --wholeSeq is ON
 	foreach $file (@kmerRatioFileList)
 	{
 	    unlink $file;
