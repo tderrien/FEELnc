@@ -270,16 +270,16 @@ if($mode eq "shuffle")
     die "Error: You ask to shuffle sequence using 'fasta_ushuffle' but your \$PATH environnment variable does not reach it. Please, check is 'fasta_ushuffle' is instal and in your \$PATH.\n" unless (-r $shufflePath);
 }
 
-# Die if lnc training file is not set and mRNA file is in FASTA: no possibility of intergenic extraction
+# Die if lnc training file is not set, mRNA file is in FASTA and the mode is not shuffle: no possibility of intergenic extraction
 my $mRNAfileformat = Utils::guess_format($mRNAfile);
 pod2usage ("- Error: Cannot train the program if lncRNA training file (-l option) is not defined and mRNA file (-a option) is in FASTA format!\nPlease, provide the mRNA/annotation file in .GTF format so that I could extract intergenic sequences for training...\n") if (!defined $lncRNAfile && $mRNAfileformat eq "fasta" && $mode ne "shuffle");
 
 
 # Define fasta file names
-my $codFile    = $nameTmp.".coding_rna.fa";
-my $codOrfFile = $nameTmp.".coding_orf.fa";
-my $nonFile    = $nameTmp.".noncoding_rna.fa";
-my $nonOrfFile = $nameTmp.".noncoding_orf.fa";
+my $codFile     = $nameTmp.".coding_rna.fa";
+my $codOrfFile  = $nameTmp.".coding_orf.fa";
+my $nonFile     = $nameTmp.".noncoding_rna.fa";
+my $nonOrfFile  = $nameTmp.".noncoding_orf.fa";
 my $testFile    = $nameTmp.".test_rna.fa";
 my $testOrfFile = $nameTmp.".test_orf.fa";
 
@@ -336,7 +336,7 @@ if(defined $lncRNAfile) # -- if file is defined, it means that we do not have to
 	die "Error: Unrecognized format for lncRNA training file '$lncRNAfile'\n";
     }
 }
-# VW modification, add the option --intergenic 
+# VW modification, add the option --intergenic
 elsif($mode eq "intergenic")
 {
     # To get mRNA annotation
