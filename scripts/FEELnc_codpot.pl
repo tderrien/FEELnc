@@ -495,7 +495,8 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
   -g,--genome=genome.fa			Genome file or directory with chr files (mandatory if input is .GTF) [ default undef ]
   -l,--lncRNAfile=file.gtf/.fasta	Specify a known set of lncRNA for training .GTF or .FASTA  [ default undef ]
   -b,--biotype				Only consider transcripts having this(these) biotype(s) from the reference annotation (e.g : -b transcript_biotype=protein_coding,pseudogene) [default undef i.e all transcripts]
-  -n,--numtx=undef			Number of mRNA and lncRNA transcripts required for the training. mRNAs and lncRNAs numbers need to be separate by a ',': i.e. 1500,1000 for 1500 mRNAs and 1000 lncRNAs. For all the annotation, let it blank [ default undef, all the two annotations ]
+  -n,--numtx=undef			Number of mRNA and lncRNA transcripts required for the training. mRNAs and lncRNAs numbers need to be separate by a ',': i.e. 1500,1000 for 1500 mRNAs and 1000 lncRNAs.
+					For all the annotation, let it blank [ default undef, all the two annotations ]
   -r,--rfcut=[0-1]			Random forest voting cutoff [ default undef i.e will compute best cutoff ]
   --spethres=undef			Two specificity threshold based on the 10-fold cross-validation, first one for mRNA and the second for lncRNA, need to be in ]0,1[ on separated by a ','
   -k,--kmer=1,2,3,6,9,12		Kmer size list with size separate by ',' as string [ default "1,2,3,6,9,12" ], the maximum value for one size is '15'
@@ -513,6 +514,9 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
 						'3': same as '0' and ORF with a start or a stop, take the longest (see '1' and '2');
 						'4': same as '3' but if no ORF is found, take the input sequence as ORF.
   --testorftype=3			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 3 ] for test data set. See --learnortype description for more informations.
+  --wholeSeq				Option to make the multi k-mer frequencies calculation on the whole transcript sequence instead of the default one.
+					Moreover, this option removed the ORF coverage from the random forest predictor list.
+					Note: this option is usefull when the sequences of input transcripts can contain mutations/deletions/insertions.
   --ntree				Number of trees used in random forest [ default 500 ]
   --percentage=0.1			Percentage of the training file use for the training of the kmer model. What remains will be used to train the random forest
 
