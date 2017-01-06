@@ -3,7 +3,7 @@
 
 
 This document is intended to give a (minimal) description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs).
-For a more general overview of lncRNAs annotation using RNASeq and FEELnc specific advantages, you could point to [this  document](http://tools.genouest.org/data/tderrien/FEELnc_shortdesc.doc).
+For a more general overview of lncRNAs annotation using RNASeq and FEELnc specific advantages, you could point to [the FEELnc paper] (http://nar.oxfordjournals.org/content/early/2017/01/03/nar.gkw1306.full).
 
 Please note that FEELnc project is still in working progress. But feel free to use it and send any comments/bug/suggestions. Thanks!
 
@@ -458,6 +458,16 @@ Can't call method "close" on an undefined value Bio/DB/SeqFeature/Store/berkeley
 
 *Version (26/05/2015): Major update includes the use of RandomForest for FEELnc_codpot*
 
+## Citation
+
+[Wucher, V. et al. FEELnc: a tool for long non-coding RNA annotation and its application to the dog transcriptome. Nucleic Acids Res (2017). doi:10.1093/nar/gkw1306](http://nar.oxfordjournals.org/content/early/2017/01/03/nar.gkw1306.full)
+
+
+## Comment - Questions - Bugs
+
+Use the [Github Issues link](https://github.com/tderrien/FEELnc/issues).
+
 
 ## Acknowledgments
-To the users of FEELnc and to [GenOuest Bioinformatics core facility](http://www.genouest.org).
+
+To the users of FEELnc and to GenOuest Bioinformatics core facility.
