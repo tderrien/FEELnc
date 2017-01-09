@@ -4,27 +4,20 @@
 
 This document is intended to give a technical description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs) from based on reconstructed transcripts from RNA-seq data (either with or without a reference genome).
 
-For a more general overview of lncRNAs annotation using RNASeq and FEELnc specific advantages, you could point to [the FEELnc paper] (http://nar.oxfordjournals.org/content/early/2017/01/03/nar.gkw1306.full).
+For a more general overview of lncRNAs annotation using RNASeq and FEELnc specific advantages, you could point to [the FEELnc paper](http://nar.oxfordjournals.org/content/early/2017/01/03/nar.gkw1306.full).
 
-[Introduction](https://github.com/tderrien/FEELnc#introduction)
+ - [Introduction](https://github.com/tderrien/FEELnc#introduction)
+ - [Input files](https://github.com/tderrien/FEELnc#input-files)
+ - [Installation](https://github.com/tderrien/FEELnc#installation-and-requirements) and [Tests](https://github.com/tderrien/FEELnc#test-with-toy-example)
+ - [FEELnc module](https://github.com/tderrien/FEELnc#launch-the-3-step-pipeline)
+   -  [filter](https://github.com/tderrien/FEELnc#1--feelnc_filterpl)
+   -  [coding_potential](https://github.com/tderrien/FEELnc#2--feelnc_codpotpl)
+   -  [classifier](https://github.com/tderrien/FEELnc#3--feelnc_classifierpl)
+ - [FEELnc Versions](https://github.com/tderrien/FEELnc#versions)
+ - [Citation](https://github.com/tderrien/FEELnc#citation)	
+ - [Questions/Comments/bug](https://github.com/tderrien/FEELnc#comment---questions---bugs)
 
-[Input files](https://github.com/tderrien/FEELnc#input-files)
 
-[Installation](https://github.com/tderrien/FEELnc#installation-and-requirements) and [Tests](https://github.com/tderrien/FEELnc#test-with-toy-example)
-
-[FEELnc module](https://github.com/tderrien/FEELnc#launch-the-3-step-pipeline)
-
-* [filter](https://github.com/tderrien/FEELnc#1--feelnc_filterpl)
-
-* [coding_potential](https://github.com/tderrien/FEELnc#2--feelnc_codpotpl)
-
-* [classifier](https://github.com/tderrien/FEELnc#3--feelnc_classifierpl)
-
-[Versions](https://github.com/tderrien/FEELnc#versions)
-
-[Citation](https://github.com/tderrien/FEELnc#citation)	
-
-[Questions/Comments/bug](https://github.com/tderrien/FEELnc#comment---questions---bugs)
 
 
 
