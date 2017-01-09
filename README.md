@@ -2,14 +2,24 @@
 ## FlExible Extraction of Long non-coding RNAs
 
 
-This document is intended to give a (minimal) description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs).
+This document is intended to give a technical description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs) from based on reconstructed transcripts from RNA-seq data (either with or without a reference genome).
+
 For a more general overview of lncRNAs annotation using RNASeq and FEELnc specific advantages, you could point to [the FEELnc paper] (http://nar.oxfordjournals.org/content/early/2017/01/03/nar.gkw1306.full).
 
-Please note that FEELnc project is still in working progress. But feel free to use it and send any comments/bug/suggestions. Thanks!
+[Introduction](https://github.com/tderrien/FEELnc#introduction)
+[Input files](https://github.com/tderrien/FEELnc#input-files)
+[Installation](https://github.com/tderrien/FEELnc#installation-and-requirements) and [Tests](https://github.com/tderrien/FEELnc#test-with-toy-example)
+[FEELnc module](https://github.com/tderrien/FEELnc#launch-the-3-step-pipeline)
+	* [filter](https://github.com/tderrien/FEELnc#1--feelnc_filterpl)
+	* [coding_potential](https://github.com/tderrien/FEELnc#2--feelnc_codpotpl)
+	* [classifier](https://github.com/tderrien/FEELnc#3--feelnc_classifierpl)
+[Versions](https://github.com/tderrien/FEELnc#versions)
+[Citation](https://github.com/tderrien/FEELnc#citation)	
+[Questions/Comments/bug](https://github.com/tderrien/FEELnc#comment---questions---bugs)
+
 
 
 ## Introduction
-
 
 Currently, FEELnc is composed of 3 modules (See *Launch FEELnc 3-step pipeline* for more details):
 
@@ -31,7 +41,7 @@ The formats used to describe genes, transcripts, exon is **.GTF** and **.FASTA**
 
 Basically, FEELnc users should have the following minimal input files:
 
-	- Infile.GTF          (-i,--infile)   : input GTF file (e.g cufflinks/stringtie transcripts.GTF)
+	- Infile.GTF          (-i,--infile)   : input GTF file (e.g cufflinks/stringtie transcripts.GTF) or FASTA (Tritnity, KisSplice)
 	- ref_annotation.GTF  (-a,--mRNAfile) : GTF annotation file*
 	- ref_genome.FASTA    (-g,--genome)   : genome FASTA file or directory with individual chrom FASTA files
 
@@ -89,15 +99,15 @@ Add FEELnc scripts and utils to your PATH and add the distribution-specific bina
 	export PATH=$PATH:${FEELNCPATH}/scripts/
 	export PATH=$PATH:${FEELNCPATH}/utils/
 
-	# for MAC
-	export PATH=$PATH:${FEELNCPATH}/bin/MAC/
-	# or
-	cp ${FEELNCPATH}/bin/MAC/ ~/bin/
-
 	# for LINUX
 	export PATH=$PATH:${FEELNCPATH}/bin/LINUX/
 	# or
 	cp ${FEELNCPATH}/bin/LINUX/ ~/bin/
+
+	# for MAC
+	export PATH=$PATH:${FEELNCPATH}/bin/MAC/
+	# or
+	cp ${FEELNCPATH}/bin/MAC/ ~/bin/
 
 If you want to use the **shuffle** mode, please check that the **fasta_ushuffle** binary is in your PATH
 
