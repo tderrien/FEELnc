@@ -2,9 +2,10 @@
 ## FlExible Extraction of Long non-coding RNAs
 
 
-This document is intended to give a technical description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs) from based on reconstructed transcripts from RNA-seq data (either with or without a reference genome).
+This document is intended to give a technical description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs)  based on reconstructed transcripts from RNA-seq data (either with or without a reference genome).
 
-For a more general overview of lncRNAs annotation using RNASeq and FEELnc specific advantages, you could point to [the FEELnc paper](http://nar.oxfordjournals.org/content/early/2017/01/03/nar.gkw1306.full).
+For a more general overview of lncRNAs annotation using RNASeq and FEELnc specific advantages, you could point to [the FEELnc paper] (http://nar.oxfordjournals.org/content/early/2017/01/03/nar.gkw1306.full).
+
 
  - [Introduction](https://github.com/tderrien/FEELnc#introduction)
  - [Input files](https://github.com/tderrien/FEELnc#input-files)
@@ -19,15 +20,15 @@ For a more general overview of lncRNAs annotation using RNASeq and FEELnc specif
 
 
 
-
-
 ## Introduction
 
-Currently, FEELnc is composed of 3 modules (See *Launch FEELnc 3-step pipeline* for more details):
+Currently, FEELnc is composed of 3 modules.
 
-	* FEELnc_filter.pl	: Extract, filter candidate transcripts
-	* FEELnc_codpot.pl	: Compute the coding potential of candidate transcripts
-	* FEELnc_classifier.pl: Classify lncRNAs based on their genomic localization wrt others transcripts
+	* FEELnc_filter.pl	: Extract, filter candidate transcripts.
+	* FEELnc_codpot.pl	: Compute the coding potential of candidate transcripts.
+	* FEELnc_classifier.pl: Classify lncRNAs based on their genomic localization wrt others transcripts.
+
+While the first and third modules require a reference genome, the  2nd module (which computes the coding potential) does not require any reference genome and could be run on de novo assembled transcripts in fasta format.
 
 
 To get help on each module, you can type :
@@ -44,13 +45,12 @@ The formats used to describe genes, transcripts, exon is **.GTF** and **.FASTA**
 Basically, FEELnc users should have the following minimal input files:
 
 	- Infile.GTF          (-i,--infile)   : input GTF file (e.g cufflinks/stringtie transcripts.GTF) or FASTA (Tritnity, KisSplice)
-	- ref_annotation.GTF  (-a,--mRNAfile) : GTF annotation file*
+	- ref_annotation.GTF  (-a,--mRNAfile) : GTF annotation file or FASTA file * 
 	- ref_genome.FASTA    (-g,--genome)   : genome FASTA file or directory with individual chrom FASTA files
 
 
 \* *Note: It is recommended to only extract protein_coding transcripts (mRNAs) from the reference annotation file (ref_annotation.GTF) when this information is available, either manually or better by using the option :*
 **--biotype transcript_biotype=protein_coding**.
-In doing so, you will not remove lncRNAs overlapping other non-coding RNAs or pseudogenes....
 
 
 -------------------------
@@ -72,12 +72,12 @@ The following software and libraries must be installed on your machine:
 - [KmerInShort](https://github.com/rizkg/KmerInShort) developped by Guillaume Rizk:
  * Linux and MAC executables in FEELnc bin directory;
  * If any trouble using supplied executables, please download and compile from sources.
-
-- If you want to use the **shuffle** mode, you need to instal the [fasta_ushuffle](https://github.com/agordon/fasta_ushuffle) software:
+ 
+-  If you want to use the **shuffle** mode, you need to install the [fasta_ushuffle](https://github.com/agordon/fasta_ushuffle) software:
  * uShuffle: A useful tool for shuffling biological sequences while preserving the k-let counts;
    M. Jiang, J. Anderson, J. Gillespie and M. Mayne; BMC Bioinformatics 2008, [9:192 doi:10.1186/1471-2105-9-192](http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-192).
 
-* Note: R librairies should be installed automatically when running FEELnc. In case it does not work, please type in a R session:
+=> Note: R librairies should be installed automatically when running FEELnc. In case it does not work, please type in a R session:
 	install.packages('ROCR')
 	install.packages('randomForest')
 
@@ -102,11 +102,13 @@ Add FEELnc scripts and utils to your PATH and add the distribution-specific bina
 	export PATH=$PATH:${FEELNCPATH}/utils/
 
 	# for LINUX
+	#----------
 	export PATH=$PATH:${FEELNCPATH}/bin/LINUX/
 	# or
 	cp ${FEELNCPATH}/bin/LINUX/ ~/bin/
 
 	# for MAC
+	# --------
 	export PATH=$PATH:${FEELNCPATH}/bin/MAC/
 	# or
 	cp ${FEELNCPATH}/bin/MAC/ ~/bin/
@@ -124,7 +126,6 @@ If you want to use the **shuffle** mode, please check that the **fasta_ushuffle*
     -b transcript_biotype=protein_coding > candidate_lncRNA.gtf
 
 	# Coding_Potential
-	# Note1: as a test, the *annotation_chr38.gtf* learning file only contains 254 mRNA transcripts.
 	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -b transcript_biotype=protein_coding -g genome_chr38.fa --mode=shuffle
 
 	# Classifier
@@ -132,11 +133,11 @@ If you want to use the **shuffle** mode, please check that the **fasta_ushuffle*
 
 
 ### Results on the toy exemple:
-The *results* directory in *test* contains the results files on the toy exemple. For more details, see the specific parts on each modules.
+The *results* directory in *test* contains the results files on the toy exemple. For more details, see the specific parts on [each modules](https://github.com/tderrien/FEELnc#launch-the-3-step-pipeline).
 
 
 ### Note:
-A bash script *utils/FEELnc_pipeline.sh* is provided to run the three steps in one command line. As an example, this script is made to be used on a GTF file without lncRNA file. It filters candidates only on mRNA annotation, keeps antisense monoexonic transcripts and uses the shuffle mode. Feel free to modify it at your convenience. To run on the toy example:
+A bash script *utils/FEELnc_pipeline.sh* is provided to run the three steps in one command line. As an example, this script is made to be used on a .GTF file without lncRNA file. It filters candidates only on mRNA annotation, keeps antisense monoexonic transcripts and uses the shuffle mode. Feel free to modify it at your convenience. To run on the toy example:
 
 	cd test/
 
@@ -204,7 +205,7 @@ For stranded RNASeq protocol, it is also possible  to include monoexonic lncRNAs
 
 ### 2- FEELnc_codpot.pl
 
-The second step of the pipeline (FEELnc_codpot) aims at computing the CPS i.e the coding potential score (between [0-1]) foreach of the candidate transcripts in the candidate_lncRNA.gtf file.
+The main step of the pipeline (FEELnc_codpot) aims at computing the CPS i.e the coding potential score (between [0-1]) foreach of the candidate transcripts in the candidate_lncRNA.gtf file.
 
 **- INPUT :**
 
@@ -219,9 +220,9 @@ If you have a set of known lncRNAs, you could run the module like:
 	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -l known_lncRNA.gtf
 
 In the absence of species-specific lncRNAs set, machine-learning strategies require to
-simulate non-coding RNA sequences to train the model.
+simulate non-coding RNA sequences to train the model. We developed 2 approaches:
 
-A first approach involves that lncRNAs derived from "debris" of protein-coding
+1/ A first approach involves that lncRNAs derived from "debris" of protein-coding
 genes (Duret *et al.* 2006). For this strategy that we called **shuffle**, the set of mRNAs are taken and shuffled while preserving 7-mer frequencies using Ushuffle.
 If you want to use the **shuffle** mode, please check that the **fasta_ushuffle** binary is in your PATH
 
@@ -229,19 +230,15 @@ If you want to use the **shuffle** mode, please check that the **fasta_ushuffle*
     or
     FEELnc_codpot.pl -i candidate_lncRNA.fa -a known_mRNA.fa --mode=shuffle
 
-    # Note: if you use the shuffle mode, each mRNA sequence is shuffled 3 times.
-            If you want to use all the permuations and you fixe the number of sequences
-            used in the training (-n option, see FEELnc_codpot.pl full options
-            list below), don't set a limit number of lncRNA sequences.
 
-Another more naive approach called **intergenic** consists in extracting random
+2/ Another more naive approach called **intergenic** consists in extracting random
 sequences from the genome of interest to model species-specific noncoding sequences.
 In this case, the reference genome file is required (ref_genome.FA) and the mode of
 the lncRNA sequences simulation have to been set to **intergenic**.
 
     FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -g ref_genome.FA --mode=intergenic
 
-For more details and a comparaison between these two lncRNA simulations, please see the FEELnc publication.
+For more details and a comparaison between these two lncRNA simulations, please see the [FEELnc publication](http://nar.oxfordjournals.org/content/early/2017/01/03/nar.gkw1306.full).
 
 As in the previous module, if your reference annotation file  ("*ref_annotation.GTF*") contains additionnal fields such **transcript_biotype** and/or **transcript_status** in the [GENCODE annotation](http://www.gencodegenes.org/gencodeformat.html) or [ENSEMBL](http://www.ensembl.org), you can extract them manually or by using the **-b option** (as  to get the best training set of known mRNAs.
 
@@ -326,7 +323,7 @@ Options:
 
 The last step of the pipeline consists in classifying new lncRNAs w.r.t to the localisation and the direction of transcription of proximal RNA transcripts because classifying lncRNAs with mRNAs (or other ncRNAs) could help to predict functions for lncRNAs.
 
-**- Tpes on interactions:**
+**- Types of interactions:**
 
 For all newly identified lncRNAs transcripts, a sliding window strategy is used to check for possible overlap with nearest transcripts from the reference annotation.
 A first level of classification disciminates 2 **TYPES** of interactions:
