@@ -73,10 +73,13 @@ The following software and libraries must be installed on your machine:
  * Linux and MAC executables in FEELnc bin directory;
  * If any trouble using supplied executables, please download and compile from sources.
  
--  If you want to use the **shuffle** mode, you need to install the [fasta_ushuffle](https://github.com/agordon/fasta_ushuffle) software:
+- [fasta_ushuffle](https://github.com/agordon/fasta_ushuffle) software:
  * uShuffle: A useful tool for shuffling biological sequences while preserving the k-let counts;
    M. Jiang, J. Anderson, J. Gillespie and M. Mayne; BMC Bioinformatics 2008, [9:192 doi:10.1186/1471-2105-9-192](http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-192).
-
+ * required only if  you want to use the **shuffle** mode
+ * Linux and MAC executables in FEELnc bin directory;
+ * If any trouble using supplied executables, please download and compile from sources.
+ 
 => Note: R librairies should be installed automatically when running FEELnc. In case it does not work, please type in a R session:
 	install.packages('ROCR')
 	install.packages('randomForest')
