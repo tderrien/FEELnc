@@ -5,6 +5,7 @@
 This document is intended to give a technical description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs)  based on reconstructed transcripts from RNA-seq data (either with or without a reference genome).
 
 For a more general overview of lncRNAs annotation using RNASeq and FEELnc specific advantages, you could point to [the FEELnc paper] (http://nar.oxfordjournals.org/content/early/2017/01/03/nar.gkw1306.full).
+---
 
 
  - [Introduction](https://github.com/tderrien/FEELnc#introduction)
@@ -94,7 +95,7 @@ Go to FEELnc directory
 Export PERL5LIB and FEELNCPATH variables
 
 	export FEELNCPATH=${PWD}
-	export PERL5LIB=$PERL5LIB:${FEELNCPATH}/lib/
+	export PERL5LIB=${FEELNCPATH}/lib/:$PERL5LIB
 
 Add FEELnc scripts and utils to your PATH and add the distribution-specific binary of KmerInShort (or KIS developped by Guillaume Rizk) to your PATH or copy it to your bin directory or compile from sources ([KmerInShort](https://github.com/rizkg/KmerInShort)).
 
