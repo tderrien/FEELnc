@@ -99,8 +99,6 @@ Export PERL5LIB and FEELNCPATH variables
 	export FEELNCPATH=${PWD}
 	export PERL5LIB=${FEELNCPATH}/lib/:$PERL5LIB
 
-Add FEELnc scripts and utils to your PATH and add the distribution-specific binary of KmerInShort (or KIS developped by Guillaume Rizk) to your PATH or copy it to your bin directory or compile from sources ([KmerInShort](https://github.com/rizkg/KmerInShort)).
-
 	export PATH=$PATH:${FEELNCPATH}/scripts/
 	export PATH=$PATH:${FEELNCPATH}/utils/
 
@@ -115,10 +113,6 @@ Add FEELnc scripts and utils to your PATH and add the distribution-specific bina
 	export PATH=$PATH:${FEELNCPATH}/bin/MAC/
 	# or
 	cp ${FEELNCPATH}/bin/MAC/ ~/bin/
-
-If you want to use the **shuffle** mode, please check that the **fasta_ushuffle** binary is in your PATH
-
-	export PATH=$PATH:PATH_TO_FASTA_USHUFFLE_BIN
 
 ### Test with toy example:
 
