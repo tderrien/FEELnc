@@ -68,6 +68,9 @@ The following software and libraries must be installed on your machine:
 - R [Rscript](http://cran.r-project.org): tested with version 3.1.0.
  * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) test with version 1.0-5;
  * [randomForest](http://cran.r-project.org/web/packages/randomForest/index.html) tested with version 4.6-10.
+ * These R librairies should be installed automatically when running FEELnc. In case it does not work, please type in a R session:
+	install.packages('ROCR')
+	install.packages('randomForest')
 
 - [KmerInShort](https://github.com/rizkg/KmerInShort) developped by Guillaume Rizk:
  * Linux and MAC executables in FEELnc bin directory;
@@ -80,10 +83,7 @@ The following software and libraries must be installed on your machine:
  * Linux and MAC executables in FEELnc bin directory;
  * If any trouble using supplied executables, please download and compile from sources.
  
-=> Note: R librairies should be installed automatically when running FEELnc. In case it does not work, please type in a R session:
-	install.packages('ROCR')
-	install.packages('randomForest')
-
+ 
 ### Installation
 
 Clone the FEELnc git:
