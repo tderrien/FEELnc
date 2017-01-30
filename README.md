@@ -3,10 +3,9 @@
 
 
 This document is intended to give a technical description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs)  based on reconstructed transcripts from RNA-seq data (either with or without a reference genome).
-
 For a more general overview of lncRNAs annotation using RNASeq and FEELnc specific advantages, you could point to [the FEELnc paper] (http://nar.oxfordjournals.org/content/early/2017/01/03/nar.gkw1306.full).
----
 
+--------
 
  - [Introduction](https://github.com/tderrien/FEELnc#introduction)
  - [Input files](https://github.com/tderrien/FEELnc#input-files)
