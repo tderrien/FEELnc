@@ -3,9 +3,9 @@
 
 
 This document is intended to give a technical description of the FEELnc pipeline in order to annotate long non-coding RNAs (lncRNAs)  based on reconstructed transcripts from RNA-seq data (either with or without a reference genome).
-
 For a more general overview of lncRNAs annotation using RNASeq and FEELnc specific advantages, you could point to [the FEELnc paper] (http://nar.oxfordjournals.org/content/early/2017/01/03/nar.gkw1306.full).
 
+--------
 
  - [Introduction](https://github.com/tderrien/FEELnc#introduction)
  - [Input files](https://github.com/tderrien/FEELnc#input-files)
@@ -68,19 +68,22 @@ The following software and libraries must be installed on your machine:
 - R [Rscript](http://cran.r-project.org): tested with version 3.1.0.
  * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) test with version 1.0-5;
  * [randomForest](http://cran.r-project.org/web/packages/randomForest/index.html) tested with version 4.6-10.
+ * These R librairies should be installed automatically when running FEELnc. In case it does not work, please type in a R session:
+	install.packages('ROCR')
+	install.packages('randomForest')
 
 - [KmerInShort](https://github.com/rizkg/KmerInShort) developped by Guillaume Rizk:
  * Linux and MAC executables in FEELnc bin directory;
  * If any trouble using supplied executables, please download and compile from sources.
  
--  If you want to use the **shuffle** mode, you need to install the [fasta_ushuffle](https://github.com/agordon/fasta_ushuffle) software:
+- [fasta_ushuffle](https://github.com/agordon/fasta_ushuffle) software:
  * uShuffle: A useful tool for shuffling biological sequences while preserving the k-let counts;
    M. Jiang, J. Anderson, J. Gillespie and M. Mayne; BMC Bioinformatics 2008, [9:192 doi:10.1186/1471-2105-9-192](http://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-9-192).
-
-=> Note: R librairies should be installed automatically when running FEELnc. In case it does not work, please type in a R session:
-	install.packages('ROCR')
-	install.packages('randomForest')
-
+ * required only if  you want to use the **shuffle** mode
+ * Linux and MAC executables in FEELnc bin directory;
+ * If any trouble using supplied executables, please download and compile from sources.
+ 
+ 
 ### Installation
 
 Clone the FEELnc git:
@@ -94,9 +97,7 @@ Go to FEELnc directory
 Export PERL5LIB and FEELNCPATH variables
 
 	export FEELNCPATH=${PWD}
-	export PERL5LIB=$PERL5LIB:${FEELNCPATH}/lib/
-
-Add FEELnc scripts and utils to your PATH and add the distribution-specific binary of KmerInShort (or KIS developped by Guillaume Rizk) to your PATH or copy it to your bin directory or compile from sources ([KmerInShort](https://github.com/rizkg/KmerInShort)).
+	export PERL5LIB=${FEELNCPATH}/lib/:$PERL5LIB
 
 	export PATH=$PATH:${FEELNCPATH}/scripts/
 	export PATH=$PATH:${FEELNCPATH}/utils/
@@ -112,10 +113,6 @@ Add FEELnc scripts and utils to your PATH and add the distribution-specific bina
 	export PATH=$PATH:${FEELNCPATH}/bin/MAC/
 	# or
 	cp ${FEELNCPATH}/bin/MAC/ ~/bin/
-
-If you want to use the **shuffle** mode, please check that the **fasta_ushuffle** binary is in your PATH
-
-	export PATH=$PATH:PATH_TO_FASTA_USHUFFLE_BIN
 
 ### Test with toy example:
 
