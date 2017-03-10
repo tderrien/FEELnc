@@ -206,7 +206,7 @@ sub parseAttributes{
     # store ids and additional information in second hash
     foreach my $attr ( @extrafields ) {
 
-	next unless $attr =~ /^\s*(.+)\s(.+)$/;
+	next unless $attr =~ /^\s*(.+?)\s(.+)$/;
 	my $c_type  = $1;
 	my $c_value = $2;
 	$c_value=~ s/\"//g;
