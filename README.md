@@ -62,7 +62,7 @@ Basically, FEELnc users should have the following minimal input files:
 The following software and libraries must be installed on your machine:
 
 - [Perl5+](https://www.perl.org/) : tested with version 5.18.2
- * [Bioperl](http://www.bioperl.org/wiki/Main_Page)  : tested with version BioPerl-1.6.924;
+ * [Bioperl](http://www.bioperl.org/wiki/Main_Page)  : tested with version BioPerl-1.6.924 (partial tests with BioPerl >=1.7);
  * [Paralell::ForkManager](http://search.cpan.org/perldoc/Parallel::ForkManager) : tested with version 1.07.
 
 - R [Rscript](http://cran.r-project.org): tested with version 3.1.0.
@@ -97,7 +97,7 @@ Go to FEELnc directory
 Export PERL5LIB and FEELNCPATH variables
 
 	export FEELNCPATH=${PWD}
-	export PERL5LIB=${FEELNCPATH}/lib/:$PERL5LIB
+	export PERL5LIB=$PERL5LIB:${FEELNCPATH}/lib/ #order is important to avoid &Bio::DB::IndexedBase::_strip_crnl error with bioperl >=v1.7
 
 	export PATH=$PATH:${FEELNCPATH}/scripts/
 	export PATH=$PATH:${FEELNCPATH}/utils/
