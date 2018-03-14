@@ -9,7 +9,9 @@ For a more general overview of lncRNAs annotation using RNASeq and FEELnc specif
 
  - [Introduction](https://github.com/tderrien/FEELnc#introduction)
  - [Input files](https://github.com/tderrien/FEELnc#input-files)
- - [Installation](https://github.com/tderrien/FEELnc#installation-and-requirements) and [Tests](https://github.com/tderrien/FEELnc#test-with-toy-example)
+ - [Installation](https://github.com/tderrien/FEELnc#installation-and-requirements) 
+    - [Install via Conda]( https://github.com/tderrien/FEELnc#install-via-conda)
+ - [Test Install](https://github.com/tderrien/FEELnc#test-with-toy-example)   
  - [FEELnc module](https://github.com/tderrien/FEELnc#launch-the-3-step-pipeline)
    -  [filter](https://github.com/tderrien/FEELnc#1--feelnc_filterpl)
    -  [coding_potential](https://github.com/tderrien/FEELnc#2--feelnc_codpotpl)
@@ -114,6 +116,13 @@ Export PERL5LIB and FEELNCPATH variables
 	# or
 	cp ${FEELNCPATH}/bin/MAC/ ~/bin/
 
+
+
+
+### Install via [Conda](https://anaconda.org/bioconda/feelnc):
+	conda install -c bioconda feelnc 
+(thanks to [Genouest Bionformatics](https://www.genouest.org))
+
 ### Test with toy example:
 
 	cd test/
@@ -140,10 +149,6 @@ A bash script *utils/FEELnc_pipeline.sh* is provided to run the three steps in o
 
 	FEELnc_pipeline.sh --candidate=transcript_chr38.gtf --reference=annotation_chr38.gtf \
 	                   --genome=genome_chr38.fa --outname=testOnToyExample --outdir=test_on_toy_example
-
-
-### Install via [Conda](https://anaconda.org/bioconda/feelnc):
-	conda install -c bioconda feelnc 
 
 
 -------------------------
