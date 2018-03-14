@@ -142,6 +142,10 @@ A bash script *utils/FEELnc_pipeline.sh* is provided to run the three steps in o
 	                   --genome=genome_chr38.fa --outname=testOnToyExample --outdir=test_on_toy_example
 
 
+### Install via [Conda](https://anaconda.org/bioconda/feelnc):
+	conda install -c bioconda feelnc 
+
+
 -------------------------
 ## Launch the 3-step pipeline
 
