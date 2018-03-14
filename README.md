@@ -139,7 +139,7 @@ A bash script *utils/FEELnc_pipeline.sh* is provided to run the three steps in o
 	cd test/
 
 	FEELnc_pipeline.sh --candidate=transcript_chr38.gtf --reference=annotation_chr38.gtf \
-	                   --refSequence=genome_chr38.fa --outname=testOnToyExample --outdir=test_on_toy_example
+	                   --genome=genome_chr38.fa --outname=testOnToyExample --outdir=test_on_toy_example
 
 
 -------------------------
