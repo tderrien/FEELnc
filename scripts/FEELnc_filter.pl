@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl 
 
 # Perl libs
 use warnings;
@@ -10,7 +10,7 @@ use Data::Dumper;
 use Parallel::ForkManager;
 
 
-# Own lib : /home/genouest/umr6061/recomgen/tderrien/bin/ThomasPerl/lib/
+# FEELnc lib
 use Parser;
 use ExtractFromHash;
 use ExtractFromFeature;
