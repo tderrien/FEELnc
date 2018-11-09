@@ -123,8 +123,8 @@ The last step if the pipeline (FEELnc_classifier) consists in classifying new ln
 
 =head2 Filtering arguments
 
-  -w,--window=10000		Size of the window around the lncRNA to compute interactions/classification [default 10000]
-  -m,--maxwindow=100000		Maximal size of the window during the expansion process [default 10000]
+  -w,--window=10000		Size of the window during the expansion process [default 10000 e.g. 10kb]
+  -m,--maxwindow=100000		Size of the window around the lncRNA to compute interactions/classification [default e.g. 100kb]
 
 =head1 AUTHORS
 
