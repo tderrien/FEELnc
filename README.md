@@ -455,7 +455,7 @@ Depending on your filtering options, this may correspond to a non-protein-coding
 
     Filtering arguments:
       -w,--window=200               Size of the window around the lncRNA to compute interactins/classification [default 10000]
-      -m,--maxwindow=10000          Maximal size of the window during the expansion process [default 10000]
+      -m,--maxwindow=10000          Maximal size of the window during the expansion process [default 100000]
 ```
 
 ## Warnings
