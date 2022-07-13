@@ -356,13 +356,13 @@ if(Utils::guess_format($infile) eq "gtf")      # -- if GTF
 {
     print STDERR "> Extract ORFs/cDNAs for candidates RNAs from a GTF file\n";
     # Use undef for $nbtx/$numtx to get all sequences and ORFs
-    ExtractCdnaOrf::CreateORFcDNAFromGTF($infile, $testFile, $testOrfFile, undef, undef, $genome, 'exon,CDS,stop_codon,start_codon', undef, $orfTypeTest, $verbosity, $kmerMax);
+    ExtractCdnaOrf::CreateORFcDNAFromGTF($infile, $testFile, $testOrfFile, undef, 1, $genome, 'exon,CDS,stop_codon,start_codon', undef, $orfTypeTest, $verbosity, $kmerMax);
 }
 elsif(Utils::guess_format($infile) eq "fasta") # -- if FASTA
 {
     print STDERR "> Extract ORFs/cDNAs for candidates RNAs from a FASTA file\n";
     # Use undef for $nbtx/$numtx to get all sequences and ORFs
-    ExtractCdnaOrf::CreateORFcDNAFromFASTA($infile, $testFile, $testOrfFile, undef, undef, $orfTypeTest, $verbosity, $kmerMax);
+    ExtractCdnaOrf::CreateORFcDNAFromFASTA($infile, $testFile, $testOrfFile, undef, 1, $orfTypeTest, $verbosity, $kmerMax);
 }
 else
 {
