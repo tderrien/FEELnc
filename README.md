@@ -133,7 +133,7 @@ To deactivate it:
 
 	source deactivate
 
-(thanks to [Genouest Bionformatics](https://www.genouest.org/howto/#conda))
+(thanks to [Genouest Bionformatics](https://www.genouest.org)
 
 ### Test with toy example:
 
