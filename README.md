@@ -458,6 +458,39 @@ Depending on your filtering options, this may correspond to a non-protein-coding
       -m,--maxwindow=10000          Maximal size of the window during the expansion process [default 100000]
 ```
 
+
+
+
+
+**- FROM TRANSCRIPT TO GENE LEVEL :**
+
+The module provides a classifcation at the transcript level. To handle gene analysis a complementary module has been developped to classify lncRNAs according to the nearest PCG at the gene level. 
+
+To launch it  use :  
+```
+  Rscript FEELnc_tpLevel2gnLevelClassification.R "PATH/TO/GTF" "PATH/TO/{INPUT}_classes_feelncclassifier.txt"  "PATH/TO/{INPUT}_feelncclassifier.log"
+```
+
+However, to transfer the FEELnc information from the transcript level to the gene level, an order of importance has to be decided.
+The class names are composed of three parts:
+  - The first part (8 letters) is composed of the main class type. 
+    - For the genic classes: lncgSSex, lncgSSin, lncgASex, lncgASin. 
+    - For the intergenic classes: lincDivg,lincSSup, lincSSdw, lincConv.
+  - The second part (4 letters) concerns only the genic classes without subtype conflicts (see below), we add one of the three subtypes: Nested (Nest), Overlapping (Ovlp) or Containing (Cont)
+- The third part (_X1.X2.X3) indicates if/that there are conflicts between annotation due to several PCGs related to the lncRNA locus. 
+    - X1: number of transcripts of the lncRNA gene: “1” if 1 transcript, “n” if more than one transcript
+    - X2: number of feelnc class(es) associated to the lncRNA:PCG pair: “1” if 1 class, “n” if more than one class (the “unclassified” class does not count)
+    - X3: number of PCG gene(s) concerned by this (these) annotation(s): “1” if 1 PCG gene, “n” if more than one PCG gene.
+
+
+Conflicts cases are of two types: the cases in which there are more than 1 annotation relative to one unique PCG (as indicated by the “n” in the middle and “1” at the end of “n.n.1”), and the case in which there more than 1 or more annotation relative to more than 1 PCG (“n.X.n” in the feelLncPcgClassType column). In these cases, we prioritized the annotation in the column « feelLncPcgClassName», which gives only 1 class per gene :
+- n.n.1 case: Genics have priority over intergenics (lncg > linc). Among the genic, exonics have priority over intronics. Among exonics and intronics, the subtypes nested / containing / overlapping have the same importance. They are kept if they do not produce conflicts and are removed if there are 2 or more subtypes.
+- n.X.n case: Same order of priority as previously (n.n.1 case).
+
+Concerning the intergenics, there can be annotation conflicts between the several PCGs: the lncRNA can be classified as lincDivg with one PCG and lincConv with another one PCG (see figure  for an example). We prioritize the classes as following: Divg > SS > Conv. Same- strand have priority over Conv because it could suggest an error in the modelization: the lncRNA could be a 5’-part or 3’-part of the PCG. Between the same strand up and down (lincSSup and lincSSdw), we choose the closest. The third part of the class name of these genes is either “_n.n.n” or “_n.1.n”.
+
+![ScreenShot](./image/FEELnc_lncRNA_classification_geneLevel.png)
+
 ## Warnings
 
  - In the installation (and/or) the classifier step, you may see a warning like
