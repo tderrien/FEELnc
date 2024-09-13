@@ -1,88 +1,131 @@
 #########################
 #
+# PATHS
+#
+#########################
+
+gtf.path <- "PATH/TO/GTF"
+txt.path <- "PATH/TO/_classes_feelncclassifier.txt"
+log.path <- "PATH/TO/feelncclassifier.log"
+
+args = commandArgs(trailingOnly=TRUE)
+
+gtf.path <- args[1]
+txt.path <- args[2]
+log.path <- args[3]
+
+#########################
+#
+# LIBRARIES
+#
+#########################
+
+library(stringr)
+library(stringi)
+
+
+
+#########################
+#
 # FUNCTIONS
 #
 #########################
 ##-----------------------------------------------------##
+# gtfAttributeParse
+##-----------------------------------------------------##
+extract_field <- function(x, fieldName) {
+    # Extract the fieldName (ex : gene_id) from the "attributes" column of a gtf
+    regEx <- paste0(fieldName, "[^;]*")
+    tmp  <- str_split(str_extract(x, regEx), " ", simplify = T)
+    if (all(is.na(tmp[2:length(tmp)] == ""))) {
+        return("")
+    } else {
+        tmp <- paste0(tmp[2:length(tmp)], collapse = " ")
+        tmp <- gsub('"', '', tmp)
+        return(tmp)
+    }
+} 
+
+##-----------------------------------------------------##
 # onlyNAs_simplifier
 ##-----------------------------------------------------##
 onlyNAs_simplifier <- function(x, separator = ";", NAvalue = "NA"){
-  
-  cell <- x
-  parsed_cell <- unlist(strsplit(cell, separator))
-  parsed_cell <- paste0(unique(parsed_cell), collapse = separator)
-  
-  if(parsed_cell == NAvalue){
-    cell <- NA
-  } 
-  
-  return(cell)
+    
+    cell <- x
+    parsed_cell <- unlist(strsplit(cell, separator))
+    parsed_cell <- paste0(unique(parsed_cell), collapse = separator)
+    
+    if(parsed_cell == NAvalue){
+        cell <- NA
+    } 
+    
+    return(cell)
 }
 
 ##-----------------------------------------------------##
 # geneBiotype_creator
 ##-----------------------------------------------------##
 geneBiotype_creator <- function(feelnc_file){
-  
-  type <- switch(EXPR = feelnc_file["type"], intergenic = "linc", genic = "lncg", "ERROR")
-  subtype <- switch(EXPR = feelnc_file["subtype"], containing = "Cont", convergent = "Conv", divergent = "Divg", nested = "Nest", overlapping = "Ovlp", same_strand = "SS", "ERROR") 
-  location <- switch(EXPR = feelnc_file["location"], downstream = "dw", exonic = "ex", intronic = "in", upstream = "up", "ERROR")
-  direction <- switch(EXPR = feelnc_file["direction"], antisense = "AS", sense = "SS", "ERROR")
-  
-  if(type == "linc"){
-    res <- paste0(type, subtype, ifelse(subtype == "SS", location, ""))
-  } else if(type == "lncg") {
-    res <- paste0(type, direction, location, subtype)
-  }
-  
-  return(res)
+    
+    type <- switch(EXPR = feelnc_file["type"], intergenic = "linc", genic = "lncg", "ERROR")
+    subtype <- switch(EXPR = feelnc_file["subtype"], containing = "Cont", convergent = "Conv", divergent = "Divg", nested = "Nest", overlapping = "Ovlp", same_strand = "SS", "ERROR") 
+    location <- switch(EXPR = feelnc_file["location"], downstream = "dw", exonic = "ex", intronic = "in", upstream = "up", "ERROR")
+    direction <- switch(EXPR = feelnc_file["direction"], antisense = "AS", sense = "SS", "ERROR")
+    
+    if (type == "linc"){
+        res <- paste0(type, subtype, ifelse(subtype == "SS", location, ""))
+    } else if (type == "lncg") {
+        res <- paste0(type, direction, location, subtype)
+    }
+    
+    return(res)
 }
 
 ##-----------------------------------------------------##
 # FEELncClass_simplificator
 ##-----------------------------------------------------##
 FEELncClass_simplificator <- function(x){
-  
-  x <- unlist(strsplit(x, ";"))
-  x[grepl("lncgSSex", x)] <- "lncgSSex"
-  x[grepl("lncgSSin", x)] <- "lncgSSin"
-  x[grepl("lncgASex", x)] <- "lncgASex"
-  x[grepl("lncgASin", x)] <- "lncgASin"
-  x[grepl("lincDivg", x)] <- "lincDivg"
-  x[grepl("lincConv", x)] <- "lincConv"
-  x[grepl("lincSS", x)] <- "lincSS"
-  x <- paste0(unique(x), collapse = ";")
-  
-  return(x)
+    
+    x <- unlist(strsplit(x, ";"))
+    x[grepl("lncgSSex", x)] <- "lncgSSex"
+    x[grepl("lncgSSin", x)] <- "lncgSSin"
+    x[grepl("lncgASex", x)] <- "lncgASex"
+    x[grepl("lncgASin", x)] <- "lncgASin"
+    x[grepl("lincDivg", x)] <- "lincDivg"
+    x[grepl("lincConv", x)] <- "lincConv"
+    x[grepl("lincSS", x)] <- "lincSS"
+    x <- paste0(unique(x), collapse = ";")
+    
+    return(x)
 }
 
 ##-----------------------------------------------------##
 # nbCategories_calculator
 ##-----------------------------------------------------##
 nbCategories_calculator <- function(x, pattern_to_remove){
-  
-  a <- strsplit(x, ";")
-  b <- lapply(a, unique)
-  b <- lapply(b, function(x)list_partRemover(x, pattern_to_remove = pattern_to_remove))
-  d <- unlist(lapply(b, function(x){length(x) == 1}))
-  nbCategories <- ifelse(d, "1", "n")
-  
-  return(nbCategories)
+    
+    a <- strsplit(x, ";")
+    b <- lapply(a, unique)
+    b <- lapply(b, function(x)list_partRemover(x, pattern_to_remove = pattern_to_remove))
+    d <- unlist(lapply(b, function(x){length(x) == 1}))
+    nbCategories <- ifelse(d, "1", "n")
+    
+    return(nbCategories)
 }
 
 ##-----------------------------------------------------##
 # list_partRemover
 ##-----------------------------------------------------##
 list_partRemover <- function(x, pattern_to_remove){
-  
-  isthere_pattern_to_remove <- any(grepl(pattern_to_remove, x))
-  
-  if(isthere_pattern_to_remove){
     
-    x <- x[- which(grepl(pattern_to_remove, x))]
-  }
-  
-  return(x)
+    isthere_pattern_to_remove <- any(grepl(pattern_to_remove, x))
+    
+    if (isthere_pattern_to_remove){
+        
+        x <- x[-which(grepl(pattern_to_remove, x))]
+    }
+    
+    return(x)
 }
 
 #########################
@@ -90,20 +133,37 @@ list_partRemover <- function(x, pattern_to_remove){
 # DATA
 #
 #########################
+
+
+## Loading GTF file
+gtf <- read.delim(gtf.path,
+                  col.names = c("seqname", "source", "feature", "start", "end", "score", "strand", "frame", "attribute"), 
+                  sep = "\t",
+                  comment.char = "#",
+                  stringsAsFactors = FALSE)
+
+gtf$gene_id <- sapply(gtf$attribute, extract_field, "gene_id")
+gtf$gene_name <- sapply(gtf$attribute, extract_field, "gene_name")
+gtf$transcript_id <- sapply(gtf$attribute, extract_field, "transcript_id")
+gtf[gtf == ""] <- NA
+gtf_genes <- gtf[gtf$feature == "gene", ]
+gtf_transcripts <- gtf[gtf$feature == "transcript", ]
+
+
 ##-----------------------------------------------------##
 # Classified genes
 ##-----------------------------------------------------##
-feelnc_results_lncRNArelativeTo_mRNA <- read.table("./FEELnc/1_Ensembl_20180731_all_24881g_38118t_gg5_v87v93_Ensemblv87eqv93_mRNAonly_FEELnc_classes_lncRNA_relativeTo_mRNA.txt",
+feelnc_results_lncRNArelativeTo_mRNA <- read.table(txt.path,
                                                    header = TRUE, sep = "\t", stringsAsFactors = FALSE)
 feelnc_results_lncRNArelativeTo_mRNA <- feelnc_results_lncRNArelativeTo_mRNA[feelnc_results_lncRNArelativeTo_mRNA$isBest == 1, ] # selection of the is_Best = 1 only
 
 ##-----------------------------------------------------##
 # Unclassified genes
 ##-----------------------------------------------------##
-feelnc_unclassified_lnc_relativeTo_pcg <- scan("./FEELnc/1_Ensembl_20180731_all_24881g_38118t_gg5_v87v93_Ensemblv87eqv93_mRNAonly_FEELnc_log_lncRNA_relativeTo_mRNA.log",
-                                               what = "character")
-pos_firsttpID <- grep("GALT", feelnc_unclassified_lnc_relativeTo_pcg)[1] # theorical position of the first transcript id in the vector : 51. To check if re-used
-feelnc_unclassified_lnc_relativeTo_pcg <- feelnc_unclassified_lnc_relativeTo_pcg[- (1:(pos_firsttpID - 1))]
+feelnc_unclassified_lnc_relativeTo_pcg <- scan(log.path,
+                                               what = "character", quiet = T)
+pos_firsttpID <- 51 # theorical position of the first transcript id in the vector : 51. To check if re-used
+feelnc_unclassified_lnc_relativeTo_pcg <- feelnc_unclassified_lnc_relativeTo_pcg[-(1:(pos_firsttpID - 1))]
 
 #########################
 #
@@ -113,9 +173,9 @@ feelnc_unclassified_lnc_relativeTo_pcg <- feelnc_unclassified_lnc_relativeTo_pcg
 ##-----------------------------------------------------##
 # Empty transcript-level dataframe creation
 ##-----------------------------------------------------##
-annotation_transcript <- data.frame(gnId = # <gtf_transcripts$gene_id>,
-                                    gnName = # <gtf_transcripts$gene_name>,
-                                    tpId = # <gtf_transcripts$transcript_id>,
+annotation_transcript <- data.frame(gnId = gtf_transcripts$gene_id,
+                                    gnName = gtf_transcripts$gene_name,
+                                    tpId = gtf_transcripts$transcript_id,
                                     feelLncPcgClassName = NA, 
                                     feelLncPcgGnId = NA, feelLncPcgGnName = NA, feelLncPcgGnDist = NA,
                                     stringsAsFactors = FALSE)
@@ -140,7 +200,7 @@ annotation_transcript$feelLncPcgGnDist <- feelnc_results_lncRNArelativeTo_mRNA$d
 ##-----------------------------------------------------##
 # Gene-level dataframe creation
 ##-----------------------------------------------------##
-annotation_gene <- data.frame(gnId = # <gtf_genes$gene_id>,
+annotation_gene <- data.frame(gnId = gtf_genes$gene_id,
                               nbTp = NA,
                               feelLncPcgClassName = NA, 
                               feelLncPcgClassType = NA,
@@ -148,22 +208,24 @@ annotation_gene <- data.frame(gnId = # <gtf_genes$gene_id>,
                               feelLncPcgClassNameByTp = NA, 
                               feelLncPcgGnIdByTp = NA, feelLncPcgGnNameByTp = NA, feelLncPcgGnDistByTp = NA,
                               stringsAsFactors = FALSE)
-
-for (i in 1:nrow(annotation_gene)){
-  
-  if(i %% 5000 == 0){cat(i, "/", nrow(annotation_gene), "\n")}
-  gene_id <- annotation_gene$gnId[i]
-  lineNumber <- which(annotation_transcript$gnId %in% gene_id)
-  
-  annotation_gene$feelLncPcgClassNameByTp[i] <- paste0(annotation_transcript$feelLncPcgClassName[lineNumber], collapse = ";")
-  annotation_gene$feelLncPcgGnIdByTp[i] <- paste0(annotation_transcript$feelLncPcgGnId[lineNumber], collapse = ";")
-  annotation_gene$feelLncPcgGnNameByTp[i] <- paste0(annotation_transcript$feelLncPcgGnName[lineNumber], collapse = ";")
-  annotation_gene$feelLncPcgGnDistByTp[i] <- paste0(annotation_transcript$feelLncPcgGnDist[lineNumber], collapse = ";")
-  
-  a <- annotation_transcript$tpId[lineNumber]
-  annotation_gene$nbTp[i] <- length(a)
+cat("\t - annotation gene : (1) \n")
+for (i in 1:nrow(annotation_gene)) {
+    if (i%%100 == 0){
+        cat(i ,"/", nrow(annotation_gene), "\n")
+    }
+    gene_id <- annotation_gene$gnId[i]
+    lineNumber <- which(annotation_transcript$gnId %in% gene_id)
+    
+    annotation_gene$feelLncPcgClassNameByTp[i] <- paste0(annotation_transcript$feelLncPcgClassName[lineNumber], collapse = ";")
+    annotation_gene$feelLncPcgGnIdByTp[i] <- paste0(annotation_transcript$feelLncPcgGnId[lineNumber], collapse = ";")
+    annotation_gene$feelLncPcgGnNameByTp[i] <- paste0(annotation_transcript$feelLncPcgGnName[lineNumber], collapse = ";")
+    annotation_gene$feelLncPcgGnDistByTp[i] <- paste0(annotation_transcript$feelLncPcgGnDist[lineNumber], collapse = ";")
+    
+    a <- annotation_transcript$tpId[lineNumber]
+    annotation_gene$nbTp[i] <- length(a)
 }
 
+annotation_gene <- annotation_gene[annotation_gene$nbTp > 0 , ]
 ##-----------------------------------------------------##
 # Order of classification of the subtypes
 ##-----------------------------------------------------##
@@ -186,25 +248,28 @@ annotation_gene[, "feelLncPcgGnIdByTp"] <- apply(annotation_gene[, "feelLncPcgGn
 annotation_gene[, "feelLncPcgGnNameByTp"] <- apply(annotation_gene[, "feelLncPcgGnNameByTp", drop = FALSE], 1, onlyNAs_simplifier)
 annotation_gene[, "feelLncPcgGnDistByTp"] <- apply(annotation_gene[, "feelLncPcgGnDistByTp", drop = FALSE], 1, onlyNAs_simplifier)
 
-for (i in 1:nrow(annotation_gene)){
-  
-  if(i %% 5000 == 0){cat(i, "/", nrow(annotation_gene), "\n")}
-  
-  tmp_lnc <- data.frame(
-    class = unlist(strsplit(annotation_gene$feelLncPcgClassNameByTp[i], ";")),
-    gnId = unlist(strsplit(annotation_gene$feelLncPcgGnIdByTp[i], ";")),
-    gnNm = unlist(strsplit(annotation_gene$feelLncPcgGnNameByTp[i], ";")),
-    gnDist = unlist(strsplit(annotation_gene$feelLncPcgGnDistByTp[i], ";")),
-    order = NA,
-    stringsAsFactors = FALSE)
-  
-  tmp_lnc$order <- reclassificationOrder$index[match(tmp_lnc$class, reclassificationOrder$classification)]
-  tmp_lnc <- tmp_lnc[order(tmp_lnc$order, tmp_lnc$gnDist), ]
-  
-  annotation_gene$feelLncPcgClassName[i] <- tmp_lnc$class[1]
-  annotation_gene$feelLncPcgGnId[i] <- tmp_lnc$gnId[1]
-  annotation_gene$feelLncPcgGnName[i] <- tmp_lnc$gnNm[1]
-  annotation_gene$feelLncPcgGnDist[i] <- tmp_lnc$gnDist[1]
+
+cat("\t - annotation gene (2): \n")
+for (i in 1:nrow(annotation_gene)) {
+    if (i%%100 == 0){
+        cat(i ,"/", nrow(annotation_gene), "\n")
+    }
+    
+    tmp_lnc <- data.frame(
+        class = unlist(strsplit(annotation_gene$feelLncPcgClassNameByTp[i], ";")),
+        gnId = unlist(strsplit(annotation_gene$feelLncPcgGnIdByTp[i], ";")),
+        gnNm = unlist(strsplit(annotation_gene$feelLncPcgGnNameByTp[i], ";")),
+        gnDist = unlist(strsplit(annotation_gene$feelLncPcgGnDistByTp[i], ";")),
+        order = NA,
+        stringsAsFactors = FALSE)
+    
+    tmp_lnc$order <- reclassificationOrder$index[match(tmp_lnc$class, reclassificationOrder$classification)]
+    tmp_lnc <- tmp_lnc[order(tmp_lnc$order, tmp_lnc$gnDist), ]
+    
+    annotation_gene$feelLncPcgClassName[i] <- tmp_lnc$class[1]
+    annotation_gene$feelLncPcgGnId[i] <- tmp_lnc$gnId[1]
+    annotation_gene$feelLncPcgGnName[i] <- tmp_lnc$gnNm[1]
+    annotation_gene$feelLncPcgGnDist[i] <- tmp_lnc$gnDist[1]
 }
 
 ##-----------------------------------------------------##
@@ -224,12 +289,23 @@ annotation_gene$feelLncPcgClassType[is.na(annotation_gene$feelLncPcgGnIdByTp)] <
 # Modification of the nn1, nnn and n1n types
 ##-----------------------------------------------------##
 pos_nn1 <- grepl("n.n.1", annotation_gene$feelLncPcgClassType)
-simplifiedClasses_nn1 <- apply(annotation_gene[pos_nn1, "feelLncPcgClassNameByTp", drop = FALSE], 1, FEELncClass_simplificator)
-simplifiedClasses_nn1 <- sapply(strsplit(simplifiedClasses_nn1, ";"), function(x){x <- x[1]})
-annotation_gene[pos_nn1, "feelLncPcgClassName"] <- simplifiedClasses_nn1
+if (sum(pos_nn1) > 0) {
+    simplifiedClasses_nn1 <- apply(annotation_gene[pos_nn1, "feelLncPcgClassNameByTp", drop = FALSE], 1, FEELncClass_simplificator)
+    simplifiedClasses_nn1 <- sapply(strsplit(simplifiedClasses_nn1, ";"), function(x){x <- x[1]})
+    annotation_gene[pos_nn1, "feelLncPcgClassName"] <- simplifiedClasses_nn1
+}
 
 pos_nnn <- grepl("n.n.n", annotation_gene$feelLncPcgClassType)
 pos_n1n <- grepl("n.1.n", annotation_gene$feelLncPcgClassType)
 
-annotation_gene$feelLncPcgClassName[pos_nnn] <- paste0(annotation_gene$feelLncPcgClassName[pos_nnn], "_n.n.n")
-annotation_gene$feelLncPcgClassName[pos_n1n] <- paste0(annotation_gene$feelLncPcgClassName[pos_n1n], "_n.1.n")
+if (sum(pos_nnn) > 0) {
+    annotation_gene$feelLncPcgClassName[pos_nnn] <- paste0(annotation_gene$feelLncPcgClassName[pos_nnn], "_n.n.n")
+}
+if (sum(pos_n1n) > 0) {
+    annotation_gene$feelLncPcgClassName[pos_n1n] <- paste0(annotation_gene$feelLncPcgClassName[pos_n1n], "_n.1.n")
+}
+
+write.table(annotation_gene,"classes_GeneLevel_feelncclassifier.txt",
+            quote = F, sep = "\t",
+            row.names = F, col.names = T)
+
