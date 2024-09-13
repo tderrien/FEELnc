@@ -26,18 +26,18 @@ For a more general overview of lncRNAs annotation using RNASeq and FEELnc specif
 
 Currently, FEELnc is composed of 3 modules.
 
-	* FEELnc_filter.pl	: Extract, filter candidate transcripts.
-	* FEELnc_codpot.pl	: Compute the coding potential of candidate transcripts.
-	* FEELnc_classifier.pl: Classify lncRNAs based on their genomic localization wrt others transcripts.
+  * FEELnc_filter.pl	: Extract, filter candidate transcripts.
+  * FEELnc_codpot.pl	: Compute the coding potential of candidate transcripts.
+  * FEELnc_classifier.pl: Classify lncRNAs based on their genomic localization wrt others transcripts.
 
 While the first and third modules require a reference genome, the  2nd module (which computes the coding potential) does not require any reference genome and could be run on de novo assembled transcripts in fasta format.
 
 
 To get help on each module, you can type :
 
-	FEELnc_filter.pl --help
-	# Or
-	FEELnc_filter.pl --man
+  FEELnc_filter.pl --help
+  # Or
+  FEELnc_filter.pl --man
 
 
 ## Input files
@@ -46,9 +46,9 @@ The formats used to describe genes, transcripts, exon is **.GTF** and **.FASTA**
 
 Basically, FEELnc users should have the following minimal input files:
 
-	- Infile.GTF          (-i,--infile)   : input GTF file (e.g cufflinks/stringtie transcripts.GTF) or FASTA (Tritnity, KisSplice)
-	- ref_annotation.GTF  (-a,--mRNAfile) : GTF annotation file or FASTA file * 
-	- ref_genome.FASTA    (-g,--genome)   : genome FASTA file or directory with individual chrom FASTA files
+  - Infile.GTF          (-i,--infile)   : input GTF file (e.g cufflinks/stringtie transcripts.GTF) or FASTA (Tritnity, KisSplice)
+  - ref_annotation.GTF  (-a,--mRNAfile) : GTF annotation file or FASTA file * 
+  - ref_genome.FASTA    (-g,--genome)   : genome FASTA file or directory with individual chrom FASTA files
 
 
 \* *Note: It is recommended to only extract protein_coding transcripts (mRNAs) from the reference annotation file (ref_annotation.GTF) when this information is available, either manually or better by using the option :*
@@ -71,8 +71,8 @@ The following software and libraries must be installed on your machine:
  * [ROCR](https://rocr.bioinf.mpi-sb.mpg.de/) test with version 1.0-5;
  * [randomForest](http://cran.r-project.org/web/packages/randomForest/index.html) tested with version 4.6-10.
  * These R librairies should be installed automatically when running FEELnc. In case it does not work, please type in a R session:
-	install.packages('ROCR')
-	install.packages('randomForest')
+  install.packages('ROCR')
+  install.packages('randomForest')
 
 - [KmerInShort](https://github.com/rizkg/KmerInShort) developped by Guillaume Rizk:
  * Linux and MAC executables in FEELnc bin directory;
@@ -90,31 +90,31 @@ The following software and libraries must be installed on your machine:
 
 Clone the FEELnc git:
 
-	git clone https://github.com/tderrien/FEELnc.git
+  git clone https://github.com/tderrien/FEELnc.git
 
 Go to FEELnc directory
 
-	cd FEELnc
+  cd FEELnc
 
 Export PERL5LIB and FEELNCPATH variables
 
-	export FEELNCPATH=${PWD}
-	export PERL5LIB=$PERL5LIB:${FEELNCPATH}/lib/ #order is important to avoid &Bio::DB::IndexedBase::_strip_crnl error with bioperl >=v1.7
+  export FEELNCPATH=${PWD}
+  export PERL5LIB=$PERL5LIB:${FEELNCPATH}/lib/ #order is important to avoid &Bio::DB::IndexedBase::_strip_crnl error with bioperl >=v1.7
 
-	export PATH=$PATH:${FEELNCPATH}/scripts/
-	export PATH=$PATH:${FEELNCPATH}/utils/
+  export PATH=$PATH:${FEELNCPATH}/scripts/
+  export PATH=$PATH:${FEELNCPATH}/utils/
 
-	# for LINUX
-	#----------
-	export PATH=$PATH:${FEELNCPATH}/bin/LINUX/
-	# or
-	cp ${FEELNCPATH}/bin/LINUX/ ~/bin/
+  # for LINUX
+  #----------
+  export PATH=$PATH:${FEELNCPATH}/bin/LINUX/
+  # or
+  cp ${FEELNCPATH}/bin/LINUX/ ~/bin/
 
-	# for MAC
-	# --------
-	export PATH=$PATH:${FEELNCPATH}/bin/MAC/
-	# or
-	cp ${FEELNCPATH}/bin/MAC/ ~/bin/
+  # for MAC
+  # --------
+  export PATH=$PATH:${FEELNCPATH}/bin/MAC/
+  # or
+  cp ${FEELNCPATH}/bin/MAC/ ~/bin/
 
 
 
@@ -123,31 +123,31 @@ Export PERL5LIB and FEELNCPATH variables
 
 Create a new environment containing FEELnc (and its dependencies):
 
-	conda create -p ~/feelnc_install_dir feelnc 
+  conda create -p ~/feelnc_install_dir feelnc 
 
 To activate it:
 
-	source activate ~/feelnc_install_dir 
+  source activate ~/feelnc_install_dir 
 
 To deactivate it:
 
-	source deactivate
+  source deactivate
 
 (thanks to [Genouest Bionformatics](https://www.genouest.org)
 
 ### Test with toy example:
 
-	cd test/
+  cd test/
 
-	# Filter
-	FEELnc_filter.pl -i transcript_chr38.gtf -a annotation_chr38.gtf \
+  # Filter
+  FEELnc_filter.pl -i transcript_chr38.gtf -a annotation_chr38.gtf \
     -b transcript_biotype=protein_coding > candidate_lncRNA.gtf
 
-	# Coding_Potential
-	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -b transcript_biotype=protein_coding -g genome_chr38.fa --mode=shuffle
+  # Coding_Potential
+  FEELnc_codpot.pl -i candidate_lncRNA.gtf -a annotation_chr38.gtf -b transcript_biotype=protein_coding -g genome_chr38.fa --mode=shuffle
 
-	# Classifier
-	FEELnc_classifier.pl -i feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf -a annotation_chr38.gtf > candidate_lncRNA_classes.txt
+  # Classifier
+  FEELnc_classifier.pl -i feelnc_codpot_out/candidate_lncRNA.gtf.lncRNA.gtf -a annotation_chr38.gtf > candidate_lncRNA_classes.txt
 
 
 ### Results on the toy exemple:
@@ -157,10 +157,10 @@ The *results* directory in *test* contains the results files on the toy exemple.
 ### Note:
 A bash script *utils/FEELnc_pipeline.sh* is provided to run the three steps in one command line. As an example, this script is made to be used on a .GTF file without lncRNA file. It filters candidates only on mRNA annotation, keeps antisense monoexonic transcripts and uses the shuffle mode. Feel free to modify it at your convenience. To run on the toy example:
 
-	cd test/
+  cd test/
 
-	FEELnc_pipeline.sh --candidate=transcript_chr38.gtf --reference=annotation_chr38.gtf \
-	                   --genome=genome_chr38.fa --outname=testOnToyExample --outdir=test_on_toy_example
+  FEELnc_pipeline.sh --candidate=transcript_chr38.gtf --reference=annotation_chr38.gtf \
+                     --genome=genome_chr38.fa --outname=testOnToyExample --outdir=test_on_toy_example
 
 
 -------------------------
@@ -171,26 +171,26 @@ A bash script *utils/FEELnc_pipeline.sh* is provided to run the three steps in o
 The first step of the pipeline (FEELnc_filter) consists in filtering out unwanted/spurious transcripts and/or transcripts overlapping (in sense) exons of the reference annotation
 and especially protein_coding exons as they more probably correspond to new mRNA isoforms (see -b,--biotype option).
 
-	# Usage:
+  # Usage:
     FEELnc_filter.pl -i infile.gtf -a annotation_mRNA.gtf > candidate_lncRNA.gtf
 
 
 If your reference annotation ("*ref_annotation.GTF*") contains transcript_biotype information (e.g protein_coding, pseudogene, miRNA...), you can subselect a specific transcript biotype to make the overlap with.
 
     FEELnc_filter.pl -i infile.gtf \
-	-a ref_annotation.GTF \
-	-b transcript_biotype=protein_coding \
-	> candidate_lncRNA.gtf
+  -a ref_annotation.GTF \
+  -b transcript_biotype=protein_coding \
+  > candidate_lncRNA.gtf
 
 This option is highly recommended if you don't want to remove transcripts
 overlapping with other transcripts than mRNAs (e.g lincRNA, miRNA, pseudogene...).
 For stranded RNASeq protocol, it is also possible  to include monoexonic lncRNAs that are antisense to mRNAs e.g
 
-	FEELnc_filter.pl -i infile.gtf \
-	-a ref_annotation.GTF \
-	-b transcript_biotype=protein_coding \
-	--monoex=-1
-	> candidate_lncRNA.gtf
+  FEELnc_filter.pl -i infile.gtf \
+  -a ref_annotation.GTF \
+  -b transcript_biotype=protein_coding \
+  --monoex=-1
+  > candidate_lncRNA.gtf
 
 
 **- FULL OPTIONS (FEELnc_filter.pl --help) :**
@@ -230,12 +230,12 @@ The main step of the pipeline (FEELnc_codpot) aims at computing the CPS i.e the 
 It makes use of the intrinsic properties of input sequences (ORF coverage and mRNA sizes, k-mer frequencies...) based on 2 training files:
 
 
-	- known_mRNA.gtf (or .fa)   : a set of known protein_coding transcripts
-	- known_lncRNA.gtf  (or .fa): a set of known lncRNA transcripts
+  - known_mRNA.gtf (or .fa)   : a set of known protein_coding transcripts
+  - known_lncRNA.gtf  (or .fa): a set of known lncRNA transcripts
 
 If you have a set of known lncRNAs, you could run the module like:
 
-	FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -l known_lncRNA.gtf
+  FEELnc_codpot.pl -i candidate_lncRNA.gtf -a known_mRNA.gtf -l known_lncRNA.gtf
 
 In the absence of species-specific lncRNAs set, machine-learning strategies require to
 simulate non-coding RNA sequences to train the model. We developed 2 approaches:
@@ -275,15 +275,15 @@ FEELnc_codpot uses a R script that will make a 10 fold cross-validation on the i
 
 If your input file is called **INPUT**, this second module will create these output files:
 
-	 - {INPUT}_RF_learningData.txt: FEELnc metrics scores (ORF coverage and mRNA sizes, k-mer frequencies and labels) for the training files.
-	 - {INPUT}_RF_statsLearn_CrossValidation.txt: statistics for n cross validation on the training files.
-	 - {INPUT}_RF_TGROC.png: TwoGraph ROC curve plot to select the best coding potential cutoff.
-	 - {INPUT}_RF.txt: FEELnc metrics scores (ORF coverage and mRNA sizes, k-mer frequencies and labels) for the testing file.
-	 - {INPUT}_RF_varImpPlot.png: Dotchart plot of variable importance as measured by a Random Forest.
+   - {INPUT}_RF_learningData.txt: FEELnc metrics scores (ORF coverage and mRNA sizes, k-mer frequencies and labels) for the training files.
+   - {INPUT}_RF_statsLearn_CrossValidation.txt: statistics for n cross validation on the training files.
+   - {INPUT}_RF_TGROC.png: TwoGraph ROC curve plot to select the best coding potential cutoff.
+   - {INPUT}_RF.txt: FEELnc metrics scores (ORF coverage and mRNA sizes, k-mer frequencies and labels) for the testing file.
+   - {INPUT}_RF_varImpPlot.png: Dotchart plot of variable importance as measured by a Random Forest.
 
-	 - {INPUT}.lncRNA.gtf || {INPUT}.lncRNA.fa: a .GTF/.FA file of the transcripts below the CPS (i.e the final set of lncRNAs).
-	 - {INPUT}.mRNA.gtf || {INPUT}.mRNA.fa: a .GTF/.FA file of the transcripts above the coding potential cutoff (i.e the final set of mRNAs).
-	 - [Possibly] {INPUT}.noORF.gtf || {INPUT}.noORF.fa: a .GTF/.FA file of the transcripts without any ORF found by FEELnc using the specified --testorftype option (see FEELnc_codpot.pl options description for more details). Transcripts contained in this file most probably correspond to lncRNAs.
+   - {INPUT}.lncRNA.gtf || {INPUT}.lncRNA.fa: a .GTF/.FA file of the transcripts below the CPS (i.e the final set of lncRNAs).
+   - {INPUT}.mRNA.gtf || {INPUT}.mRNA.fa: a .GTF/.FA file of the transcripts above the coding potential cutoff (i.e the final set of mRNAs).
+   - [Possibly] {INPUT}.noORF.gtf || {INPUT}.noORF.fa: a .GTF/.FA file of the transcripts without any ORF found by FEELnc using the specified --testorftype option (see FEELnc_codpot.pl options description for more details). Transcripts contained in this file most probably correspond to lncRNAs.
 
 An example of an {INPUT}_RF_TGROC.png graphic obtained using automatic threshold, i.e. sensibility equal to specificity on 10-fold cross-validation:
 ![ScreenShot](./image/FEELnc_codpot_performance.png)
@@ -377,7 +377,7 @@ Foreach lncRNA interaction, a best lncRNA:RNA_partner interaction is identified 
 **- USAGE :**
 
 ```
-	FEELnc_classifier.pl -i lncRNA.gtf -a  ref_annotation.GTF > lncRNA_classes.txt
+  FEELnc_classifier.pl -i lncRNA.gtf -a  ref_annotation.GTF > lncRNA_classes.txt
 ```
 
 
@@ -385,8 +385,8 @@ Foreach lncRNA interaction, a best lncRNA:RNA_partner interaction is identified 
 
 If your input file is called **INPUT**, the classifier will create these output files:
 
-	 - {INPUT}_feelncclassifier.log: general statistics on the number of interactions
-	 - {INPUT}_classes.txt: tabulated-format file with all the interactions
+   - {INPUT}_feelncclassifier.log: general statistics on the number of interactions
+   - {INPUT}_classes.txt: tabulated-format file with all the interactions
 
 
 
@@ -436,7 +436,7 @@ Therefore, the possibly newly identified mRNAs in the previous step are not incl
 
 \* **Note2**:  you may see a warning message like this:
 
-	lncRNA_ID and ENSXXXX are overlapping in the same strand
+  lncRNA_ID and ENSXXXX are overlapping in the same strand
 Depending on your filtering options, this may correspond to a non-protein-coding transcript (pseudogene, miRNA) which overlaps the lncRNA
 
 **- FULL OPTIONS (FEELnc_classifier.pl --help) :**
@@ -457,6 +457,34 @@ Depending on your filtering options, this may correspond to a non-protein-coding
       -w,--window=200               Size of the window around the lncRNA to compute interactins/classification [default 10000]
       -m,--maxwindow=10000          Maximal size of the window during the expansion process [default 100000]
 ```
+**- FROM TRANSCRIPT TO GENE LEVEL :**
+
+The module provides a classifcation at the transcript level. To handle gene analysis a complementary module has been developped to classify lncRNAs according to the nearest PCG at the gene level. 
+
+To launch it  use :  
+```
+  Rscript FEELnc_tpLevel2gnLevelClassification.R "PATH/TO/GTF" "PATH/TO/{INPUT}_classes_feelncclassifier.txt"  "PATH/TO/{INPUT}_feelncclassifier.log"
+```
+
+However, to transfer the FEELnc information from the transcript level to the gene level, an order of importance has to be decided.
+The class names are composed of three parts:
+  - The first part (8 letters) is composed of the main class type. 
+    - For the genic classes: lncgSSex, lncgSSin, lncgASex, lncgASin. 
+    - For the intergenic classes: lincDivg,lincSSup, lincSSdw, lincConv.
+  - The second part (4 letters) concerns only the genic classes without subtype conflicts (see below), we add one of the three subtypes: Nested (Nest), Overlapping (Ovlp) or Containing (Cont)
+- The third part (_X1.X2.X3) indicates if/that there are conflicts between annotation due to several PCGs related to the lncRNA locus. 
+    - X1: number of transcripts of the lncRNA gene: “1” if 1 transcript, “n” if more than one transcript
+    - X2: number of feelnc class(es) associated to the lncRNA:PCG pair: “1” if 1 class, “n” if more than one class (the “unclassified” class does not count)
+    - X3: number of PCG gene(s) concerned by this (these) annotation(s): “1” if 1 PCG gene, “n” if more than one PCG gene.
+
+
+Conflicts cases are of two types: the cases in which there are more than 1 annotation relative to one unique PCG (as indicated by the “n” in the middle and “1” at the end of “n.n.1”), and the case in which there more than 1 or more annotation relative to more than 1 PCG (“n.X.n” in the feelLncPcgClassType column). In these cases, we prioritized the annotation in the column « feelLncPcgClassName», which gives only 1 class per gene :
+- n.n.1 case: Genics have priority over intergenics (lncg > linc). Among the genic, exonics have priority over intronics. Among exonics and intronics, the subtypes nested / containing / overlapping have the same importance. They are kept if they do not produce conflicts and are removed if there are 2 or more subtypes.
+- n.X.n case: Same order of priority as previously (n.n.1 case).
+
+Concerning the intergenics, there can be annotation conflicts between the several PCGs: the lncRNA can be classified as lincDivg with one PCG and lincConv with another one PCG (see figure  for an example). We prioritize the classes as following: Divg > SS > Conv. Same- strand have priority over Conv because it could suggest an error in the modelization: the lncRNA could be a 5’-part or 3’-part of the PCG. Between the same strand up and down (lincSSup and lincSSdw), we choose the closest. The third part of the class name of these genes is either “_n.n.n” or “_n.1.n”.
+
+![ScreenShot](./image/FEELnc_lncRNA_classification_geneLevel.png)
 
 ## Warnings
 
