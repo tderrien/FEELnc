@@ -123,11 +123,11 @@ Export PERL5LIB and FEELNCPATH variables
 
 Create a new environment containing FEELnc (and its dependencies):
 
-	conda create -p ~/feelnc_install_dir feelnc 
+	conda create -p ~/feelnc_install bioconda::feelnc 
 
 To activate it:
 
-	source activate ~/feelnc_install_dir 
+	source activate ~/feelnc_install 
 
 To deactivate it:
 
