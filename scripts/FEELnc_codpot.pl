@@ -511,6 +511,7 @@ The second step if the pipeline (FEELnc_codpot) aims at computing coding potenti
   --testorftype=3			Integer [0,1,2,3,4] to specify the type of longest ORF calculate [ default: 3 ] for test data set. See --learnortype description for more informations.
   --ntree				Number of trees used in random forest [ default 500 ]
   --percentage=0.1			Percentage of the training file use for the training of the kmer model. What remains will be used to train the random forest
+  -p,--processor=1			Number of processors used to run KmerInShort [ default 1 ]
 
 =head2 Debug arguments
 
